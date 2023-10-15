@@ -162,11 +162,9 @@ create table delivery_info(
 create table order_detail(
 	orderId int NOT NULL auto_increment,
     listingId int unsigned NOT NULL,
-    paymentId int NOT NULL,
     purchaseId int NOT NULL,
     quantity int NOT NULL,
     PRIMARY KEY(orderId),
-    FOREIGN KEY (`paymentId`) REFERENCES `payment` (`paymentId`),
     FOREIGN KEY (`listingId`) REFERENCES `item_listing` (`listingId`) ON DELETE CASCADE
 );
 
