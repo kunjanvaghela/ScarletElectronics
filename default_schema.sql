@@ -1,3 +1,4 @@
+
 /*Db Scripts*/
 
 create schema ScarletElectronics;
@@ -66,7 +67,11 @@ CREATE TABLE `ref_catalog` (
 
 CREATE TABLE `end_user` (
   `userId` int unsigned NOT NULL,
-  `address` varchar(50) DEFAULT NULL,
+  `address_line1` varchar(50) DEFAULT NULL,
+  `address_line2` varchar(50) DEFAULT NULL,
+  `address_city` varchar(50) DEFAULT NULL,
+  `address_state_code` varchar(2) DEFAULT NULL,
+  `address_zipcode` varchar(6) DEFAULT NULL,
   `phone_nr` varchar(15) DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -87,11 +92,14 @@ CREATE TABLE `item_listing` (
   `remarks` varchar(100) DEFAULT NULL,
   `updated_by` varchar(20) DEFAULT NULL,
   `updated_on` timestamp NULL DEFAULT NULL,
+  `quantity` int unsigned DEFAULT 0,
   PRIMARY KEY (`listingId`),
   KEY `sellerId` (`sellerId`),
   KEY `itemId` (`itemId`),
   CONSTRAINT `item_listing_ibfk_1` FOREIGN KEY (`sellerId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE,
-  CONSTRAINT `item_listing_ibfk_2` FOREIGN KEY (`itemId`) REFERENCES `ref_catalog` (`itemId`) ON DELETE CASCADE
+  CONSTRAINT `item_listing_ibfk_2` FOREIGN KEY (`itemId`) REFERENCES `ref_catalog` (`itemId`) ON DELETE CASCADE,
+  CHECK (`quantity` >= 0),
+  CHECK (`price` >= 0)
 );
 
 /*Support Request Table:*/
@@ -135,7 +143,11 @@ create table payment(
 	paymentId int NOT NULL auto_increment Primary key,
     userId int unsigned NOT NULL,
     name_on_card varchar(30) NOT NULL,
-    billing_address varchar(128) NOT NULL,
+	business_address_line1 varchar(50) DEFAULT NULL,
+    business_address_line2 varchar(50) DEFAULT NULL,
+    business_address_city varchar(50) DEFAULT NULL,
+    business_address_state_code varchar(2) DEFAULT NULL,
+    business_address_zipcode varchar(6) DEFAULT NULL,
     card_number varchar(128) NOT NULL,
     FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`)
 );
@@ -155,6 +167,11 @@ create table delivery_info(
     purchaseId int NOT NULL,
     estimated_delivery_date timestamp,
     actual_delivery_date timestamp,
+	delivery_address_line1 varchar(50) DEFAULT NULL,
+    delivery_address_line2 varchar(50) DEFAULT NULL,
+    delivery_address_city varchar(50) DEFAULT NULL,
+    delivery_address_state_code varchar(2) DEFAULT NULL,
+    delivery_address_zipcode varchar(6) DEFAULT NULL,
     FOREIGN KEY (`purchaseId`) REFERENCES `purchase` (`purchaseId`)
 );
 
@@ -189,4 +206,18 @@ create table favourite(
     FOREIGN KEY (`itemId`) REFERENCES `ref_catalog` (`itemId`)    
 );
 
--- drop schema ScarletElectronics;
+create table tax_and_delivery_table(
+	statecode varchar(2),
+    tax_percent int unsigned NOT NULL,
+	deliveryFee int unsigned NOT NULL,
+    is_active bit NOT NULL
+);
+
+create table promocode(
+	promocode varchar(15) NOT NULL primary key,
+    discount_percent int unsigned,
+	max_discount int NOT NULL,
+    is_active bit NOT NULL
+);
+
+drop schema ScarletElectronics;
