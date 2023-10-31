@@ -28,7 +28,7 @@
         <br> <br><br>
         <h2 class="text-center">SignUp/Login Form</h2>
 
-        <form action="/login" method="post" name="login">
+        <form action="/users/login" method="post" name="login">
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="exampleInputEmail1" class="form-label text-left">Email address</label>
                 <input type="email" class="form-control text-left" id="emailId" name="emailId" required>
@@ -38,11 +38,11 @@
                 <label for="exampleInputPassword1" class="form-label text-left">Password</label>
                 <input type="password" class="form-control text-left" id="password" name="password" required>
             </div>
-            <p class="small"><a class="text-primary" href="forgotpassword.jsp">Forgot password?</a></p>
+            <p class="small"><a class="text-primary" href="/users/forgot-password">Forgot password?</a></p>
 
             <div class="col-md-3 text-center mx-auto">
                 <button type="submit" class="btn btn-primary align-self-center">Log In</button>
-                <a class="btn btn-outline-success align-self-center" href="/register" role="button">Sign Up</a>
+                <a class="btn btn-outline-success align-self-center" href="/users/register" role="button">Sign Up</a>
             </div>
         </form>
         <br> <br>

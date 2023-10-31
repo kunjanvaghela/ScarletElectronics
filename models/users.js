@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'User',
         tableName: 'users',
         timestamps: false,  // This will remove the automatic timestamp fields (createdAt, updatedAt)
-        underscored: true,
+        //underscored: true,
         hooks: {
             beforeCreate: (user, options) => {
                 if (user.name) {
