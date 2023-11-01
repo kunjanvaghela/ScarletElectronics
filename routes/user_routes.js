@@ -12,7 +12,7 @@ const OTP = db.OTP;
 
 router.get("/Home_Landing", (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('Home_Laning');
+    res.render('Home_Landing');
 });
 
 router.get('/login', (req, res) => {
