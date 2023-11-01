@@ -80,6 +80,12 @@ module.exports = (sequelize, DataTypes) => {
         //underscored: true,
         
     })
-    
+    Catalog.sync({ force: false })
+        .then(() => {
+            console.log('catalog table has been successfully created, if one doesnt exist');
+        })
+        .catch(error => {
+            console.log('This error occured', error);
+        });
     return Catalog;
 };
