@@ -7,7 +7,7 @@ const Catalog = db.Catalog;
 
 router.get("/", (req, res) => {
     console.log('Working');
-    res.render('seller_listing', Catalog);
+    res.render('seller_listing');
 });
 
 router.get("/get-existing-listing", (req, res) => {
