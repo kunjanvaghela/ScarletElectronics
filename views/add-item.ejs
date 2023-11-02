@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Item</h1>
+    <form action="/additem" method="POST" action="/add-item/insert">
+        <!-- Item Name -->
+        <label for="itemName">Item Name:</label>
+        <input type="text" name="itemName" id="itemName" required>
+        
+        <!-- Description -->
+        <label for="description">Description:</label>
+        <textarea name="description" id="description" rows="4" cols="50"></textarea>
+        
+        <!-- Item Image -->
+        <label for="itemImage">Item Image:</label>
+        <input type="file" name="itemImage" id="itemImage" accept="image/*">
+        
+        <!-- Category -->
+        <label for="category">Category:</label>
+        <input type="text" name="category" id="category">
+        
+        <!-- CPU -->
+        <label for="CPU">CPU:</label>
+        <input type="text" name="CPU" id="CPU">
+        
+        <!-- GPU -->
+        <label for="GPU">GPU:</label>
+        <input type="text" name="GPU" id="GPU">
+        
+        <!-- RAM -->
+        <label for="RAM">RAM:</label>
+        <input type="text" name "RAM" id="RAM">
+        
+        <!-- Storage -->
+        <label for="storage">Storage:</label>
+        <input type="text" name="storage" id="storage">
+        
+        <!-- Operating System -->
+        <label for="operatingSystem">Operating System:</label>
+        <input type="text" name="operatingSystem" id="operatingSystem">
+        
+        <!-- Screen Size -->
+        <label for="screenSize">Screen Size:</label>
+        <input type="text" name="screenSize" id="screenSize">
+        
+        <!-- Screen Type -->
+        <label for="screenType">Screen Type:</label>
+        <input type="text" name="screenType" id="screenType">
+        
+        <!-- Screen Resolution -->
+        <label for="screenResolution">Screen Resolution:</label>
+        <input type="text" name="screenResolution" id="screenResolution">
+        
+        <!-- Front Camera -->
+        <label for="frontCamera">Front Camera:</label>
+        <input type="text" name="frontCamera" id="frontCamera">
+        
+        <!-- Rear Camera -->
+        <label for="rearCamera">Rear Camera:</label>
+        <input type="text" name="rearCamera" id="rearCamera">
+        
+        <button type="submit">Add Item</button>
+    </form>
+</body>
+</html>
