@@ -1,3 +1,4 @@
+const { encrypt, decrypt } = require('../util/encryptionUtil'); 
 const IV_LENGTH = 16;
 module.exports = (sequelize, DataTypes) => {
     const Catalog = sequelize.define('Catalog', {
@@ -5,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false
+            allowNull: false,
           },
           name: {
             type: DataTypes.STRING(350),
@@ -13,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
           },
           description: {
             type: DataTypes.STRING(1000),
+            defaultValue: "NA",
             allowNull: false,
           },
           category: {
