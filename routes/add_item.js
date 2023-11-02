@@ -11,7 +11,7 @@ const Catalog = db.Catalog;
 
 router.get("/add", (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('add-item');
+    res.render('additem');
 });
 
 
@@ -33,7 +33,7 @@ router.post('/insert', async (req, res) => {
         
         const catalog = await Catalog.create(catalogData);
         // Handle the response after success
-        res.redirect('add');  // Redirect to login or any other page
+        res.redirect('/item-listing');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
         console.error('Error occurred:', error);
