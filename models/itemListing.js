@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const ItemListing = sequelize.define('Staff', {
+    const ItemListing = sequelize.define('ItemListing', {
         listingId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -34,11 +34,18 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         sequelize,
-        modelName: 'Staff',
+        modelName: 'ItemListing',
         tableName: 'item_listing',
         timestamps: false,  // This will remove the automatic timestamp fields (createdAt, updatedAt)
         //underscored: true,
     }
     );
+    ItemListing.sync({ force: false })
+        .then(() => {
+            console.log('item_listing table has been successfully synched');
+        })
+        .catch(error => {
+            console.log('item_listing sync error occured : ', error);
+        });
     return ItemListing;
 }

@@ -25,4 +25,23 @@ router.get("/get-existing-listing", (req, res) => {
     
 });
 
+router.post('/create', async (req, res) => {
+  // Get data from request
+  const itemListingData = req.body;
+  const ItemListing = db.ItemListing;
+  itemListingData.sellerId = 15; // Temporary
+  console.log(itemListingData);
+
+  try {
+      // const user = await User.create(userData);
+      await ItemListing.create(itemListingData);
+      // Handle the response after success
+      res.redirect('/item-listing');  // Redirect to login or any other page
+  } catch (error) {
+      // Handle the error response
+      console.error('Error occurred:', error);
+      res.status(500).send('Error occurred');
+  }
+});
+
 module.exports = router;

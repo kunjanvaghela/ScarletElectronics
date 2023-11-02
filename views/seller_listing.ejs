@@ -11,67 +11,230 @@
 
 <body>
     <h1 class="text-primary text-center mx-auto">Item Listing Page</h1>
-    <div class="col-md-3 text-center mx-auto">
-        <a class="btn btn-outline-success align-self-center" href="/item-listing/get-existing-listing" role="button">Get Listing</a>
-    </div>
-    
-    <div class="col-md-3 text-center mx-auto">
-        <%if(typeof Catalog !== 'undefined' && Catalog !== 'null'){%>
-        <table class="table table-bordered" id="itemCatalog" cellspacing="0" width="100%">
-            <thead>
-                <th>itemId</th>
-                <th>name</th>
-                <!-- <th>description</th>
-                <th>category</th>
-                <th>cpu</th>
-                <th>gpu</th>
-                <th>ram</th>
-                <th>storage</th>
-                <th>operating_system</th>
-                <th>screen_size</th>
-                <th>front_camera</th>
-                <th>rear_camera:</th>
-                <th>itemImage</th> -->
-                <th>listing_Status</th>
-                <th>approval_Status</th>
-                <th>created_on</th>
-                <th>created_by</th>
-                <!-- <th>remarks</th> -->
-                <th>updated_by</th>
-                <th>updated_on</th>
+    <div>
+        <div class="row">
+            <div class="col-md-2 vh-100">
+                <form id="itemFilter1" name="itemFilter" method="get"
+                    action="">
+                    <div align="center">
 
-            </thead>
-            <tbody>
+                        <br>
+                        <br>
+                        <h4>Item Filter</h4>
+                        <br> <br> <label for="itemName"
+                            class="filterOptionStyling">Item name:</label> <input
+                            type="text" id="itemName" name="itemName"
+                            class="filterOptionStyling"> <br>
+                        <br> <select name="category" class="filterOptionStyling">
+                            <option value="">Select Category</option>
+                            <c:forEach items="${listUniqueCategory}"
+                                var="listUniqueCategory">
+                                <option>${listUniqueCategory}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="cpu" class="filterOptionStyling">
+                            <option value="">Select CPU</option>
+                            <c:forEach items="${listUniqueCPU}" var="listUniqueCPU">
+                                <option>${listUniqueCPU}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="gpu" class="filterOptionStyling">
+                            <option value="">Select GPU</option>
+                            <c:forEach items="${listUniqueGPU}" var="listUniqueGPU">
+                                <option>${listUniqueGPU}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="ram" class="filterOptionStyling">
+                            <option value="">Select RAM</option>
+                            <c:forEach items="${listUniqueRAM}" var="listUniqueRAM">
+                                <option>${listUniqueRAM}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="storage" class="filterOptionStyling">
+                            <option value="">Select Storage</option>
+                            <c:forEach items="${listUniqueStorage}" var="listUniqueStorage">
+                                <option>${listUniqueStorage}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="os" class="filterOptionStyling">
+                            <option value="">Select Operating System</option>
+                            <c:forEach items="${listUniqueOS}" var="listUniqueOS">
+                                <option>${listUniqueOS}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="screenSize" class="filterOptionStyling">
+                            <option value="">Select Screen Size</option>
+                            <c:forEach items="${listUniqueScreenSize}"
+                                var="listUniqueScreenSize">
+                                <option>${listUniqueScreenSize}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="screenType" class="filterOptionStyling">
+                            <option value="">Select Screen Type</option>
+                            <c:forEach items="${listUniqueScreenType}"
+                                var="listUniqueScreenType">
+                                <option>${listUniqueScreenType}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="screenRes" class="filterOptionStyling">
+                            <option value="">Select Screen Resolution</option>
+                            <c:forEach items="${listUniqueScreenRes}"
+                                var="listUniqueScreenRes">
+                                <option>${listUniqueScreenRes}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="frontCam" class="filterOptionStyling">
+                            <option value="">Select Front Camera</option>
+                            <c:forEach items="${listUniqueFrontCam}"
+                                var="listUniqueFrontCam">
+                                <option>${listUniqueFrontCam}</option>
+                            </c:forEach>
+                        </select> <br>
+                        <br> <select name="rearCam" class="filterOptionStyling">
+                            <option value="">Select Rear Camera</option>
+                            <c:forEach items="${listUniqueRearCam}" var="listUniqueRearCam">
+                                <option>${listUniqueRearCam}</option>
+                            </c:forEach>
+                        </select> <br> <br>
+                        <br>
+                        <!-- <input type="submit" value="Search" /> -->
+                        <!-- <input type="submit" value="Search" name="Search" id="Search" /> -->
+                        <button type="submit">Apply Filter</button>
+
+                        <button type="submit" formaction="">Clear Filter</button>
+                    </div>
+                </form>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <p></p>
+            </div>
+            <div class="col-md-2 vh-100">
+                <div class="row">
+                    <div class="col-md-3 text-center mx-auto">
+                        <a class="btn btn-outline-success align-self-center" href="/item-listing/get-existing-listing" role="button">Add Item</a>
+                    </div>
+                    <div class="col-md-3 text-center mx-auto">
+                        <a class="btn btn-outline-success align-self-center" href="/item-listing/get-existing-listing" role="button">Get Items</a>
+                    </div>
+                </div>
                 
-                <%Catalog.forEach((y) => {%>
-                    <tr>
-                        
-                        <td><%=y.itemId%></td>
-                        <td><%=y.name%></td>
-                        <!-- <td><%=y.description%></td>
-                        <td><%=y.category%></td>
-                        <td><%=y.cpu%></td>
-                        <td><%=y.gpu%></td>
-                        <td><%=y.ram%></td>
-                        <td><%=y.storage%></td>
-                        <td><%=y.operating_system%></td>
-                        <td><%=y.screen_size%></td>
-                        <td><%=y.front_camera%></td>
-                        <td><%=y.rear_camera%></td>
-                        <td><%=y.itemImage%></td> -->
-                        <td><%=y.listing_Status%></td>
-                        <td><%=y.approval_Status%></td>
-                        <td><%=y.created_on%></td>
-                        <td><%=y.created_by%></td>
-                        <!-- <td><%=y.remarks%></td> -->
-                        <td><%=y.updated_by%></td>
-                        <td><%=y.updated_on%></td>
-                    </th>
-                <%})%>
-                <%}%>
-            </tbody>
-        </table>
+                <div class="col-md-3 text-center mx-auto">
+                    <form action="/item-listing/create" method="POST" id="createitemlisting" name="createitemlisting">
+                        <%if(typeof Catalog !== 'undefined' && Catalog !== 'null'){%>
+                        <table class="table table-bordered" id="itemCatalog" cellspacing="0" width="100%">
+                            <thead>
+                                <th>Select Item</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>CPU</th>
+                                <th>GPU</th>
+                                <th>RAM</th>
+                                <th>Storage</th>
+                                <th>OS</th>
+                                <th>Screen Size</th>
+                                <th>Front Cam</th>
+                                <th>Rear Cam</th>
+                                <!-- <th>itemImage</th>
+                                <th>listing_Status</th>
+                                <th>approval_Status</th>
+                                <th>created_on</th>
+                                <th>created_by</th>
+                                <th>remarks</th>
+                                <th>updated_by</th>
+                                <th>updated_on</th>-->
+
+                            </thead>
+                            <tbody>
+                                
+                                <%Catalog.forEach((y) => {%>
+                                    <tr>
+                                        <td><input type="radio" id="itemId"
+                                            name="itemId"
+                                            value=<%=y.itemId%> ></td>
+                                        <!-- <td><%=y.itemId%></td> -->
+                                        <td><%=y.name%></td>
+                                        <td><%=y.description%></td>
+                                        <td><%=y.category%></td>
+                                        <td><%=y.cpu%></td>
+                                        <td><%=y.gpu%></td>
+                                        <td><%=y.ram%></td>
+                                        <td><%=y.storage%></td>
+                                        <td><%=y.operating_system%></td>
+                                        <td><%=y.screen_size%></td>
+                                        <td><%=y.front_camera%></td>
+                                        <td><%=y.rear_camera%></td>
+                                        <!-- <td><%=y.itemImage%></td>
+                                        <td><%=y.listing_Status%></td>
+                                        <td><%=y.approval_Status%></td>
+                                        <td><%=y.created_on%></td>
+                                        <td><%=y.created_by%></td>
+                                        <td><%=y.remarks%></td>
+                                        <td><%=y.updated_by%></td>
+                                        <td><%=y.updated_on%></td> -->
+                                    </th>
+                                <%})%>
+                                <%}%>
+                            </tbody>
+                        </table>
+                        <table>
+                            <tr>
+                                <td>Price:</td>
+                                <td><input type="number" step="0.01" name="price" id="price" /></td>
+                            </tr>
+                            <tr>
+                                <td>Quantity:</td>   <td><input type="number" step="1" name="quantity" id="quantity" /></td> 
+                            </tr>
+                            <tr>
+                                <td><input type="submit" value="Submit" class="btn btn-primary"
+										onclick="return validateForm()" /></td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>  
+        </div>
     </div>
 </body>
+
+
+<script>
+    function validateForm() {
+        const priceInput = document.getElementById('price');
+        const quantityInput = document.getElementById('quantity');
+        
+        
+        var radioButtons = document.getElementsByName("itemId");
+        var selected = false;
+        for (var i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                selected = true;
+                break;
+            }
+        }
+        if (!selected) {
+            alert("Please select an item.");
+            return false;
+        }
+        
+        if (priceInput.value === '') {
+            alert('Please fill in Initial Price');
+            return false;
+        }
+        else if (quantityInput.value === '') {
+            alert('Please fill in Bid Increment');
+            return false;
+        }
+        else {
+            
+            return true;
+        }
+    }
+</script>
 
 </html>
