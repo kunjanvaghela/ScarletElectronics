@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
           },
           description: {
             type: DataTypes.STRING(1000),
-            defaultValue: "x",
+            defaultValue: "NA",
             allowNull: false,
           },
           category: {

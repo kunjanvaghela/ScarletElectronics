@@ -47,4 +47,19 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 const User = require('./users.js')(sequelize, Sequelize.DataTypes);
 
+const EndUser = require('./endusers.js')(sequelize, Sequelize.DataTypes);
+User.hasOne(EndUser, { foreignKey: 'userId' });
+EndUser.belongsTo(User, { foreignKey: 'userId' });
+
+const Staff = require('./staff.js')(sequelize, Sequelize.DataTypes);
+User.hasOne(Staff, { foreignKey: 'userId' });
+Staff.belongsTo(User, { foreignKey: 'userId' });
+
+const ItemListing = require('./itemListing.js')(sequelize, Sequelize.DataTypes);
+const Catalog = require('./catalog.js')(sequelize, Sequelize.DataTypes);
+ItemListing.belongsTo(EndUser, { foreignKey: 'sellerId' });
+ItemListing.belongsTo(Catalog, { foreignKey: 'itemId' }); // Need to check re-Catalog object name
+
+// console.log("Db object : ", db);
+
 module.exports = db;
