@@ -7,6 +7,7 @@ const { encrypt, decrypt } = require('../util/encryptionUtil'); // Assuming the 
 
 const db = require('../models');
 const { where } = require('sequelize');
+const EndUser = db.EndUsers;
 const User = db.User;
 const OTP = db.OTP;
 
@@ -36,7 +37,13 @@ router.post('/registerUser', async (req, res) => {
     console.log(userData);
 
     try {
-        const user = await User.create(userData);
+        // const user = await User.create(userData);
+        await User.create(userData).then((user) => {
+            userData.userId = user.userid;
+            console.log("User Inserted, now have to insert EndUser");
+            console.log(userData);
+            EndUser.create(userData);
+        });
         // Handle the response after success
         res.redirect('Home_Landing');  // Redirect to login or any other page
     } catch (error) {
