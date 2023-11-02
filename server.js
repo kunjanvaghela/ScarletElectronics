@@ -11,6 +11,7 @@ const db = require('./models');
 const { where } = require('sequelize');
 const User = db.User;
 const OTP = db.OTP;
+const Catalog = db.Catalog;
 
 OTP.belongsTo(User, {
     foreignKey: 'emailId',
@@ -25,7 +26,7 @@ app.set('view engine', 'ejs');
 
 
 app.use('/users', userRouter);
-app.use('/add-item/insert', addItem);
+app.use('/add-item', addItem);
 
 
 // app.post('/forgot-password', (req, res, next) => {

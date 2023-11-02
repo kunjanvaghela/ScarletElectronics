@@ -9,18 +9,31 @@ const { where } = require('sequelize');
 const Catalog = db.Catalog;
 
 
+router.get("/add", (req, res) => {
+    console.log('Successfully in Root :Inssss:sss:: /');
+    res.render('add-item');
+});
 
 
-router.post('/add-item/insert', async (req, res) => {
+router.post('/insert', async (req, res) => {
     // Get data from request
-    const CatalogData = req.body;
+    const catalogData = req.body;
     const Catalog = db.Catalog;
-    console.log(CatalogData);
+
+    catalogData.listing_Status = 'Active'; // Example value
+    catalogData.approval_Status = 'Approved'; // Example value
+    catalogData.created_on = new Date();
+    catalogData.remarks = 'No remarks'; // Example value
+    catalogData.updated_on = new Date();
+
+    console.log(catalogData);
+    
 
     try {
-        const Catalog = await Catalog.create(CatalogData);
+        
+        const catalog = await Catalog.create(catalogData);
         // Handle the response after success
-        res.redirect('add-item/insert');  // Redirect to login or any other page
+        res.redirect('add');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
         console.error('Error occurred:', error);
