@@ -28,6 +28,8 @@ app.use('/users', userRouter);
 
 app.use('/item-listing', itemListing);
 
+app.use('/cart',cart);
+
 // app.post('/forgot-password', (req, res, next) => {
 //     const  { emailId } = req.body;
 //     console.log("In POST forgot Password " + emailId);
