@@ -25,6 +25,7 @@ const User = db.User;
 const Cart = db.Cart;
 const ItemListing = db.ItemListing;
 const Catalog = db.Catalog;
+const Promocode = db.Promocode;
 
 
 async function check_email(req,res)
@@ -159,6 +160,23 @@ router.post('/update-itemlisting', async (req, res)=>
 
     console.log("listingId: ", listingId);
     console.log("updateCount: ", updateCount);
+
+    if (updateCount < 0)
+    {
+        //return 400 error - updateCount cannot be negative
+        res.status(400).send("updateCount cannot be negative");
+        console.log("updateCount cannot be negative");
+        return;
+    }
+
+    if (updateCount == 0)
+    {
+        //remove listingId from cart
+        const deleteListingId = await Cart.destroy({where:{userId:userid, listingId:listingId}});
+        //return success message
+        res.status(200).send("listingId deleted from cart successfully");
+        return;
+    }
 
     //check if listingId exists in db
     const listingIdExists = await ItemListing.findOne({where:{listingId:listingId}});
@@ -348,9 +366,40 @@ router.get('/display-shipping-charges', async (req, res)=>
 
 });
 
-router.get('/check-promo-code', async (req, res)=>
+router.post('/check-promo-code', async (req, res)=>
 {
     console.log("check-promo-code inside ------------------------")
+
+    //parse promoCode from request
+    //parse query parameters
+    console.log("req.query: ", req.body);
+    const promoCode = req.body.promoCode;
+
+    console.log("promoCode: ", promoCode);
+
+    //check if promoCode exists in db
+    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+
+    if(!promoCodeData)
+    {
+        //return 404 error - promoCode does not exist in db
+        res.status(404).send("promoCode does not exist in db");
+        console.log("promoCode does not exist in db");
+        return;
+    }
+
+    // check if promoCode is active
+    if(promoCodeData.dataValues.is_active == false)
+    {
+        //return 400 error - promoCode is not active
+        res.status(400).send("promoCode is not active");
+        console.log("promoCode is not active");
+        return;
+    }
+
+    //return success message
+    res.status(200).send("promoCode is active");
+    
 
 });
 
