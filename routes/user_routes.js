@@ -26,6 +26,26 @@ router.get('/register', (req, res) => {
     res.render('register');
 });
 
+router.get('/cart', (req, res) => {
+    const fields = [
+      { name: 'email', label: 'Email', type: 'text' },
+      { name: 'password', label: 'Password', type: 'password' },
+      // Add more fields as needed
+    ];
+  
+    res.render('cartPage', { fields });
+});
+
+router.get('/checkout', (req, res) => {
+    const itemsArray = [
+        { item: 'item1', qty: 2, cost_qty: 10 , cost_item: 10 },
+        { item: 'item2', qty: 1, cost_qty: 5 , cost_item: 10 },
+        // Add more items as needed
+    ];
+  
+    res.render('checkoutPage', { itemsArray });
+});
+
 router.get('/forgot-password', (req, res, next) => {
     res.render('forgot-password');
 });
