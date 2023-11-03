@@ -1,0 +1,11 @@
+To do for landing page:
+
++ Shop by Categoery: column icons
++ fix slider
+	ref:
+		1. https://www.youtube.com/watch?v=j18CH0Grhbw&pp=ygUbaHRtbCBjc3MgcGljdHVyZSBzbGlkZXNob3cg&ab_channel=CodeInstinct
+		2. https://www.youtube.com/watch?v=McPdzhLRzCg&ab_channel=Skillthrive
+		3. https://www.youtube.com/watch?v=0wvrlOyGlq0&ab_channel=CodingSnow
++ dynamic 
+	ref: https://www.youtube.com/watch?v=aoQ6S1a32j8&ab_channel=freeCodeCamp.org
++ functional link
