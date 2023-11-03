@@ -55,7 +55,7 @@ router.get('/forgot-password', (req, res, next) => {
 router.post('/registerUser',upload.none(), async (req, res) => {
     const recaptchaResponse = req.body['g-recaptcha-response'];
     console.log("IN REGISTER USER NOW WILL PRINT REQ")
-    console.log(req)
+    //console.log(req)
     // Check if CAPTCHA response is present
     if (!recaptchaResponse) {
         return res.status(400).json({ message: 'Please complete the CAPTCHA.BACKEND' });
@@ -72,14 +72,14 @@ router.post('/registerUser',upload.none(), async (req, res) => {
 
         const userData = req.body;
         const User = db.User;
-        console.log(userData);
+        console.log("USERDATA BEFORE INSERT",userData);
 
-        // await User.create(userData).then((user) => {
-        //     userData.userId = user.userid;
-        //     console.log("User Inserted, now have to insert EndUser");
-        //     console.log(userData);
-        //     //EndUser.create(userData);
-        // });
+        await User.create(userData).then((user) => {
+            userData.userId = user.userid;
+            console.log("User Inserted, now have to insert EndUser");
+            console.log(userData);
+            //EndUser.create(userData);
+        });
 
         return res.status(200).json({ message: 'Welcome ' + User.name + ',  Registration Successful' });
 
@@ -93,9 +93,10 @@ router.post('/registerUser',upload.none(), async (req, res) => {
 router.post('/login', async (req, res) => {
     const { emailId, password } = req.body;
     const User = db.User;
+    console.log("IN login")
 
     const recaptchaResponse = req.body['g-recaptcha-response'];
-    console.log(req)
+    //console.log(req)
     // Check if CAPTCHA response is present
     if (!recaptchaResponse) {
         return res.status(400).json({ message: 'Please complete the CAPTCHA.' });
@@ -135,9 +136,9 @@ router.post('/login', async (req, res) => {
             httpOnly: true
         });
 
-        // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+         return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' }); //SERVER EXPECTS JSON.
       // return res.status(201).redirect('/users/Home_Landing');  // Manad's redirection
-        return res.status(200).render('seller_listing');
+        //return res.status(200).render('seller_listing'); //WAS THIS
     } catch (error) {
         console.error('Error during login:', error);
         return res.status(401).render("loginPage" , {message: 'Login Failed Please use valid Credentials'});
