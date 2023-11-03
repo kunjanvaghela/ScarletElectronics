@@ -323,7 +323,7 @@ router.get('/fetch-cart', async (req, res)=>
     console.log("cartDetails: ", cartDetails);
 
     //return cart details
-    res.render('cart',{cartDetails});
+    res.render('cart',{ cartDetails });
     // res.status(200).send(cartDetails);
 
 });
