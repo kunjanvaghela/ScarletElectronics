@@ -45,6 +45,27 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+console.log("Starting to create assosciations!!");
 const User = require('./users.js')(sequelize, Sequelize.DataTypes);
+
+const EndUser = require('./endusers.js')(sequelize, Sequelize.DataTypes);
+// User.hasOne(EndUser, { foreignKey: 'userId' });
+// EndUser.belongsTo(User, { foreignKey: 'userId' });
+
+const Staff = require('./staff.js')(sequelize, Sequelize.DataTypes);
+// User.hasOne(Staff, { foreignKey: 'userId' });
+// Staff.belongsTo(User, { foreignKey: 'userId' });
+
+const ItemListing = require('./itemListing.js')(sequelize, Sequelize.DataTypes);
+// EndUser.hasMany(ItemListing, { foreignKey: 'sellerId' });
+// ItemListing.belongsTo(EndUser, { foreignKey: 'sellerId' });
+
+const Catalog = require('./catalog.js')(sequelize, Sequelize.DataTypes);
+// Catalog.hasMany(ItemListing, { foreignKey: 'itemId' });
+// ItemListing.belongsTo(Catalog, { foreignKey: 'itemId' });
+console.log("Assosciations created!!");
+
+// console.log("Db object : ", db);
 
 module.exports = db;

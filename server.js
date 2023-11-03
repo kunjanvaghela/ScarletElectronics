@@ -2,6 +2,7 @@ console.log('server.js loaded');
 const express = require('express');
 const jwt = require("jsonwebtoken");
 const userRouter = require("./routes/user_routes.js");
+const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
 const cart = require("./routes/cart_routes.js");
 
@@ -12,6 +13,7 @@ const db = require('./models');
 const { where } = require('sequelize');
 const User = db.User;
 const OTP = db.OTP;
+const Catalog = db.Catalog;
 
 OTP.belongsTo(User, {
     foreignKey: 'emailId',
@@ -26,6 +28,8 @@ app.set('view engine', 'ejs');
 
 
 app.use('/users', userRouter);
+app.use('/add-item', addItem);
+
 
 app.use('/item-listing', itemListing);
 
