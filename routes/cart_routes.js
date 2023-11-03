@@ -21,6 +21,7 @@ const router = express.Router();
 const db = require('../models');
 const { where } = require('sequelize');
 const cart = require("../models/cart");
+const userUtil = require("../util/userUtil");
 const User = db.User;
 const Cart = db.Cart;
 const ItemListing = db.ItemListing;
@@ -29,68 +30,6 @@ const Promocode = db.Promocode;
 
 router.use(express.urlencoded({ extended: true }));
 
-
-async function check_email(req,res)
-{
-    try{
-
-        //parse emailId from request
-        //parse query parameters
-        console.log("req.body: ", req.body);
-        const emailId = req.body.emailId;
-    
-        if(emailId === undefined)
-        {
-            return false;
-        }
-        const user_email = await  User.findOne({where: {'emailId': emailId}});
-        if(user_email !== null)
-        {
-            const dbemail = user_email.get({ plain: true });
-            console.log("Found User: ", dbemail);
-            
-            //get details of user from db
-            user_details = await User.findOne({where:{emailId:emailId}});
-            return user_details;
-        }
-        else
-        {   
-            //return 404 error - user not found
-            res.status(400).send("User not found");
-            console.log("User not found");
-            return false;
-        }
-        
-    }
-    catch(err)
-    {
-        console.log("Error Caught" + err);
-        //return 500 error - Internal Server Error
-        res.status(500).send("Internal Server Error");
-        return false;
-    }
-}
-
-async function authent(req,res)
-{
-    console.log("authent inside ------------------------");
-    console.log(req.body);
-    authentication = await check_email(req,res)
-
-    if(!authentication)
-    {
-        //return invalid authorization token
-        res.status(401).send("Invalid Authorization Token");
-        console.log("Invalid Authorization Token");
-        return [false, null];
-    }
-
-    console.log("user id: ", authentication.dataValues.userid);
-    //get cart details from db
-
-    //return authentication_status and user id
-    return [true, authentication.dataValues.userid];
-}
 
 router.post('/add-itemlisting', async (req, res)=>
 {

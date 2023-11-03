@@ -16,6 +16,11 @@ router.get("/Home_Landing", (req, res) => {
     res.render('Home_Landing');
 });
 
+router.get("/", (req, res) => {
+    console.log('Successfully in Landing Page');
+    res.render('index_Landing');
+});
+
 router.get('/login', (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
     res.render('loginPage');
