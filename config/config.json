@@ -1,13 +1,13 @@
 {
-  "development2": {
+  "development": {
     "username": "root",
-    "password": "manad",
+    "password": "Mitul14$",
     "database": "scarletelectronics",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
 
-"development": {
+"development2": {
   "username": "ucqjbqovzep1waym",
   "password": "ERQVg4nWFFhjNrVkyOV3",
   "database": "bjy4c3bfqe9mnlvfzpwb",
