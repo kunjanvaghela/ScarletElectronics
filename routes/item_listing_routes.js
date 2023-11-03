@@ -76,8 +76,10 @@ router.get("/get-existing-listing", (req, res) => {
 router.post('/create', async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
-  itemListingData.sellerId = 15; // Temporary
-  req.cookies;
+  // itemListingData.sellerId = 15; // Temporary
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
+  itemListingData.sellerId = userDetails.userid;
   console.log(itemListingData);
 
   try {
