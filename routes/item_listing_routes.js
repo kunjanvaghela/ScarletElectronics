@@ -7,8 +7,13 @@ const Catalog = db.Catalog;
 const ItemListing = db.ItemListing;
 const UserUtil = require('../util/userUtil');
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   console.log('Working');
+
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  const username = userDetails.name;
+  // console.log('username : ', userDetails);
+  // console.log('username : ', username);
 
   ItemListing.findAll({
     include: [Catalog],
@@ -37,7 +42,7 @@ router.get("/", (req, res) => {
     });
 
     // Send the serialized data as a response
-    res.render('listings', {serializedListings});
+    res.render('listings', {serializedListings, username});
     // res.render('seller_listing', {serializedListings})
   }).catch((error) => {
     console.error('Error retrieving data:', error);
