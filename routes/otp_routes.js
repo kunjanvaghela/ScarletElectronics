@@ -7,6 +7,7 @@ const User = db.User;
 const OTP = db.OTP;
 
 router.post('/', async (req, res)=>{
+    
     try{
         const { emailId } = req.body;
         const user_email = await  User.findOne({where: {emailId: emailId}});
@@ -17,18 +18,23 @@ router.post('/', async (req, res)=>{
             console.log("Found User: ", dbemail);
             const createdOPT = await sendOTP({email:emailId,subject :"OPT Verification from ScarletElectronics", message:"This is message for OTP verification", duration :1});
             
+            res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.header('Pragma', 'no-cache');
+            res.header('Expires', 0);
             res.status(200).render('otp_validation', {emailId});
             return;
         }
         else
         {   
-            res.status(400).render('forgot-password');
+
+            res.status(400).render('forgot-password', {message : "User not found. Please sign up first!!"});
         }
         
     }
     catch(err)
     {
         console.log("Error Caught" + err);
+        res.status(400).redirect('/users/login');
     }
 });
 
