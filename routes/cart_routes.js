@@ -245,7 +245,6 @@ router.post('/remove-itemlisting', async (req, res)=>
 
 });
 
-
 router.get('/fetch-cart-display', async (req, res)=>
 {
     //get authentication status and user id
@@ -270,6 +269,23 @@ router.get('/fetch-cart-display', async (req, res)=>
 
 });
 
+router.post('/fetch-cart-display', async (req, res)=>
+{
+    //get authentication status and user id
+    const [authentication, userId] = await authent(req,res);
+    
+    if(!authentication)
+    {
+        return;
+    }
+    console.log("fetch-cart inside ------------------------")
+    //display 
+    console.log("req.body: ", req.body);
+
+    res.redirect('/cart/get-final-cost');
+
+});
+
 router.get('/fetch-cart', async (req, res)=>
 {
     console.log("fetch-cart inside ------------------------")
@@ -286,12 +302,19 @@ router.get('/fetch-cart', async (req, res)=>
     const cartDetails = await get_cart(userId);
     
     console.log("cartDetails: ", cartDetails);
+    
+    //add total price to cartDetails
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
+    }
+
+
 
     //return cart details
-    res.status(200).send(cartDetails);
+    res.status(200).send(cartDetails,{cartDetails});
 
 });
-
 
 router.post('/flush', async (req, res)=>
 {
@@ -312,30 +335,24 @@ router.post('/flush', async (req, res)=>
     res.status(200).send("Cart flushed successfully");
 });
 
-
-
 router.get('/get-payment-information', async (req, res)=>
 {
     console.log("get-payment-information inside ------------------------")
-
 });
 
 router.post('/add-payment-information', async (req, res)=>
 {
     console.log("add-payment-information inside ------------------------")
-
 });
 
 router.get('/fetch-address', async (req, res)=>
 {
     console.log("fetch-address inside ------------------------")
-
 });
 
 router.get('/display-shipping-charges', async (req, res)=>
 {
     console.log("display-shipping-charges inside ------------------------")
-
 });
 
 router.post('/check-promo-code', async (req, res)=>
@@ -378,6 +395,44 @@ router.post('/check-promo-code', async (req, res)=>
 router.get('/get-final-cost', async (req, res)=>
 {
     console.log("get-final-cost inside ------------------------")
+    
+    const [authentication, userId] = await authent(req,res);
+    
+    if(!authentication)
+    {
+        return;
+    }
+    //get cart body
+    cartDetails = await get_cart(userId)
+
+    total_price = 0;
+    // calculate total price of each listing
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
+        total_price += cartDetails[i].totalPrice;
+    }
+
+
+    
+    
+    promocode = -50
+    sales = total_price*0.1
+    finalPrice = total_price - promocode + sales
+
+    //convert to string
+    promoCode = promocode.toString();
+
+
+    res.render('checkout',{
+        cartDetails:cartDetails,
+        TotalPrice:total_price,
+        Promocode: promocode,
+        Sales:sales,
+        FinalPrice:finalPrice
+    });
+    res.render()
+
 
 });
 
