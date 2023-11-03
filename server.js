@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
+const cart = require("./routes/cart_routes.js");
 
 const mysql = require('mysql2');
 const { encrypt, decrypt } = require('./util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory
@@ -31,6 +32,8 @@ app.use('/add-item', addItem);
 
 
 app.use('/item-listing', itemListing);
+
+app.use('/cart',cart);
 
 // app.post('/forgot-password', (req, res, next) => {
 //     const  { emailId } = req.body;
