@@ -43,8 +43,9 @@ router.post('/registerUser', async (req, res) => {
             console.log("User Inserted, now have to insert EndUser");
             console.log(userData);
             EndUser.create(userData);
+
         });
-        // Handle the response after success
+
         res.redirect('Home_Landing');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
@@ -72,7 +73,18 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'You have entered Invalid password, '+user.name+'' });
         }
 
-        return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+        // Calculate the expiration time as the current time + 10 minutes
+        const tenMinutes = 1000 * 60 * 10; // 10 minutes in milliseconds
+        const expiresAt = new Date(Date.now() + tenMinutes);
+        
+        // Handle the response after success
+        res.cookie('emailId', user.emailId, {
+            expires : expiresAt,
+            httpOnly: true
+        });
+
+        // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+        return res.status(200).render('seller_listing');
 
     } catch (error) {
         console.error('Error during login:', error);
