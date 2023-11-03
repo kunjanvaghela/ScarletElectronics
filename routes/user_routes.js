@@ -7,6 +7,7 @@ const { encrypt, decrypt } = require('../util/encryptionUtil'); // Assuming the 
 
 const db = require('../models');
 const { where } = require('sequelize');
+const EndUser = db.EndUsers;
 const User = db.User;
 const OTP = db.OTP;
 
@@ -36,9 +37,15 @@ router.post('/registerUser', async (req, res) => {
    // console.log(userData['emailId']);
 
     try {
-        //const existing = await User.findOne(userData.emailId)
-        const user = await User.create(userData);
-        // Handle the response after success
+        // const user = await User.create(userData);
+        await User.create(userData).then((user) => {
+            userData.userId = user.userid;
+            console.log("User Inserted, now have to insert EndUser");
+            console.log(userData);
+            EndUser.create(userData);
+
+        });
+
         res.redirect('Home_Landing');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
@@ -67,7 +74,19 @@ router.post('/login', async (req, res) => {
             return res.status(401).render("loginPage", { message: 'Wrong Password. Please try again!' });
         }
 
-        return res.status(201).redirect('/users/Home_Landing');
+        // Calculate the expiration time as the current time + 10 minutes
+        const tenMinutes = 1000 * 60 * 10; // 10 minutes in milliseconds
+        const expiresAt = new Date(Date.now() + tenMinutes);
+        
+        // Handle the response after success
+        res.cookie('emailId', user.emailId, {
+            expires : expiresAt,
+            httpOnly: true
+        });
+
+        // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+      // return res.status(201).redirect('/users/Home_Landing');  // Manad's redirection
+        return res.status(200).render('seller_listing');
 
     } catch (error) {
         console.error('Error during login:', error);
