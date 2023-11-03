@@ -3,6 +3,7 @@ const express = require('express');
 const jwt = require("jsonwebtoken");
 const userRouter = require("./routes/user_routes.js");
 const itemListing = require("./routes/item_listing_routes.js");
+const cart = require("./routes/cart_routes.js");
 
 const mysql = require('mysql2');
 const { encrypt, decrypt } = require('./util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory

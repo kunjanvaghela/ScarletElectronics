@@ -1,4 +1,49 @@
-const IV_LENGTH = 16;
+ 
+module.exports = (sequelize, DataTypes) => {
+    const Cart = sequelize.define("Cart", {
+        cartId: 
+        {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+            allowNull: false
+        },
+        listingId: 
+        {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        userId: 
+        {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        quantity: 
+        {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        }
+    },
+    {
+        sequelize,
+        modelName: 'Cart',
+        tableName: 'cart',
+        timestamps:false,
+        //underscored: true,
+    });
+    
+    Cart.sync({ force: false })
+    .then(() => {
+        console.log('OTP table, if one doesnt exist');
+    })
+    .catch(error => {
+        console.log('This error occured', error);
+    });
+
+
+    return Cart;
+}
+
 
 /*
    CREATE TABLE IF NOT EXISTS `bjy4c3bfqe9mnlvfzpwb`.`cart` (
@@ -6,37 +51,38 @@ const IV_LENGTH = 16;
   `listingId` INT UNSIGNED NOT NULL,
   `userId` INT UNSIGNED NOT NULL,
   `quantity` INT NOT NULL,
-*/
 
-const Catalog = sequelize.define('Cart', 
-{
+}
+
+
+
+const Cart = sequelize.define("Cart", {
     cartId: 
     {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
     },
     listingId: 
     {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     userId: 
     {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     quantity: 
     {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
     }
 });
 
-Catalog.sync({ force: false }).then(() => {
-    console.log("Catalog table synced");
-});
 
-module.exports = Catalog;
 
+module.exports = [Cart, DataTypes]
+
+*/
