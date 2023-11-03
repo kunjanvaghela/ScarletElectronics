@@ -7,6 +7,9 @@
 </head>
 <body>
     <h1>OTP Validation</h1>
+    <% if (locals.message) { %>
+        <p style="font-size: larger; color: red;" class="error"><%= locals.message %></p>
+      <% } %>
     <form action="/users/recover-password" method="POST">
         Please check you <%= locals.emailId%> for the OTP.
         <br> 

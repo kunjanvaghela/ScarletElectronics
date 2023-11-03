@@ -12,7 +12,7 @@ const OTP = db.OTP;
 
 router.get("/Home_Landing", (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('Home_Laning');
+    res.render('Home_Landing');
 });
 
 router.get('/login', (req, res) => {
@@ -33,16 +33,18 @@ router.post('/registerUser', async (req, res) => {
     // Get data from request
     const userData = req.body;
     const User = db.User;
-    console.log(userData);
+   // console.log(userData['emailId']);
 
     try {
+        //const existing = await User.findOne(userData.emailId)
         const user = await User.create(userData);
         // Handle the response after success
         res.redirect('Home_Landing');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
         console.error('Error occurred:', error);
-        res.status(500).send('Error occurred');
+        res.status(409).render("loginPage", {message : "Email alredy exists in the system, Please Login or use Forget Password Option."});
+       // res.status(500).send('Error occurred');
     }
 });
 
@@ -56,20 +58,20 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ where: { emailId } });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).render("loginPage", { message: 'You do not exists in our system. Please Sign up' });
         }
 
         const decryptedPassword = decrypt(user.encrypted_password);
 
         if (password !== decryptedPassword) {
-            return res.status(401).json({ message: 'You have entered Invalid password, '+user.name+'' });
+            return res.status(401).render("loginPage", { message: 'Wrong Password. Please try again!' });
         }
 
-        return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+        return res.status(201).redirect('/users/Home_Landing');
 
     } catch (error) {
         console.error('Error during login:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(401).render("loginPage" , {message: 'Login Failed Please use valid Credentials'});
     }
 });
 

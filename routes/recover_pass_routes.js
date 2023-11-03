@@ -19,7 +19,10 @@ router.post('/update', async(req, res) =>{
             user.password = password1;
             user.save();
             console.log("Password Changed Sucessfully");
-            res.status(200).send("Welcome Home");
+            res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.header('Pragma', 'no-cache');
+            res.header('Expires', 0);
+            res.status(200).redirect("/users/Home_Landing");
             return;
         }
         else
@@ -48,14 +51,25 @@ router.post('/', async (req, res)=>{
         {
             if(dbOTP.otp === OTP_val && dbOTP.expires_on >= Date.now())
             {
+                res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+                res.header('Pragma', 'no-cache');
+                res.header('Expires', 0);
                 res.status(200).render("recover-password", {emailId : emailId});
                 return;
             }
+            else if(dbOTP.expires_on < Date.now())
+            {
+                res.status(400).render("forgot-password", {message : "Your OTP has been expired Please generate again!!"});
+            }
             else
             {
-                res.status(400).send("Use the latest OTP");
+                res.status(400).render("otp_validation", {message : "You entered wrong OTP. Try again!!" , emailId : emailId});
                 return;
             }
+        }
+        else
+        {
+            res.send(404).render("otp_validation", {message : "Your do not exists in our System. Please Sign up first!!" });
         }
 
     }
