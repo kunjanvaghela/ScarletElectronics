@@ -100,7 +100,7 @@ router.post('/login', async (req, res) => {
         }
 
         // Calculate the expiration time as the current time + 10 minutes
-        const tenMinutes = 1000 * 60 * 10; // 10 minutes in milliseconds
+        const tenMinutes = 1000 * 60 * 120; // 10 minutes in milliseconds
         const expiresAt = new Date(Date.now() + tenMinutes);
         
         // Handle the response after success

@@ -16,16 +16,17 @@
                 // Prevent the default form submit action
                 event.preventDefault();
 
+                console.log($(this).data('item-id'));
                 // Get the item details from the data attributes
-                var itemId = $(this).data('item-id');
+                var listingId = $(this).data('item-id');
                 var itemName = $(this).data('item-name');
                 var itemPrice = $(this).data('item-price');
                 var itemCategory = $(this).data('item-category');
-                console.log(itemId, itemName, itemPrice, itemCategory);
+                console.log(listingId, itemName, itemPrice, itemCategory);
 
                 // Create an object with the item details
                 var itemData = {
-                    id: itemId,
+                    listingId: listingId,
                     name: itemName,
                     price: itemPrice,
                     category: itemCategory
@@ -35,8 +36,7 @@
                 $.ajax({
                     type: 'POST',
                     url: '/cart/add-itemlisting', // Replace with your actual API endpoint
-                    data: JSON.stringify(itemData),
-                    contentType: 'application/json',
+                    data: itemData,
                     success: function(response) {
                         // Handle success - perhaps confirm to the user that the item was added
                         alert('Item added to cart!');
@@ -115,7 +115,12 @@
                                     <h7 class="card-subtitle mb-2 text-muted"><%= item.category %></h7>
                                     <p class="card-text"><%= item.description %></p>
                                     <a href="#" class="btn btn-primary">View Details</a>
-                                    <a href="#" class="btn btn-secondary add-to-cart-btn">Add to Cart</a>
+                                    <a href="#" class="btn btn-secondary add-to-cart-btn"   
+                                    data-item-id="<%= item.listingId %>"
+                                    data-item-name="<%= item.name %>"
+                                    data-item-price="<%= item.price %>"
+                                    data-item-category="<%= item.category %>">                                                             
+                                    Add to Cart</a>
                                 </div>
                             </div>
                         </div>
@@ -125,6 +130,15 @@
 
         </div>
     </div>
+
+    <div class="container">
+        <div class="d-flex justify-content-end">
+            <form action="/cart/fetch-cart-display" method="GET">
+                <button type="submit" class="btn btn-primary">Next page</button>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
         <div class="d-flex align-items-end">
             <form action="/item-listing/create" method="GET">
