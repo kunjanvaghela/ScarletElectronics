@@ -20,7 +20,7 @@
                 <tr class="table-primary">
                     <th class="w-25 text-center">Item Name</th>
                     <th class="w-25 text-center">Quantity (qty)</th>
-                    <th class="w-25 text-center">Cost</th>
+                    <th class="w-25 text-center">Cost per item</th>
                     <th class="w-25 text-center">Actions</th>
                 </tr>
             </thead>
@@ -34,16 +34,21 @@
         </div>
 
         <div class="form-group" id = "address">
-            <input type="text" class="form-control" name="address1" id="address1" placeholder="Enter Shipping Address 1"><br>
-            <input type="text" class="form-control" name="address2" id="address2" placeholder="Enter Shipping Address 2"><br>
-            <input type="text" class="form-control" name="address3" id="address3" placeholder="Enter Shipping Address 3"><br>
-            <input type="text" class="form-control" name="address4" id="address4" placeholder="Enter Shipping Address 4"><br>
-            <input type="text" class="form-control" name="address5" id="address5" placeholder="Enter Shipping Address 5"><br>
+
+            <input type="text" class="form-control" name="address1" id="address1" placeholder="Address line 1"><br>
+
+            <input type="text" class="form-control" name="address2" id="address2" placeholder="Address line 2"><br>
+
+            <input type="text" class="form-control" name="address3" id="address3" placeholder="city"><br>
+
+            <input type="text" class="form-control" name="address4" id="address4" placeholder="state"><br>
+
+            <input type="text" class="form-control" name="address5" id="address5" placeholder="pincode"><br>
         </div>
         
         <div class="col-md-3 text-center mx-auto">
             <button type="button" class="btn btn-danger align-self-center" id="removeAll">Flush Cart</button>
-            <button type="submit" class="btn btn-primary align-self-center" value="submit">Add To Cart</button>
+            <button type="submit" class="btn btn-primary align-self-center" id="getFinalCost">Get Final Cost</button>
         </div>
     </form>
     <br> <br>
@@ -53,13 +58,9 @@
             const addRowButton = document.getElementById('addRow');
             let rowCounter = 0;
 
-            // Populate table rows from an array
-            // const itemsArray = [
-            //     { item: 'item1', qty: 2, cost: 10 },
-            //     { item: 'item2', qty: 1, cost: 5 },
-            //     // Add more items as needed
-            // ];
+
             var cartDetails = <%- JSON.stringify(cartDetails) %>;
+            cart_row_reference = [];
             for (const itemData of cartDetails) {
                 rowCounter++;
                 const newRow = document.createElement('tr');
@@ -99,9 +100,86 @@
 
         function removeRow(button) {
             // Get the parent row and remove it
+            var cartDetails = <%- JSON.stringify(cartDetails) %>;
+            console.log(cartDetails);
             const row = button.parentElement.parentElement;
             row.remove();
+
+            //send ajax post request to remove item
+            console.log(row);
+
+            //get item number from row from substring after 4th character of for attribute of label
+            var itemNumber = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
+            //convert item number to integer
+            itemNumber = parseInt(itemNumber);
+            console.log(itemNumber);
+
+            //get listing id cartdetails[itemNumber-1].listing_id
+            var listingId = cartDetails[itemNumber-1].listingId;
+            console.log(cartDetails[itemNumber-1]);
+            console.log(listingId);
+            
+
+            // send ajax post request to remove item with listing_id
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/cart/remove-itemlisting", true);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+
+            
+            xhttp.send(`${listingId}`);
+
+            //remove item from cartDetails
         }
+
+        //checkout button
+        document.getElementById('getFinalCost').addEventListener('click', () => {
+            //get all rows from the table
+            const dynamicTable = document.getElementById('dynamicTable');
+            const rows = dynamicTable.getElementsByTagName("tr");
+            console.log(rows);
+
+            //get all addresses
+            const address = document.getElementById('address');
+            const address1 = address.getElementsByTagName("input")[0].value;
+            const address2 = address.getElementsByTagName("input")[1].value;
+            const address3 = address.getElementsByTagName("input")[2].value;
+            const address4 = address.getElementsByTagName("input")[3].value;
+            const address5 = address.getElementsByTagName("input")[4].value;
+            console.log(address1);
+            console.log(address2);
+            console.log(address3);
+            console.log(address4);
+            console.log(address5);
+
+            //get promocode
+            const promocode = document.getElementById('promocode');
+            const promocode1 = promocode.getElementsByTagName("input")[0].value;
+            console.log(promocode1);
+
+            //get all quantities
+            var quantities = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var quantity = row.getElementsByTagName("input")[0].value;
+                quantities.push(quantity);
+            }
+            console.log(quantities);
+
+            //get all listing ids
+            var listingIds = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var listingId = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
+                listingIds.push(listingId);
+            }
+            console.log(listingIds);
+
+            //send ajax post request to checkout
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/fetch-cart-display/finalcost", true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promocode: promocode1}));
+        });
     </script>
 
 </body>

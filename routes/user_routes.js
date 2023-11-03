@@ -130,8 +130,9 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'You have entered an invalid password, ' + user.name });
         }
 
-        // Calculate the expiration time as the current time + 10 minutes
-        const tenMinutes = 1000 * 60 * 120; // 10 minutes in milliseconds
+
+        // Calculate the expiration time as the current time + 120 minutes
+        const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
         const expiresAt = new Date(Date.now() + tenMinutes);
         
         // Set the cookie
