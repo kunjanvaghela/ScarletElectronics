@@ -5,6 +5,7 @@ const db = require('../models');
 const { where } = require('sequelize');
 const Catalog = db.Catalog;
 const ItemListing = db.ItemListing;
+const UserUtil = require('../util/userUtil');
 
 router.get("/", (req, res) => {
   console.log('Working');
@@ -47,8 +48,13 @@ router.get("/", (req, res) => {
   // res.render('listings');
 });
 
-router.get("/create", (req, res) => {
+router.get("/create", async (req, res) => {
   console.log('Working');
+  console.log(req.cookies.emailId);
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
+  // console.log(req.cookies['emailId']);
+  console.log("Cookie must have been displayed!");
   res.render('seller_listing');
 });
 
@@ -71,6 +77,7 @@ router.post('/create', async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
   itemListingData.sellerId = 15; // Temporary
+  req.cookies;
   console.log(itemListingData);
 
   try {
