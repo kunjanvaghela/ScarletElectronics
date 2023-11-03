@@ -1,5 +1,5 @@
 {
-  "development": {
+  "development1": {
     "username": "root",
     "password": "root",
     "database": "bjy4c3bfqe9mnlvfzpwb",
@@ -7,7 +7,7 @@
     "dialect": "mysql"
   },
 
- "development1": {
+ "development": {
   "username": "ucqjbqovzep1waym",
   "password": "ERQVg4nWFFhjNrVkyOV3",
   "database": "bjy4c3bfqe9mnlvfzpwb",
