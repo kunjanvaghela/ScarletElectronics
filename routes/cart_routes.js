@@ -36,7 +36,10 @@ async function check_email(req,res)
         console.log("req.body: ", req.body);
         const emailId = req.body.emailId;
     
-        console.log("emailId: ", emailId);
+        if(emailId === undefined)
+        {
+            return false;
+        }
         const user_email = await  User.findOne({where: {'emailId': emailId}});
         if(user_email !== null)
         {
@@ -228,6 +231,8 @@ router.post('/fetch-cart', async (req, res)=>
     //get authentication status and user id
     const [authentication, userid] = await authent(req,res);
     
+
+    console.log("authentication: ", authentication);
     if(!authentication)
     {
         return;
@@ -298,7 +303,7 @@ router.post('/fetch-cart', async (req, res)=>
 
 });
 
-router.delete('/flush', async (req, res)=>
+router.post('/flush', async (req, res)=>
 {
     console.log("flush inside ------------------------")
 
