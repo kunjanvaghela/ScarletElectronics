@@ -7,6 +7,12 @@
 <!-- Navbar -->
 <nav class="navbar sticky-top navbar-light bg-light">
 	<div class="container-fluid align-right">
+		<div class="nav-item">
+			<form action="/item-listing" method="get">
+				<button type="submit" class="btn btn-primary">Home</button>
+			</form>
+		</div>
+
 		<% if (username) { %>
 				<ul class="nav">
 					<li class="nav-item"><h4>Welcome <%= username %>! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h4> </li>
