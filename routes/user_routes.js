@@ -27,6 +27,12 @@ router.get('/login', (req, res) => {
 
 })
 
+router.get('/logout', (req, res) => {
+    console.log('Successfully in Root :Inssss:sss:: /');
+    res.clearCookie("emailId");
+    res.redirect('/users/login');
+})
+
 router.get('/register', (req, res) => {
     res.render('register');
 });
@@ -86,12 +92,13 @@ router.post('/login', async (req, res) => {
         // Handle the response after success
         res.cookie('emailId', user.emailId, {
             expires : expiresAt,
-            httpOnly: true
+            httpOnly: false
         });
 
         // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
       // return res.status(201).redirect('/users/Home_Landing');  // Manad's redirection
-        return res.status(200).render('seller_listing');
+        // return res.status(200).render('seller_listing');
+        return res.status(200).redirect('/item-listing');
 
     } catch (error) {
         console.error('Error during login:', error);

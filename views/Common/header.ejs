@@ -1,0 +1,29 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+<!-- Navbar -->
+<nav class="navbar sticky-top navbar-light bg-light">
+	<div class="container-fluid align-right">
+		<% if (username) { %>
+				<ul class="nav">
+					<li class="nav-item"><h4>Welcome <%= username %>! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h4> </li>
+					<li class="nav-item">
+						<form action="/users/logout" method="get">
+							<button type="submit" class="btn btn-primary">Logout</button>
+						</form>
+					</li>
+				</ul>
+		<% } else { %>
+			<ul class="nav">
+				<li class="nav-item">
+					<form action="/users/login" method="get">
+						<button type="submit" class="btn btn-primary">Sign In</button>
+					</form>
+				</li>
+			</ul>
+		<% } %>
+	</div>
+</nav>
