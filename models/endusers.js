@@ -20,8 +20,18 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'end_user',
         timestamps: false,  // This will remove the automatic timestamp fields (createdAt, updatedAt)
         //underscored: true,
-    }
-    );
+    });
+
+    EndUser.associate = (models) => {
+        EndUser.hasMany(models.ItemListing, {
+            foreignKey: 'sellerId'
+        });
+        EndUser.belongsTo(models.User, {
+            foreignKey: 'userId'
+        });
+        
+    };
+
     return EndUser;
 }
   

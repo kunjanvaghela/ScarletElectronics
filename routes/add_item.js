@@ -16,6 +16,10 @@ router.get("/add", (req, res) => {
 
 
 router.post('/insert', async (req, res) => {
+
+    //Cookie-Presence check. TODO can be used further to validate user.
+    console.log(req.cookies);
+    
     // Get data from request
     const catalogData = req.body;
     const Catalog = db.Catalog;

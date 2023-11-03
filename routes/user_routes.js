@@ -14,6 +14,11 @@ router.get("/Home_Landing", (req, res) => {
     res.render('Home_Landing');
 });
 
+router.get("/", (req, res) => {
+    console.log('Successfully in Landing Page');
+    res.render('index_Landing');
+});
+
 router.get('/login', (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
     res.render('loginPage');
@@ -21,6 +26,26 @@ router.get('/login', (req, res) => {
 
 router.get('/register', (req, res) => {
     res.render('register');
+});
+
+router.get('/cart', (req, res) => {
+    const fields = [
+      { name: 'email', label: 'Email', type: 'text' },
+      { name: 'password', label: 'Password', type: 'password' },
+      // Add more fields as needed
+    ];
+  
+    res.render('cartPage', { fields });
+});
+
+router.get('/checkout', (req, res) => {
+    const itemsArray = [
+        { item: 'item1', qty: 2, cost_qty: 10 , cost_item: 10 },
+        { item: 'item2', qty: 1, cost_qty: 5 , cost_item: 10 },
+        // Add more items as needed
+    ];
+  
+    res.render('checkoutPage', { itemsArray });
 });
 
 router.get('/forgot-password', (req, res, next) => {
@@ -60,7 +85,8 @@ router.post('/registerUser',upload.none(), async (req, res) => {
 
     } catch (error) {
         console.error('Error occurred:', error);
-        res.status(500).send('Error occurred');
+        res.status(409).render("loginPage", {message : "Email alredy exists in the system, Please Login or use Forget Password Option."});
+       // res.status(500).send('Error occurred');
     }
 });
 
@@ -87,7 +113,7 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ where: { emailId } });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).render("loginPage", { message: 'You do not exists in our system. Please Sign up' });
         }
 
         const decryptedPassword = decrypt(user.encrypted_password);
@@ -96,11 +122,25 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'You have entered an Invalid password, ' + user.name });
         }
 
-        return res.status(200).json({ message: 'Welcome ' + user.name + ',  Login successful' });
+//         return res.status(200).json({ message: 'Welcome ' + user.name + ',  Login successful' });
+//         }
 
+        // Calculate the expiration time as the current time + 10 minutes
+        const tenMinutes = 1000 * 60 * 10; // 10 minutes in milliseconds
+        const expiresAt = new Date(Date.now() + tenMinutes);
+        
+        // Handle the response after success
+        res.cookie('emailId', user.emailId, {
+            expires : expiresAt,
+            httpOnly: true
+        });
+
+        // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
+      // return res.status(201).redirect('/users/Home_Landing');  // Manad's redirection
+        return res.status(200).render('seller_listing');
     } catch (error) {
         console.error('Error during login:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(401).render("loginPage" , {message: 'Login Failed Please use valid Credentials'});
     }
 });
 

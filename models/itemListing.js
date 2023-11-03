@@ -38,8 +38,17 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'item_listing',
         timestamps: false,  // This will remove the automatic timestamp fields (createdAt, updatedAt)
         //underscored: true,
-    }
-    );
+    });
+
+    ItemListing.associate = (models) => {
+        ItemListing.belongsTo(models.Catalog, {
+            foreignKey: 'itemId',
+        });
+        ItemListing.belongsTo(models.EndUsers, {
+            foreignKey: 'sellerId' 
+        });
+    };
+
     ItemListing.sync({ force: false })
         .then(() => {
             console.log('item_listing table has been successfully synched');
