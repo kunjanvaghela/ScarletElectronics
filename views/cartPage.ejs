@@ -54,24 +54,24 @@
             let rowCounter = 0;
 
             // Populate table rows from an array
-            // const itemsArray = [
-            //     { item: 'item1', qty: 2, cost: 10 },
-            //     { item: 'item2', qty: 1, cost: 5 },
-            //     // Add more items as needed
-            // ];
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            for (const itemData of cartDetails) {
+            const itemsArray = [
+                { item: 'item1', qty: 2, cost: 10 },
+                { item: 'item2', qty: 1, cost: 5 },
+                // Add more items as needed
+            ];
+
+            for (const itemData of itemsArray) {
                 rowCounter++;
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
                     <td class="w-25">
-                        <label for="item${rowCounter}">${itemData.name}</label>
+                        <label for="item${rowCounter}">${itemData.item}</label>
                     </td>
                     <td class="w-25">
-                        <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1">
+                        <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.qty}">
                     </td>
                     <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.price}</label>
+                        <label for="item${rowCounter}">${itemData.cost}</label>
                     </td>
                     <td class="w-25">
                         <button type="button" style="width: 100%" class="btn btn-danger btn-block" onclick="removeRow(this)">Remove Item</button>
@@ -89,12 +89,6 @@
             dynamicTable.innerHTML = '';
             address.innerHTML = '';
             promocode.innerHTML = '';
-
-            //send ajax post request to flush
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/cart/flush", true);
-            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhttp.send();
         });
 
         function removeRow(button) {
