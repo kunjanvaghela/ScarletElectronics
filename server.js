@@ -1,41 +1,40 @@
-console.log('server.js loaded');
-const express = require('express');
+console.log("server.js loaded");
+const express = require("express");
 const jwt = require("jsonwebtoken");
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
 const cart = require("./routes/cart_routes.js");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
-const mysql = require('mysql2');
-const { encrypt, decrypt } = require('./util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory
+const mysql = require("mysql2");
+const { encrypt, decrypt } = require("./util/encryptionUtil"); // Assuming the encryptionUtil.js file is in the same directory
 
-const db = require('./models');
-const { where } = require('sequelize');
+const db = require("./models");
+const { where } = require("sequelize");
 const User = db.User;
 const OTP = db.OTP;
 const Catalog = db.Catalog;
 
 OTP.belongsTo(User, {
-    foreignKey: 'emailId',
-    targetKey: 'emailId',
-    onDelete: 'CASCADE', // Define the onDelete behavior (e.g., CASCADE, SET NULL)
+	foreignKey: "emailId",
+	targetKey: "emailId",
+	onDelete: "CASCADE", // Define the onDelete behavior (e.g., CASCADE, SET NULL)
 });
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 app.use(cookieParser());
 
-app.use('/users', userRouter);
-app.use('/add-item', addItem);
+app.use("/users", userRouter);
+app.use("/add-item", addItem);
 
+app.use("/item-listing", itemListing);
 
-app.use('/item-listing', itemListing);
-
-app.use('/cart',cart);
+app.use("/cart", cart);
 
 // app.post('/forgot-password', (req, res, next) => {
 //     const  { emailId } = req.body;
@@ -50,9 +49,8 @@ app.use('/cart',cart);
 
 // });
 
-
 db.sequelize.sync().then(() => {
-    app.listen(3000, () => {
-        console.log('Server is running on port 3000')
-    });
+	app.listen(3000, () => {
+		console.log("Server is running on port 3000");
+	});
 });
