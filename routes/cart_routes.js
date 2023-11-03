@@ -22,6 +22,7 @@ const db = require('../models');
 const { where } = require('sequelize');
 const cart = require("../models/cart");
 const userUtil = require("../util/userUtil");
+const authent = userUtil.authent;
 const User = db.User;
 const Cart = db.Cart;
 const ItemListing = db.ItemListing;
@@ -30,6 +31,67 @@ const Promocode = db.Promocode;
 
 router.use(express.urlencoded({ extended: true }));
 
+async function get_cart(userId)
+{
+    let cartDetails = [];
+    let listingIds = [];
+
+    const cartDetailsSQL = await Cart.findAll({where:{userId:userId}})
+
+    for (var i = 0; i < cartDetailsSQL.length; i++) 
+    {
+
+        // listing id and quantity for each listing in cart
+        var listingId = cartDetailsSQL[i].dataValues.listingId;
+        var quantity = cartDetailsSQL[i].dataValues.quantity;
+
+        //append listing id and quantity to cartDetails
+        cartDetails.push({
+                            listingId:listingId, 
+                            quantity:quantity
+                        });
+        
+        //append listing id to listingIds
+        listingIds.push(listingId);
+    
+    }
+
+    //get the result of listing details from db
+    const listingDetailsSQL = await ItemListing.findAll({where:{listingId:listingIds}});
+
+    itemIDs = []
+
+    // add name and price to cartDetails for that listing id
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        for (var j = 0; j < listingDetailsSQL.length; j++) 
+        {
+            if(cartDetails[i].listingId == listingDetailsSQL[j].dataValues.listingId)
+            {
+                cartDetails[i].price = listingDetailsSQL[j].dataValues.price;
+                itemIDs.push(listingDetailsSQL[j].dataValues.itemId);
+            }
+        }
+    }
+
+    //get name from catalog for each item id
+    const itemDetailsSQL = await Catalog.findAll({where:{itemId:itemIDs}});
+
+    // add name to cartDetails for that listing id
+
+    for (var i = 0; i < cartDetails.length; i++)
+    {
+        for (var j = 0; j < itemDetailsSQL.length; j++) 
+        {
+            if(itemDetailsSQL[j].dataValues.itemId == itemIDs[i])
+            {
+                cartDetails[i].name = itemDetailsSQL[j].dataValues.name;
+            }
+        }
+    }
+
+    return cartDetails;
+}
 
 router.post('/add-itemlisting', async (req, res)=>
 {
@@ -184,98 +246,21 @@ router.post('/remove-itemlisting', async (req, res)=>
 });
 
 
-router.get('/fetch-cart', async (req, res)=>
+router.get('/fetch-cart-display', async (req, res)=>
 {
-    console.log("fetch-cart inside ------------------------")
     //get authentication status and user id
-    // const [authentication, userid] = await authent(req,res);
-    // const [userid] = await authent(req,res);
+    const [authentication, userId] = await authent(req,res);
     
-
-    // console.log("authentication: ", authentication);
-    // if(!authentication)
-    // {
-    //     return;
-    // }
-
-    let cartDetails = [];
-    let listingIds = [];
-
-    // const cartDetailsSQL = await Cart.findAll({where:{userId:userid}})
-
-    // for (var i = 0; i < cartDetailsSQL.length; i++) 
-    // {
-
-    //     // listing id and quantity for each listing in cart
-    //     var listingId = cartDetailsSQL[i].dataValues.listingId;
-    //     var quantity = cartDetailsSQL[i].dataValues.quantity;
-
-    //     //append listing id and quantity to cartDetails
-    //     cartDetails.push({
-    //                         listingId:listingId, 
-    //                         quantity:quantity
-    //                     });
-        
-    //     //append listing id to listingIds
-    //     listingIds.push(listingId);
+    if(!authentication)
+    {
+        return;
+    }
     
-    // }
+    console.log("fetch-cart inside ------------------------")
 
-    // //get the result of listing details from db
-    // const listingDetailsSQL = await ItemListing.findAll({where:{listingId:listingIds}});
 
-    // itemIDs = []
-
-    // // add name and price to cartDetails for that listing id
-    // for (var i = 0; i < cartDetails.length; i++) 
-    // {
-    //     for (var j = 0; j < listingDetailsSQL.length; j++) 
-    //     {
-    //         if(cartDetails[i].listingId == listingDetailsSQL[j].dataValues.listingId)
-    //         {
-    //             cartDetails[i].price = listingDetailsSQL[j].dataValues.price;
-    //             itemIDs.push(listingDetailsSQL[j].dataValues.itemId);
-    //         }
-    //     }
-    // }
-
-    // //get name from catalog for each item id
-    // const itemDetailsSQL = await Catalog.findAll({where:{itemId:itemIDs}});
-
-    // // add name to cartDetails for that listing id
-
-    // for (var i = 0; i < cartDetails.length; i++)
-    // {
-    //     for (var j = 0; j < itemDetailsSQL.length; j++) 
-    //     {
-    //         if(itemDetailsSQL[j].dataValues.itemId == itemIDs[i])
-    //         {
-    //             cartDetails[i].name = itemDetailsSQL[j].dataValues.name;
-    //         }
-    //     }
-    // }
-
-    cartDetails = [
-        {
-            "listingId": 2,
-            "quantity": 2,
-            "price": 1200.78,
-            "name": "iPhone 13"
-        },
-        {
-            "listingId": 3,
-            "quantity": 4,
-            "price": 580,
-            "name": "Samsung Galaxy S21"
-        },
-        {
-            "listingId": 4,
-            "quantity": 2,
-            "price": 2300,
-            "name": "Dell XPS 13"
-        }
-    ];
-
+    //get cart details
+    const cartDetails = await get_cart(userId);
 
     console.log("cartDetails: ", cartDetails);
 
@@ -284,6 +269,29 @@ router.get('/fetch-cart', async (req, res)=>
     // res.status(200).send(cartDetails);
 
 });
+
+router.get('/fetch-cart', async (req, res)=>
+{
+    console.log("fetch-cart inside ------------------------")
+
+    //get authentication status and user id
+    const [authentication, userId] = await authent(req,res);
+
+    if(!authentication)
+    {
+        return;
+    }
+
+    //get cart details
+    const cartDetails = await get_cart(userId);
+    
+    console.log("cartDetails: ", cartDetails);
+
+    //return cart details
+    res.status(200).send(cartDetails);
+
+});
+
 
 router.post('/flush', async (req, res)=>
 {

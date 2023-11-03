@@ -40,7 +40,7 @@ async function authent(req,res)
 {
     console.log("authent inside ------------------------");
     console.log(req.body);
-    authentication = await userUtil.check_email(req.cookies.emailId);
+    authentication = await check_email(req.cookies.emailId);
 
     if(!authentication)
     {

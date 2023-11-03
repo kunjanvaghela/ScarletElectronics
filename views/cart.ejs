@@ -89,6 +89,12 @@
             dynamicTable.innerHTML = '';
             address.innerHTML = '';
             promocode.innerHTML = '';
+
+            //send ajax post request to flush
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/cart/flush", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send();
         });
 
         function removeRow(button) {
