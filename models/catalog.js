@@ -81,7 +81,14 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,  // This will remove the automatic timestamp fields (createdAt, updatedAt)
         //underscored: true,
         
-    })
+    });
+
+    Catalog.associate = (models) => {
+      Catalog.hasMany(models.ItemListing, {
+          foreignKey: 'itemId',
+      });
+  };
+
     Catalog.sync({ force: false })
         .then(() => {
             console.log('catalog table has been successfully created, if one doesnt exist');

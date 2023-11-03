@@ -90,7 +90,17 @@ module.exports = (sequelize, DataTypes) => {
                 }
             }
         }
-    })
+    });
+
+    User.associate = (models) => {
+        User.hasOne(models.EndUsers, {
+            foreignKey: 'userId',
+        });
+        User.hasOne(models.Staff, {
+            foreignKey: 'userId' 
+        });
+    };
+
     User.sync({ force: false })
         .then(() => {
             console.log('User table has been successfully created, if one doesnt exist');
