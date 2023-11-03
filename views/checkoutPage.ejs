@@ -12,37 +12,52 @@
     <br> <br>
     <h1 class="text-primary text-center mx-auto">CheckOut Items</h1>
     
-    <table class="table table-bordered">
-        <thead>
-            <tr class="table-primary">
-                <th class="text-center">Item Name</th>
-                <th class="text-center">Quantity (qty)</th>
-                <th class="text-center">Cost / Qty</th>
-                <th class="text-center">Total Cost</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% itemsArray.forEach((item, index) => { %>
-                <tr>
-                    <td><%= item.item %></td>
-                    <td class="text-center"><%= item.qty %></td>
-                    <td class="text-center"><%= item.cost_qty %></td>
-                    <td class="text-center"><%= item.cost_item %></td>
+    <form action="#" method="post" name="checkout">
+        <table class="table table-bordered">
+            <thead>
+                <tr class="table-primary">
+                    <th class="text-center">Item Name</th>
+                    <th class="text-center">Quantity (qty)</th>
+                    <th class="text-center">Cost / Qty</th>
+                    <th class="text-center">Total Cost</th>
                 </tr>
-            <% }); %>
-            <tr>
-                <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost (Excluding Tax)</td>
-                <td class="text-center" style="font-weight: bold;">Total Cost</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="text-center" style="font-weight: bold;">Sales Tax</td>
-                <td class="text-center" style="font-weight: bold;">Sales Tax</td>
-            </tr>
-            <tr class="table-active">
-                <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost (Including Tax)</td>
-                <td class="text-center" style="font-weight: bold;">Total Cost</td>
-            </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <% itemsArray.forEach((item, index) => { %>
+                    <tr>
+                        <td><%= item.item %></td>
+                        <td class="text-center"><%= item.qty %></td>
+                        <td class="text-center"><%= item.cost_qty %></td>
+                        <td class="text-center"><%= item.cost_item %></td>
+                    </tr>
+                <% }); %>
+                <tr>
+                    <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost (Excluding Tax)</td>
+                    <td class="text-center" style="font-weight: bold;">Total Cost</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-center" style="font-weight: bold;">Promo Code</td>
+                    <td class="text-center" style="font-weight: bold;">promo code</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-center" style="font-weight: bold;">Sales Tax</td>
+                    <td class="text-center" style="font-weight: bold;">Sales Tax</td>
+                </tr>
+                <tr class="table-active">
+                    <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost (Including Tax)</td>
+                    <td class="text-center" style="font-weight: bold;">Total Cost</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="form-group" id = "payment">
+            <input type="text" class="form-control" name="payment" id="payment" placeholder="Enter credit card number for payment"><br>
+        </div>
+        
+        <div class="col-md-3 text-center mx-auto">
+            <button type="submit" class="btn btn-primary align-self-center" value="submit">CheckOut</button>
+        </div>
+    </form>
 </body>
 </html>

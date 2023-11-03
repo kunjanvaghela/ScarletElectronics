@@ -28,10 +28,22 @@
                 <!-- Table rows will be added here -->
             </tbody>
         </table>
+
+        <div class="form-group" id = "promocode">
+            <input type="text" class="form-control" name="promocode" id="promocode" placeholder="Enter pramotional code if you have any????"><br>
+        </div>
+
+        <div class="form-group" id = "address">
+            <input type="text" class="form-control" name="address1" id="address1" placeholder="Enter Shipping Address 1"><br>
+            <input type="text" class="form-control" name="address2" id="address2" placeholder="Enter Shipping Address 2"><br>
+            <input type="text" class="form-control" name="address3" id="address3" placeholder="Enter Shipping Address 3"><br>
+            <input type="text" class="form-control" name="address4" id="address4" placeholder="Enter Shipping Address 4"><br>
+            <input type="text" class="form-control" name="address5" id="address5" placeholder="Enter Shipping Address 5"><br>
+        </div>
         
         <div class="col-md-3 text-center mx-auto">
             <button type="button" class="btn btn-danger align-self-center" id="removeAll">Flush Cart</button>
-            <button type="submit" class="btn btn-primary align-self-center" value="submit">CheckOut</button>
+            <button type="submit" class="btn btn-primary align-self-center" value="submit">Add To Cart</button>
         </div>
     </form>
     <br> <br>
@@ -72,7 +84,11 @@
         document.getElementById('removeAll').addEventListener('click', () => {
             // Remove all rows from the table
             const dynamicTable = document.getElementById('dynamicTable');
+            const address = document.getElementById('address');
+            const promocode = document.getElementById('promocode');
             dynamicTable.innerHTML = '';
+            address.innerHTML = '';
+            promocode.innerHTML = '';
         });
 
         function removeRow(button) {
