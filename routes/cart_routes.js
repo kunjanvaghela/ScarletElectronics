@@ -272,11 +272,13 @@ router.get('/fetch-cart-display', async (req, res)=>
 
     //get cart details
     const cartDetails = await get_cart(userId);
+    userDetails = await userUtil.check_email(req.cookies.emailId);
+    const username = userDetails.name;
 
     console.log("cartDetails: ", cartDetails);
 
     //return cart details
-    res.render('cart',{ cartDetails });
+    res.render('cart',{ cartDetails, username });
     // res.status(200).send(cartDetails);
 
 });
