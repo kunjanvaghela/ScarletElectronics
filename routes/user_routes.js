@@ -2,155 +2,252 @@ const express = require("express");
 const router = express.Router();
 const send_otp_routes = require("./otp_routes");
 const recover_pass_routes = require("./recover_pass_routes");
-const axios = require('axios'); // Required for reCAPTCHA verification
-const db = require('../models');
-const EndUser= db.EndUsers;
+const axios = require("axios"); // Required for reCAPTCHA verification
+const db = require("../models");
+const EndUser = db.EndUsers;
 
-const { encrypt, decrypt } = require('../util/encryptionUtil');
+const { encrypt, decrypt } = require("../util/encryptionUtil");
 
-const multer = require('multer');
+const multer = require("multer");
 const upload = multer();
 
 router.get("/Home_Landing", (req, res) => {
-    console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('Home_Landing');
+	console.log("Successfully in Root :Inssss:sss:: /");
+	res.render("Home_Landing");
 });
 
-router.get("/", (req, res) => {
-    console.log('Successfully in Landing Page');
-    res.render('index_Landing');
+router.get("/login", (req, res) => {
+	console.log("Successfully in Root :Inssss:sss:: /");
+	res.render("loginPage");
 });
 
-router.get('/login', (req, res) => {
-    console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('loginPage');
-})
-
-router.get('/logout', (req, res) => {
-    console.log('Successfully in Root :Inssss:sss:: /');
-    res.clearCookie("emailId");
-    res.redirect('/users/login');
-})
-
-router.get('/register', (req, res) => {
-    res.render('register');
+router.get("/logout", (req, res) => {
+	console.log("Successfully in Root :Inssss:sss:: /");
+	res.clearCookie("emailId");
+	res.redirect("/users/login");
 });
 
-router.get('/cart', (req, res) => {
-    const fields = [
-      { name: 'email', label: 'Email', type: 'text' },
-      { name: 'password', label: 'Password', type: 'password' },
-      // Add more fields as needed
-    ];
-  
-    res.render('cartPage', { fields });
+router.get("/register", (req, res) => {
+	res.render("register");
 });
 
-router.get('/checkout', (req, res) => {
-    const itemsArray = [
-        { item: 'item1', qty: 2, cost_qty: 10 , cost_item: 10 },
-        { item: 'item2', qty: 1, cost_qty: 5 , cost_item: 10 },
-        // Add more items as needed
-    ];
-  
-    res.render('checkoutPage', { itemsArray });
+router.get("/cart", (req, res) => {
+	const fields = [
+		{ name: "email", label: "Email", type: "text" },
+		{ name: "password", label: "Password", type: "password" },
+		// Add more fields as needed
+	];
+
+	res.render("cartPage", { fields });
 });
 
-router.get('/forgot-password', (req, res, next) => {
-    res.render('forgot-password');
+router.get("/checkout", (req, res) => {
+	const itemsArray = [
+		{ item: "item1", qty: 2, cost_qty: 10, cost_item: 10 },
+		{ item: "item2", qty: 1, cost_qty: 5, cost_item: 10 },
+		// Add more items as needed
+	];
+
+	res.render("checkoutPage", { itemsArray });
 });
 
-router.post('/registerUser',upload.none(), async (req, res) => {
-    const recaptchaResponse = req.body['g-recaptcha-response'];
-    console.log("IN REGISTER USER NOW WILL PRINT REQ")
-    //console.log(req)
-    // Check if CAPTCHA response is present
-    if (!recaptchaResponse) {
-        return res.status(400).json({success:false, message: 'Please complete the CAPTCHA' });
-    }
-
-    try {
-        // Verify reCAPTCHA
-        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
-        const verificationResponse = await axios.post(verificationURL);
-
-        if (!verificationResponse.data.success) {
-            return res.status(400).json({success:false,message:'CAPTCHA verification Failed/ Expired. Reload and Try again'});
-        }
-
-        const userData = req.body;
-        const User = db.User;
-        console.log("USERDATA BEFORE INSERT",userData);
-
-        await User.create(userData).then((user) => {
-            userData.userId = user.userid;
-            console.log("User Inserted, now have to insert EndUser");
-            console.log(userData);
-            EndUser.create(userData);
-        });
-
-        return res.status(200).json({success:true, message: 'Welcome ' + User.name + ',  Registration Successful' });
-
-    } catch (error) {
-        console.error('Error occurred:', error);
-        res.status(409).json({success:false,message : "Email already exists in the system, Please Login or use Forget Password Option."});
-    }
+router.get("/forgot-password", (req, res, next) => {
+	res.render("forgot-password");
 });
 
-router.post('/login', async (req, res) => {
-    const { emailId, password } = req.body;
-    const User = db.User;
-    console.log("IN login");
+router.post("/registerUser", upload.none(), async (req, res) => {
+	const recaptchaResponse = req.body["g-recaptcha-response"];
+	console.log("IN REGISTER USER NOW WILL PRINT REQ");
+	//console.log(req)
+	// Check if CAPTCHA response is present
+	if (!recaptchaResponse) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Please complete the CAPTCHA" });
+	}
 
-    const recaptchaResponse = req.body['g-recaptcha-response'];
+	try {
+		// Verify reCAPTCHA
+		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+		const verificationResponse = await axios.post(verificationURL);
 
-    // Check if CAPTCHA response is present
-    if (!recaptchaResponse) {
-        return res.status(400).json({ success: false, message: 'Please complete the CAPTCHA.' });
-    }
+		if (!verificationResponse.data.success) {
+			return res.status(400).json({
+				success: false,
+				message:
+					"CAPTCHA verification Failed/ Expired. Reload and Try again",
+			});
+		}
 
-    try {
-        // Verify reCAPTCHA
-        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
-        const verificationResponse = await axios.post(verificationURL);
+		const userData = req.body;
+		const User = db.User;
+		console.log("USERDATA BEFORE INSERT", userData);
 
-        if (!verificationResponse.data.success) {
-            return res.status(400).json({success:false,message:'CAPTCHA verification Failed/ Expired. Reload and Try again'});
-        }
+		await User.create(userData).then((user) => {
+			userData.userId = user.userid;
+			console.log("User Inserted, now have to insert EndUser");
+			console.log(userData);
+			EndUser.create(userData);
+		});
 
-        const user = await User.findOne({ where: { emailId } });
-
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'You do not exist in our system. Please Sign up' });
-        }
-
-        const decryptedPassword = decrypt(user.encrypted_password);
-
-        if (password !== decryptedPassword) {
-            return res.status(401).json({ success: false, message: 'You have entered an invalid password, ' + user.name });
-        }
-
-
-        // Calculate the expiration time as the current time + 120 minutes
-        const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
-        const expiresAt = new Date(Date.now() + tenMinutes);
-        
-        // Set the cookie
-        res.cookie('emailId', user.emailId, {
-            expires : expiresAt,
-            httpOnly: false
-        });
-
-        // Send a JSON response indicating success and possibly a redirect URL.
-        return res.status(200).json({ success: true, message: 'Welcome '+user.name+', Login successful', redirectUrl: '/item-listing' });
-    } catch (error) {
-        console.error('Error during login:', error);
-        return res.status(401).json({ success: false, message: 'Login Failed. Please use valid credentials.' });
-    }
+		return res.status(200).json({
+			success: true,
+			message: "Welcome " + User.name + ",  Registration Successful",
+		});
+	} catch (error) {
+		console.error("Error occurred:", error);
+		res.status(409).json({
+			success: false,
+			message:
+				"Email already exists in the system, Please Login or use Forget Password Option.",
+		});
+	}
 });
 
+router.post("/login", async (req, res) => {
+	const { emailId, password } = req.body;
+	const User = db.User;
+	console.log("IN login");
 
-router.use('/send-otp', send_otp_routes);
-router.use('/recover-password', recover_pass_routes);
+	const recaptchaResponse = req.body["g-recaptcha-response"];
+
+	// Check if CAPTCHA response is present
+	if (!recaptchaResponse) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Please complete the CAPTCHA." });
+	}
+
+	try {
+		// Verify reCAPTCHA
+		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+		const verificationResponse = await axios.post(verificationURL);
+
+		if (!verificationResponse.data.success) {
+			return res.status(400).json({
+				success: false,
+				message:
+					"CAPTCHA verification Failed/ Expired. Reload and Try again",
+			});
+		}
+
+		const user = await User.findOne({ where: { emailId } });
+
+		if (!user) {
+			return res.status(404).json({
+				success: false,
+				message: "You do not exist in our system. Please Sign up",
+			});
+		}
+
+		const decryptedPassword = decrypt(user.encrypted_password);
+
+		if (password !== decryptedPassword) {
+			return res.status(401).json({
+				success: false,
+				message: "You have entered an invalid password, " + user.name,
+			});
+		}
+
+		// Calculate the expiration time as the current time + 120 minutes
+		const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+		const expiresAt = new Date(Date.now() + tenMinutes);
+
+		// Set the cookie
+		res.cookie("emailId", user.emailId, {
+			expires: expiresAt,
+			httpOnly: false,
+		});
+
+		// Send a JSON response indicating success and possibly a redirect URL.
+		return res.status(200).json({
+			success: true,
+			message: "Welcome " + user.name + ", Login successful",
+			redirectUrl: "/item-listing",
+		});
+	} catch (error) {
+		console.error("Error during login:", error);
+		return res.status(401).json({
+			success: false,
+			message: "Login Failed. Please use valid credentials.",
+		});
+	}
+});
+
+router.use("/send-otp", send_otp_routes);
+router.use("/recover-password", recover_pass_routes);
+
+router.get("/", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		const userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+		const user = {
+			name: userDetails.name,
+			emailId: userDetails.emailId,
+			phone: endUserDetails.phone_nr,
+			address1: endUserDetails.address_line1,
+			address2: endUserDetails.address_line2,
+			city: endUserDetails.address_city,
+			state: endUserDetails.address_state_code,
+			zipcode: endUserDetails.address_zipcode,
+		};
+		res.render("userProfile", { user: user });
+	} else {
+		res.redirect("login");
+	}
+});
+
+router.get("/modify-user", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		const userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+		const user = {
+			name: userDetails.name,
+			emailId: userDetails.emailId,
+			phone: endUserDetails.phone_nr,
+			address1: endUserDetails.address_line1,
+			address2: endUserDetails.address_line2,
+			city: endUserDetails.address_city,
+			state: endUserDetails.address_state_code,
+			zipcode: endUserDetails.address_zipcode,
+		};
+		res.render("editProfile", { user: user });
+	} else {
+		res.redirect("login");
+	}
+});
+
+router.post("/modify-user", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		var userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+		db.User.update(
+			{
+				name: req.body.name,
+			},
+			{ where: { userid: userId } }
+		);
+
+		db.EndUsers.update(
+			{
+				phone_nr: req.body.phone,
+				address_line1: req.body.address_line1,
+				address_line2: req.body.address_line2,
+				address_city: req.body.address_city,
+				address_state_code: req.body.address_state_code,
+				address_zipcode: req.body.address_zipcode,
+			},
+			{ where: { userid: userId } }
+		);
+		res.redirect("/users/");
+	} else {
+		res.redirect("login");
+	}
+});
 
 module.exports = router;
