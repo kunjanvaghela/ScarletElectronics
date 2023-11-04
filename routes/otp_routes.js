@@ -16,7 +16,7 @@ router.post('/', async (req, res)=>{
             const dbemail = user_email.get({ plain: true });
             await OTP.destroy({where:{emailId: emailId}});
             console.log("Found User: ", dbemail);
-            const createdOPT = await sendOTP({email:emailId,subject :"OPT Verification from ScarletElectronics", message:"This is message for OTP verification", duration :1});
+            const createdOPT = await sendOTP({email:emailId,subject :"OTP Verification from ScarletElectronics", message:"This is message for OTP verification", duration :1});
             
             res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.header('Pragma', 'no-cache');

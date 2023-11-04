@@ -410,9 +410,17 @@ router.get('/get-final-cost', async (req, res)=>
 {
     console.log("get-final-cost inside ------------------------")
     
-    const [authentication, userId] = await authent(req,res);
+    // const [authentication, userId] = await authent(req,res);
+
+    const userDetails = await userUtil.check_email(req.cookies.emailId);
+
+    if(!userDetails.userid)
+    {
+        return;
+    }
+    const userId = userDetails.userid;
     
-    if(!authentication)
+    if(!userId)
     {
         return;
     }
@@ -430,7 +438,7 @@ router.get('/get-final-cost', async (req, res)=>
 
     
     
-    promocode = -50
+    promocode = 50
     sales = total_price*0.1
     finalPrice = total_price - promocode + sales
 
@@ -449,7 +457,6 @@ router.get('/get-final-cost', async (req, res)=>
 
 
 });
-
 
 
 //export router

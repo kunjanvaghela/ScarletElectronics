@@ -22,7 +22,7 @@ router.post('/update', async(req, res) =>{
             res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.header('Pragma', 'no-cache');
             res.header('Expires', 0);
-            res.status(200).redirect("/item-listing/");
+            res.status(200).redirect("/users/login");
             return;
         }
         else
