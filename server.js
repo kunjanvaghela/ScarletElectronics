@@ -1,6 +1,9 @@
 console.log('server.js loaded');
 const express = require('express');
 const jwt = require("jsonwebtoken");
+
+const landing = require("./routes/user_routes.js")
+
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
@@ -27,31 +30,21 @@ const app = express();
 // app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.set('view engine', 'ejs');
-
 app.use(cookieParser());
 
+
+// remedy for css not loading
+var path = require('path');
+app.use("/public", express.static(path.resolve(__dirname + '/public')));
 app.use('/users', userRouter);
+// end of Yujia's remedy
+
+
+
 app.use('/add-item', addItem);
-
-
 app.use('/item-listing', itemListing);
-
 app.use('/cart',cart);
-
-// app.post('/forgot-password', (req, res, next) => {
-//     const  { emailId } = req.body;
-//     console.log("In POST forgot Password " + emailId);
-//     User.findOne({where: {emailId: emailId}}).then((user) => {
-//         console.log("Found User: ", user);
-//     }).catch((err) => {
-//         console.log("No Users found");
-//     });
-//     // console.log(req.body);
-//     // res.send(emailId);
-
-// });
 
 
 db.sequelize.sync().then(() => {
