@@ -98,17 +98,25 @@ router.post('/add-itemlisting', async (req, res)=>
     console.log("add-itemlisting inside ------------------------")
 
     //get authentication status and user id
-    const [authentication, userid] = await authent(req,res);
+    // const [authentication, userid] = await authent(req,res);
     
-    if(!authentication)
+    const userDetails = await userUtil.check_email(req.cookies.emailId);
+
+    if(!userDetails.userid)
     {
         return;
     }
 
+    const userId = userDetails.userid;
+
     //parse listingId from request
     //parse query parameters
-    console.log("req.query: ", req.body);
-    const listingId = req.body.listingId;
+    console.log("req data: ", req.body);
+    // console.log("req.query: ", JSON.parse(req.body));
+    const data = req.body;
+    const listingId = data.listingId;
+
+    // const listingId = req.body.listingId;
 
     console.log("listingId: ", listingId);
 
@@ -124,7 +132,7 @@ router.post('/add-itemlisting', async (req, res)=>
     }
 
     //check if listingId already exists in cart
-    const listingIdExistsInCart = await Cart.findOne({where:{listingId:listingId, userId:userid}});
+    const listingIdExistsInCart = await Cart.findOne({where:{listingId:listingId, userId:userId}});
 
     if(listingIdExistsInCart)
     {
@@ -134,8 +142,10 @@ router.post('/add-itemlisting', async (req, res)=>
         return;
     }
 
+    console.log("my " ,userId, listingId);
+
     //add listingId to cart
-    const addListingId = await Cart.create({userId:userid, listingId:listingId, quantity:1});
+    const addListingId = await Cart.create({userId:userId, listingId:listingId, quantity:1});
 
     //return success message
     res.status(200).send("listingId added to cart successfully");
@@ -218,10 +228,12 @@ router.post('/remove-itemlisting', async (req, res)=>
 
     //parse listingId from request
     //parse query parameters
-    console.log("req.query: ", req.body);
-    const listingId = req.body.listingId;
+    console.log("req.query: ", JSON.parse(req.body));
+    data = JSON.parse(req.body);
+    console.log(data);
+    const listingId = data['listingId'];
 
-    console.log("listingId: ", listingId);
+    console.log("listingId: ", data['listingId']);
 
     //check if listingId exists in db
     const listingIdExists = await ItemListing.findOne({where:{listingId:listingId}});

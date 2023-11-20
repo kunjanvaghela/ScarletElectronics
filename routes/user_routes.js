@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const send_otp_routes = require("./otp_routes");
-const recover_pass_routes =require("./recover_pass_routes");
-const mysql = require('mysql2');
-const { encrypt, decrypt } = require('../util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory
-
+const recover_pass_routes = require("./recover_pass_routes");
+const axios = require('axios'); // Required for reCAPTCHA verification
 const db = require('../models');
-const { where } = require('sequelize');
-const EndUser = db.EndUsers;
-const User = db.User;
-const OTP = db.OTP;
+const EndUser= db.EndUsers;
+
+const { encrypt, decrypt } = require('../util/encryptionUtil');
+
+const multer = require('multer');
+const upload = multer();
 
 router.get("/Home_Landing", (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
@@ -24,7 +24,12 @@ router.get("/", (req, res) => {
 router.get('/login', (req, res) => {
     console.log('Successfully in Root :Inssss:sss:: /');
     res.render('loginPage');
+})
 
+router.get('/logout', (req, res) => {
+    console.log('Successfully in Root :Inssss:sss:: /');
+    res.clearCookie("emailId");
+    res.redirect('/users/login');
 })
 
 router.get('/register', (req, res) => {
@@ -55,69 +60,95 @@ router.get('/forgot-password', (req, res, next) => {
     res.render('forgot-password');
 });
 
-router.post('/registerUser', async (req, res) => {
-    // Get data from request
-    const userData = req.body;
-    const User = db.User;
-   // console.log(userData['emailId']);
+router.post('/registerUser',upload.none(), async (req, res) => {
+    const recaptchaResponse = req.body['g-recaptcha-response'];
+    console.log("IN REGISTER USER NOW WILL PRINT REQ")
+    //console.log(req)
+    // Check if CAPTCHA response is present
+    if (!recaptchaResponse) {
+        return res.status(400).json({success:false, message: 'Please complete the CAPTCHA' });
+    }
 
     try {
-        // const user = await User.create(userData);
+        // Verify reCAPTCHA
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+        const verificationResponse = await axios.post(verificationURL);
+
+        if (!verificationResponse.data.success) {
+            return res.status(400).json({success:false,message:'CAPTCHA verification Failed/ Expired. Reload and Try again'});
+        }
+
+        const userData = req.body;
+        const User = db.User;
+        console.log("USERDATA BEFORE INSERT",userData);
+
         await User.create(userData).then((user) => {
             userData.userId = user.userid;
             console.log("User Inserted, now have to insert EndUser");
             console.log(userData);
             EndUser.create(userData);
-
         });
 
-        res.redirect('Home_Landing');  // Redirect to login or any other page
+        return res.status(200).json({success:true, message: 'Welcome ' + User.name + ',  Registration Successful' });
+
     } catch (error) {
-        // Handle the error response
         console.error('Error occurred:', error);
-        res.status(409).render("loginPage", {message : "Email alredy exists in the system, Please Login or use Forget Password Option."});
-       // res.status(500).send('Error occurred');
+        res.status(409).json({success:false,message : "Email already exists in the system, Please Login or use Forget Password Option."});
     }
 });
 
 router.post('/login', async (req, res) => {
-    // Get data from request
     const { emailId, password } = req.body;
-
     const User = db.User;
+    console.log("IN login");
+
+    const recaptchaResponse = req.body['g-recaptcha-response'];
+
+    // Check if CAPTCHA response is present
+    if (!recaptchaResponse) {
+        return res.status(400).json({ success: false, message: 'Please complete the CAPTCHA.' });
+    }
 
     try {
+        // Verify reCAPTCHA
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+        const verificationResponse = await axios.post(verificationURL);
+
+        if (!verificationResponse.data.success) {
+            return res.status(400).json({success:false,message:'CAPTCHA verification Failed/ Expired. Reload and Try again'});
+        }
+
         const user = await User.findOne({ where: { emailId } });
 
         if (!user) {
-            return res.status(404).render("loginPage", { message: 'You do not exists in our system. Please Sign up' });
+            return res.status(404).json({ success: false, message: 'You do not exist in our system. Please Sign up' });
         }
 
         const decryptedPassword = decrypt(user.encrypted_password);
 
         if (password !== decryptedPassword) {
-            return res.status(401).render("loginPage", { message: 'Wrong Password. Please try again!' });
+            return res.status(401).json({ success: false, message: 'You have entered an invalid password, ' + user.name });
         }
 
-        // Calculate the expiration time as the current time + 10 minutes
-        const tenMinutes = 1000 * 60 * 60; // 10 minutes in milliseconds
+
+        // Calculate the expiration time as the current time + 120 minutes
+        const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
         const expiresAt = new Date(Date.now() + tenMinutes);
         
-        // Handle the response after success
+        // Set the cookie
         res.cookie('emailId', user.emailId, {
             expires : expiresAt,
-            httpOnly: true
+            httpOnly: false
         });
 
-        // return res.status(200).json({ message: 'Welcome '+user.name+',  Login successful' });
-      // return res.status(201).redirect('/users/Home_Landing');  // Manad's redirection
-        return res.status(200).render('seller_listing');
-
+        // Send a JSON response indicating success and possibly a redirect URL.
+        return res.status(200).json({ success: true, message: 'Welcome '+user.name+', Login successful', redirectUrl: '/item-listing' });
     } catch (error) {
         console.error('Error during login:', error);
-        return res.status(401).render("loginPage" , {message: 'Login Failed Please use valid Credentials'});
+        return res.status(401).json({ success: false, message: 'Login Failed. Please use valid credentials.' });
     }
 });
+
 
 router.use('/send-otp', send_otp_routes);
 router.use('/recover-password', recover_pass_routes);

@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </head>
 
 <body>
@@ -17,7 +19,8 @@
         <h1 class="text-primary text-center mx-auto">Welcome to the ScarletElectronics</h1>
         <br> <br> <br>
         <h2 class="text-center">User Register Form</h2>
-        <form id="reg" name="registration" method="POST" action="/users/registerUser" onSubmit="return formValidation();">
+        <form id="reg" name="registration" method="POST" action="/users/registerUser"
+            onSubmit="return formValidation();">
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="name" class="form-label text-left">Name</label> <input type="text"
                     class="form-control text-left" id="name" name="name" onchange="allLetter();" required>
@@ -25,7 +28,8 @@
             <br>
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="pseudoName" class="form-label text-left">Pseudo
-                    Name:</label> <input type="text" class="form-control text-left" id="pseudoName" name="pseudoName" required>
+                    Name:</label> <input type="text" class="form-control text-left" id="pseudoName" name="pseudoName"
+                    required>
                 <div id="emailHelp" class="form-text">This Name will be used
                     in Public Reports (Bidding History)</div>
             </div>
@@ -46,7 +50,8 @@
                 <label for="password" class="form-label text-left">Password</label>
                 <input type="password" class="form-control text-left" id="password" name="password"
                     onchange="passid_validation(7,12);" required>
-                <p style="font-size: small;" class="form-text">Password should contains 7 to 12 characters, atleast one Capital letter, atleast one digit, atleast one special character</p>
+                <p style="font-size: small;" class="form-text">Password should contains 7 to 12 characters, atleast one
+                    Capital letter, atleast one digit, atleast one special character</p>
             </div>
             <br>
             <div class="col-md-3 align-self-center mx-auto">
@@ -144,9 +149,12 @@
                 </div>
             </div>
             <br> <br>
+            <div class="col-md-2 text-center mx-auto">
+                <div class="g-recaptcha" data-sitekey="6Lffbu8oAAAAAIxa23ZCnXKjsEXDijpsEfiiwcU_"></div>
+            </div>
             <p id="err_para" style="color: red;"></p><br>
             <div class="col-md-3 text-center mx-auto">
-                <button type="submit" id = "submit_button"class="btn btn-primary align-self-center" >Submit</button>
+                <button type="submit" id="submit_button" class="btn btn-primary align-self-center">Submit</button>
             </div>
         </form>
     </div>
@@ -154,38 +162,114 @@
     </div>
 
 
-    <script>
-        function phoneNumberCheck()
-        {
-           var validator =  /^\d{10}$/;
-           var phone_num = document.getElementById("phoneNr").value;
+    <!-- <script src="formValidation.js"></script> -->
+    <script type="text/javascript">
 
-           if(!validator.test(phone_num))
-           {
+        // document.getElementById('reg').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+
+        //     const recaptchaResponse = document.querySelector('[name="g-recaptcha-response"]').value;
+
+        //     // Validate CAPTCHA
+        //     if (!recaptchaResponse) {
+        //         alert('Please complete the CAPTCHA before AJAX.');
+        //         return;
+        //     }
+
+        //     // Collect form data
+        //     const formData = new FormData(event.currentTarget);
+
+        //     fetch('/users/registerUser', {
+        //         method: 'POST',
+        //         body: formData
+        //     })
+        //         .then(response => response.json()) // Always expect a JSON response
+        //         .then(data => {
+        //             if (data.success) {
+        //                 // Redirect to the specified URL
+        //                 window.location.href = data.redirectUrl || '/users/login';
+        //             } else {
+        //                 // Display the error message
+        //                 alert(data.message);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             alert('An unexpected error occurred. \n',error);
+        //         });
+        // });
+        document.getElementById('reg').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const recaptchaResponse = document.querySelector('[name="g-recaptcha-response"]').value;
+
+            // Validate CAPTCHA
+            if (!recaptchaResponse) {
+                alert('Please complete the CAPTCHA before AJAX.');
+                return;
+            }
+
+            // Collect form data
+            const formData = new FormData(event.currentTarget);
+
+            fetch('/users/registerUser', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    // Check if the response is not ok (e.g., status code 400, 409, etc.)
+                    if (!response.ok) {
+                        // Convert the response to JSON and then throw an error with the backend's message
+                        return response.json().then(data => {
+                            throw new Error(data.message);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to the specified URL
+                        alert(data.message);
+                        window.location.href = data.redirectUrl || '/users/login';
+                    }
+                })
+                .catch(error => {
+                    // This will now catch errors with specific messages from the backend
+                    console.error('Error:', error);
+                    alert(error.message);
+                });
+        });
+
+    </script>
+    <script>
+        function phoneNumberCheck() {
+            var validator = /^\d{10}$/;
+            var phone_num = document.getElementById("phoneNr").value;
+
+            if (!validator.test(phone_num)) {
                 alert("Phone must contain only 10 Numbers.")
                 return false;
-           }
-           return true;
+            }
+            return true;
         }
 
 
-        function passid_validation(mx,my){
+        function passid_validation(mx, my) {
             var strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{7,}$/;
             var passid = document.getElementById("password").value;
 
             var passid_len = passid.length;
-            if (passid_len == 0 ){
+            if (passid_len == 0) {
                 alert("Password should not be empty");
                 //document.registration.passid.focus();
                 return false;
             }
-            else if(passid_len >= my || passid_len < mx){
-                alert("Password Length should be between "+mx+" to "+my);
+            else if (passid_len >= my || passid_len < mx) {
+                alert("Password Length should be between " + mx + " to " + my);
                 //document.registration.passid.focus();
                 return false;
             }
-            else if(!strongPasswordRegex.test(passid))
-            {
+            else if (!strongPasswordRegex.test(passid)) {
                 alert("Password not satisfy all the criteria");
                 //document.registration.passid.focus();
                 return false;
@@ -193,30 +277,30 @@
             return true;
         }
 
-        
 
-        function allLetter(){ 
+
+        function allLetter() {
             var uname = document.getElementById("name");
 
             //var uname = document.getElementById('name').value;
             console.log(uname);
 
             var letters = /^[a-zA-Z ]*$/;
-            if(uname.value.match(letters)){
+            if (uname.value.match(letters)) {
                 return true;
             }
             alert('Username must have alphabet characters only');
-           // document.registration.name.focus();
+            // document.registration.name.focus();
             return false;
         }
 
 
-        function validateEmail(){
+        function validateEmail() {
             var uemail = document.getElementById('emailId').value;
             console.log(uemail);
-            
+
             var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            if(uemail.match(mailformat)){
+            if (uemail.match(mailformat)) {
                 return true;
             }
             alert("You have entered an invalid email address!");
@@ -225,30 +309,30 @@
         }
 
 
-        function cpassid_validation(){
+        function cpassid_validation() {
             var passid = document.getElementById('password').value;
             var cpassid = document.getElementById('cpassword').value;
 
-            if (passid == cpassid){
+            if (passid == cpassid) {
                 return true
             }
             alert("Password and Confirm Password do not match!");
             return false;
         }
 
-        function formValidation(){
+        function formValidation() {
             var uemail = document.getElementById("emailId");
             var uname = document.getElementById("name");
             var passid = document.getElementById("password");
             var cpassid = document.getElementById("cpassword");
             var err_para = document.getElementById("err_para");
-            
-            if(uemail.value==''||uname.value==''||passid.value==''||cpassid.value==''){	
+
+            if (uemail.value == '' || uname.value == '' || passid.value == '' || cpassid.value == '') {
                 alert("You have missed mandatory field(s)");
                 return false;
             }
-            
-            if(allLetter() && validateEmail() && passid_validation(7,12) && cpassid_validation() && phoneNumberCheck()){
+
+            if (allLetter() && validateEmail() && passid_validation(7, 12) && cpassid_validation() && phoneNumberCheck()) {
                 console.log("Insise");
                 return true;
             }
