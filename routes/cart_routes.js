@@ -1,6 +1,5 @@
 
 /*
-
 Add Itemlisting	                cart/add-itemlisting	       POST	token, listingId
 Update Itemlisting	            cart/update-itemlisting	       PUT	token, listingId, updateCount
 Remove Itemlisting	            cart/remove-itemlisting	       DELETE	token, listingId
@@ -472,6 +471,8 @@ router.post('/checkout', async (req, res)=>
     //redirect to order confirmation page
     res.render('orderplace')
     res.status(200).send("Order placed successfully");
+
+
 });
 
 
