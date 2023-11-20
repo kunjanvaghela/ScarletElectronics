@@ -58,16 +58,21 @@ router.get("/create", async (req, res) => {
   console.log(req.cookies.emailId);
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
+  const username = userDetails.name;
+
   // console.log(req.cookies['emailId']);
   console.log("Cookie must have been displayed!");
-  res.render('seller_listing');
+  res.render('seller_listing', { username });
 });
 
-router.get("/get-existing-listing", (req, res) => {
+router.get("/get-existing-listing", async (req, res) => {
     console.log('Button Working');
+    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
     const item_listing = Catalog.findAll().then(function(Catalog){
         
-        res.render('seller_listing', {Catalog});
+        res.render('seller_listing', {Catalog, username});
         //console.log(Catalog);
         
       }).catch(function(err){

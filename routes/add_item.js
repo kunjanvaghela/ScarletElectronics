@@ -7,11 +7,16 @@ const mysql = require('mysql2');
 const db = require('../models');
 const { where } = require('sequelize');
 const Catalog = db.Catalog;
+const UserUtil = require('../util/userUtil');
 
 
-router.get("/add", (req, res) => {
-    console.log('Successfully in Root :Inssss:sss:: /');
-    res.render('additem');
+router.get("/add", async (req, res) => {
+    console.log('Successfully in /add-item/add');
+    const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const username = userDetails.name;
+    console.log('username : ',  username);
+    res.render('additem', { username });
+    
 });
 
 
