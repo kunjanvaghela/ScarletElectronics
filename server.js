@@ -8,6 +8,7 @@ const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
 const cart = require("./routes/cart_routes.js");
+const reivew = require("./routes/review_rating.js");
 const cookieParser = require('cookie-parser');
 
 const mysql = require('mysql2');
@@ -45,6 +46,7 @@ app.use('/users', userRouter);
 app.use('/add-item', addItem);
 app.use('/item-listing', itemListing);
 app.use('/cart',cart);
+app.use('/review', reivew);
 
 
 db.sequelize.sync().then(() => {
