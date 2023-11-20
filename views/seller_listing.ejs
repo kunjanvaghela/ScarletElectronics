@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <%- include('Common/header.ejs') %>
     <h1 class="text-primary text-center mx-auto">Item Listing Page</h1>
     <div>
         <div class="row">
@@ -226,11 +227,11 @@
         }
         
         if (priceInput.value === '') {
-            alert('Please fill in Initial Price');
+            alert('Please fill in the Price');
             return false;
         }
         else if (quantityInput.value === '') {
-            alert('Please fill in Bid Increment');
+            alert('Please provide the quantity');
             return false;
         }
         else {
