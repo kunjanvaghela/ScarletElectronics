@@ -176,7 +176,7 @@
 
             //send ajax post request to checkout
             var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/fetch-cart-display/finalcost", true);
+            xhttp.open("POST", "/fetch-cart-display", true);
             xhttp.setRequestHeader("Content-type", "application/json");
             xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promocode: promocode1}));
         });

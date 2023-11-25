@@ -45,8 +45,9 @@ async function authent(req,res)
     if(!authentication)
     {
         //return invalid authorization token
-        res.status(401).send("Invalid Authorization Token");
+        res.status(401);
         console.log("Invalid Authorization Token");
+        res.render('loginPage');
         return [false, null];
     }
 

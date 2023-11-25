@@ -453,11 +453,10 @@ router.get('/get-final-cost', async (req, res)=>
         Sales:sales,
         FinalPrice:finalPrice
     });
-    res.render()
-
+    return finalPrice;
 
 });
 
 
 //export router
-module.exports = router;
+module.exports = { router, get_cart};
