@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const EndUserRequest = sequelize.define('end_user_request', {
+    const EndUserRequest = sequelize.define('EndUserRequest', {
         requestId: {
           type: DataTypes.INTEGER.UNSIGNED,
           allowNull: false,
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         created_on: {
           type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
         },
         current_status: {
           type: DataTypes.STRING(5),
