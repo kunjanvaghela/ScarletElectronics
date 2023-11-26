@@ -53,6 +53,40 @@ router.get("/", async (req, res) => {
   // res.render('listings');
 });
 
+router.get("/product", async (req, res) => {
+  console.log('Working');
+  try {
+
+    console.log('Item-Id : ', req.query['item-id'])
+
+    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const username = userDetails.name;
+    const itemId = req.query['item-id'];
+
+    const product = await Catalog.findOne({
+        where: { itemId },
+        include: [{
+          model: ItemListing,
+          attributes: ['listingId', 'price', 'quantity'],
+        }],
+      });
+
+      if (!product) {
+        console.log('Product not found');
+        res.status(404).send('Product not found');
+        return;
+      }
+    console.log('product : ', product);
+    console.log('product.ItemListings : ', product.ItemListings);
+    res.render('product', {product, username});
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    res.status(500).send('Internal server error');
+  }
+  
+});
+
+
 router.get("/create", async (req, res) => {
   console.log('Working');
   console.log(req.cookies.emailId);

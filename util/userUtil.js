@@ -8,7 +8,7 @@ async function check_email(emailId)
     try{
         //parse emailId from request
         //parse query parameters
-        console.log("emailId: ", emailId);
+        // console.log("emailId: ", emailId);
         // const emailId = req.body.emailId;
     
         if(emailId === undefined) {
