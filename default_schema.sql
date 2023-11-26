@@ -24,11 +24,12 @@ CREATE TABLE `users` (
 ); 
 
 CREATE TABLE `staff` (
-  `userId` int unsigned NOT NULL,
+  `userId` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
   `ssn` int DEFAULT NULL,
   `date_of_birth` date DEFAULT NULL,
-  `designation` varchar(10) DEFAULT NULL,
-  `status` varchar(1) DEFAULT NULL,
+  `designation` varchar(20) DEFAULT NULL,
+  `status` varchar(5) DEFAULT NULL,
   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_by` varchar(20) DEFAULT NULL,
   `remarks` varchar(100) DEFAULT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE `staff` (
   -- Seperate end user and staff tables
   -- CONSTRAINT `ref_staff_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 );
+
 
 /*Item Master Table*/
 CREATE TABLE `ref_catalog` (
