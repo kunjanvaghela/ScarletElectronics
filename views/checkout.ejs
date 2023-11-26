@@ -65,34 +65,57 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dynamicTable = document.getElementById('dynamicTable');
-            const addRowButton = document.getElementById('addRow');
             let rowCounter = 0;
-
+    
             var cartDetails = <%- JSON.stringify(cartDetails) %>;
             cart_row_reference = [];
             for (const itemData of cartDetails) {
                 rowCounter++;
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
-                <tr>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.name}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.quantity}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.price}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.totalPrice}</label>
-                    </td>
-                <tr>
+                    <tr>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.name}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.quantity}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.price}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.totalPrice}</label>
+                        </td>
+                    <tr>
                 `;
                 dynamicTable.appendChild(newRow);
             }
-        });
+    
+            const checkoutButton = document.getElementById('checkout');
+            checkoutButton.addEventListener('click', function () {
 
+
+                // get card details
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardName = document.getElementById('cardName').value;
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCVV = document.getElementById('cardCVV').value;
+
+                //AJAX call to send data to server
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/cart/checkout');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                
+
+                xhr.send(JSON.stringify({
+                    cardNumber: cardNumber,
+                    cardName: cardName,
+                    cardExpiry: cardExpiry,
+                    cardCVV: cardCVV,
+                }));
+            });
+        });
     </script>
+        
 </body>
 </html>

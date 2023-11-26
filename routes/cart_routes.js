@@ -1,6 +1,5 @@
 
 /*
-
 Add Itemlisting	                cart/add-itemlisting	       POST	token, listingId
 Update Itemlisting	            cart/update-itemlisting	       PUT	token, listingId, updateCount
 Remove Itemlisting	            cart/remove-itemlisting	       DELETE	token, listingId
@@ -92,6 +91,8 @@ async function get_cart(userId)
 
     return cartDetails;
 }
+
+
 
 router.post('/add-itemlisting', async (req, res)=>
 {
@@ -228,9 +229,11 @@ router.post('/remove-itemlisting', async (req, res)=>
 
     //parse listingId from request
     //parse query parameters
-    console.log("req.query: ", JSON.parse(req.body));
-    data = JSON.parse(req.body);
-    console.log(data);
+    var data = req.body;
+    // console.log(data_temp);
+    // console.log("req.query: ", JSON.parse(req.body));
+    // data = JSON.parse(req.body);
+    // console.log(data);
     const listingId = data['listingId'];
 
     console.log("listingId: ", data['listingId']);
@@ -304,6 +307,8 @@ router.get('/fetch-cart', async (req, res)=>
 {
     console.log("fetch-cart inside ------------------------")
 
+    console.log(req.cookies)
+
     //get authentication status and user id
     const [authentication, userId] = await authent(req,res);
 
@@ -326,7 +331,8 @@ router.get('/fetch-cart', async (req, res)=>
 
 
     //return cart details
-    res.status(200).send(cartDetails,{cartDetails});
+    res.status(200)
+    res.send(cartDetails);
 
 });
 
@@ -359,6 +365,7 @@ router.post('/add-payment-information', async (req, res)=>
     console.log("add-payment-information inside ------------------------")
 });
 
+
 router.get('/fetch-address', async (req, res)=>
 {
     console.log("fetch-address inside ------------------------")
@@ -376,12 +383,12 @@ router.post('/check-promo-code', async (req, res)=>
     //parse promoCode from request
     //parse query parameters
     console.log("req.query: ", req.body);
-    const promoCode = req.body.promoCode;
+    const promoCode1 = req.body.promocode;
 
-    console.log("promoCode: ", promoCode);
+    console.log("promoCode: ", promoCode1);
 
     //check if promoCode exists in db
-    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode1}});
 
     if(!promoCodeData)
     {
@@ -406,26 +413,32 @@ router.post('/check-promo-code', async (req, res)=>
 
 });
 
+router.get('/orderplace', async (req, res) => { 
+    
+    console.log("orderplace inside ------------------------")
+    res.render('orderplace') 
+});
+
+
 router.get('/get-final-cost', async (req, res)=>
 {
     console.log("get-final-cost inside ------------------------")
     
-    // const [authentication, userId] = await authent(req,res);
-
-    const userDetails = await userUtil.check_email(req.cookies.emailId);
-
-    if(!userDetails.userid)
+    //get authentication status and user id
+    const [authentication, userId] = await authent(req,res);
+    
+    if(!authentication)
     {
         return;
     }
-    const userId = userDetails.userid;
+   
     
     if(!userId)
     {
         return;
     }
     //get cart body
-    cartDetails = await get_cart(userId)
+    let cartDetails = await get_cart(userId)
 
     total_price = 0;
     // calculate total price of each listing
@@ -436,14 +449,18 @@ router.get('/get-final-cost', async (req, res)=>
     }
 
 
-    
-    
+    console.log("cartDetails:  1 ", cartDetails);
+
     promocode = 50
+
     sales = total_price*0.1
     finalPrice = total_price - promocode + sales
 
     //convert to string
+    total_price = total_price.toString();
     promoCode = promocode.toString();
+
+
 
 
     res.render('checkout',{
@@ -453,7 +470,72 @@ router.get('/get-final-cost', async (req, res)=>
         Sales:sales,
         FinalPrice:finalPrice
     });
-    return finalPrice;
+//    res.render()
+
+
+});
+
+router.post('/checkout', async (req, res)=>
+{
+    console.log("checkout inside ------------------------")
+
+    //get authentication status and user id
+    const [authentication, userid] = await authent(req,res);
+    
+    if(!authentication)
+    {
+        return;
+    }
+
+    console.log("req.body: ", req.body);
+
+
+    //get payment details
+
+    //get cart details
+    const cartDetails = await get_cart(userid);
+
+    //get total price
+    total_price = 0;
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        total_price += cartDetails[i].price * cartDetails[i].quantity;
+    }
+
+    //update quantity in itemlisting
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        const updateQuantity = await ItemListing.update({quantity:cartDetails[i].quantity - cartDetails[i].quantity},{where:{listingId:cartDetails[i].listingId}});
+    }
+
+
+
+    
+    console.log("cartDetails: ", cartDetails);
+    
+    const tax = 0.1 * total_price;
+    const promoCode = 50;
+    const finalPrice = total_price + tax - promoCode;
+
+    console.log("Final Price: ", total_price);
+
+
+
+
+
+    //delete cart details from db
+    const deleteCartDetails = await Cart.destroy({where:{userId:userid}});
+
+    //update quantity in itemlisting
+    I
+
+
+
+
+    //victors code
+
+
+
 
 });
 
