@@ -18,12 +18,12 @@ router.use(express.urlencoded({ extended: true }));
 router.post("/create-payment-intent", async (req, res) => {  
     const userDetails = await userUtil.check_email(req.cookies.emailId);
     const customerId = paymentService.fetchCustomerFromStripe(userDetails);
-    const total = await paymentService.calculateTotal(userDetails);
+    const total = Math.ceil(await paymentService.calculateTotal(userDetails) * 100);
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
         customer: customerId,
         // setup_future_usage: "off_session",
-        amount: total * 100,
+        amount: total,
         currency: "usd",
         // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
         automatic_payment_methods: {
