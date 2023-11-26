@@ -34,8 +34,9 @@ CREATE TABLE `staff` (
   `remarks` varchar(100) DEFAULT NULL,
   `updated_by` varchar(20) DEFAULT NULL,
   `updated_on` datetime DEFAULT NULL,
-  PRIMARY KEY (`userId`),
-  CONSTRAINT `ref_staff_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+  PRIMARY KEY (`userId`)
+  -- Seperate end user and staff tables
+  -- CONSTRAINT `ref_staff_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 );
 
 /*Item Master Table*/
@@ -106,14 +107,19 @@ CREATE TABLE `item_listing` (
 CREATE TABLE `end_user_request` (
   `requestId` int unsigned NOT NULL AUTO_INCREMENT,
   `userId` int unsigned NOT NULL,
-  /*`listingId` int unsigned DEFAULT NULL,*/
+  `listingId` int unsigned DEFAULT NULL,
   `update_description` varchar(200) DEFAULT NULL,
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `current_status` varchar(5) DEFAULT NULL,
+  `customer_rep` int unsigned DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
   PRIMARY KEY (`requestId`),
   KEY `userId` (`userId`),
-  -- KEY `listingId` (`listingId`),
-  CONSTRAINT `enduserrequests_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE
-  -- CONSTRAINT `enduserrequests_ibfk_3` FOREIGN KEY (`listingId`) REFERENCES `item_listing` (`listingId`) ON DELETE CASCADE
+  KEY `listingId` (`listingId`),
+  CONSTRAINT `enduserrequests_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE,
+  CONSTRAINT `enduserrequests_ibfk_2` FOREIGN KEY (`listingId`) REFERENCES `item_listing` (`listingId`) ON DELETE CASCADE
+  -- No need to create a foriegn key for staff table as only customer rep can access this
+  /*CONSTRAINT `enduserrequests_ibfk_3` FOREIGN KEY (`customer_rep`) REFERENCES `staff` (`userId`) ON DELETE CASCADE*/
 );
 
 -- CREATE TABLE `frequentlyaskedquestions` (
