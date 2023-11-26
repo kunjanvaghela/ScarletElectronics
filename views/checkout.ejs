@@ -19,7 +19,7 @@
                     <th class="text-center">Item Name</th>
                     <th class="text-center">Quantity (qty)</th>
                     <th class="text-center">Per Item cost</th>
-                    <th class="text-center">Total Cost</th>
+                    <th class="text-center">Total Item Cost</th>
                 </tr>
             </thead>
             <tbody id="dynamicTable">
@@ -41,7 +41,7 @@
                     <td class="text-center" style="font-weight: bold;"><%- Sales %></td>
                 </tr>
                 <tr class="table-active">
-                    <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost</td>
+                    <td colspan="3" class="text-center" style="font-weight: bold;">Final Cost</td>
                     <td class="text-center" style="font-weight: bold;"><%- FinalPrice %></td>
                 </tr>
             </tbody>
@@ -57,7 +57,7 @@
         </div>
         
         <div class="col-md-3 text-center mx-auto">
-            <button type="button" class="btn btn-primary align-self-center" onclick="window.location.href = '/orderplace';" id="checkout">CheckOut</button>
+            <button type="button" class="btn btn-primary align-self-center"  id="checkout">CheckOut</button>
         </div>
     </form>
     <br> <br>
@@ -66,7 +66,7 @@
             const dynamicTable = document.getElementById('dynamicTable');
             let rowCounter = 0;
     
-            var cartDetails = <%= JSON.stringify(cartDetails) %>;
+            var cartDetails = <%- JSON.stringify(cartDetails) %>;
             cart_row_reference = [];
             for (const itemData of cartDetails) {
                 rowCounter++;
@@ -90,11 +90,29 @@
                 dynamicTable.appendChild(newRow);
             }
     
-            // const checkoutButton = document.getElementById('checkout');
-            // checkoutButton.addEventListener('click', function () {
-            //     // Redirect to the "orderplace.ejs" file
-            //     window.location.href = '/orderplace.ejs';
-            // });
+            const checkoutButton = document.getElementById('checkout');
+            checkoutButton.addEventListener('click', function () {
+
+
+                // get card details
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardName = document.getElementById('cardName').value;
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCVV = document.getElementById('cardCVV').value;
+
+                //AJAX call to send data to server
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/cart/checkout');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                
+
+                xhr.send(JSON.stringify({
+                    cardNumber: cardNumber,
+                    cardName: cardName,
+                    cardExpiry: cardExpiry,
+                    cardCVV: cardCVV,
+                }));
+            });
         });
     </script>
         

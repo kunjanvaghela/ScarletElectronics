@@ -17,7 +17,7 @@ async function check_email(emailId)
         const user_email = await  User.findOne({where: {'emailId': emailId}});
         if(user_email !== null) {
             const dbemail = user_email.get({ plain: true });
-            console.log("Found User: ", dbemail);
+            //console.log("Found User: ", dbemail);
             
             //get details of user from db
             const user_details = await User.findOne({where:{emailId:emailId}});
