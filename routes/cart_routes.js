@@ -229,9 +229,11 @@ router.post('/remove-itemlisting', async (req, res)=>
 
     //parse listingId from request
     //parse query parameters
-    console.log("req.query: ", JSON.parse(req.body));
-    data = JSON.parse(req.body);
-    console.log(data);
+    var data = req.body;
+    // console.log(data_temp);
+    // console.log("req.query: ", JSON.parse(req.body));
+    // data = JSON.parse(req.body);
+    // console.log(data);
     const listingId = data['listingId'];
 
     console.log("listingId: ", data['listingId']);
