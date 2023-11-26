@@ -17,7 +17,7 @@
         <h1 class="text-primary text-center mx-auto">Create Customer Representative</h1>
         <br>
         <h2 class="text-center"></h2>
-        <form method="POST" action="/admin/insert-customer-rep">
+        <form method="POST" action="/admin/insert-customer-rep" onsubmit="formatDate()">
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="name" class="form-label text-left">Name</label> <input type="text"
                     class="form-control text-left" id="name" name="name" onchange="allLetter('a')" required>
@@ -28,9 +28,17 @@
                 <input type="number" class="form-control text-left" id="ssn" name="ssn" onchange="validateSSN()" required>
             </div>
             <br>
+            <br>
+            <!-- <div class="col-md-3 align-self-center mx-auto">
+                <label for="password" class="form-label text-left">Password</label> <input type="password"
+                    class="form-control text-left" id="password" name="password" required>
+            </div> -->
             <div class="col-md-3 align-self-center mx-auto">
-                <label for="dob" class="form-label text-left">Date of Birth (MM/DD/YYYY)</label>
-                <input type="text" class="form-control text-left" id="dob" name="dob" placeholder="MM/DD/YYYY" onchange="validateDOB()" required>
+                <label for="password" class="form-label text-left">Password</label>
+                <input type="password" class="form-control text-left" id="password" name="password"
+                    onchange="passid_validation(7,12);" required>
+                <p style="font-size: small;" class="form-text">Password should contains 7 to 12 characters, atleast one
+                    Capital letter, atleast one digit, atleast one special character</p>
             </div>
             <br>
             <div class="col-md-3 align-self-center mx-auto">
@@ -45,14 +53,30 @@
             </div>
         </form>
     </div>
-    </form>
-    </div>
-
 
     <script src="formValidation.js"></script>
     <script type="text/javascript">
         // Your existing JS code here
+
+        function formatDate() {
+            // Get the input element
+            var dobInput = document.getElementById('dob');
+
+            // Get the entered value
+            var inputValue = dobInput.value;
+
+            // Split the entered value by "/"
+            var dateParts = inputValue.split('/');
+
+            // Rearrange the parts to match "YYYY-MM-DD" format
+            var formattedDate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1];
+            console.log('Formatted Date:', formattedDate);
+
+            // Set the formatted date back to the input
+            dobInput.value = formattedDate;
+        }
     </script>
+
     <script>
         function validateSSN() {
             var ssnInput = document.getElementById('ssn');
@@ -66,20 +90,28 @@
                 ssnInput.setCustomValidity('Please enter a valid 9-digit SSN');
             }
         }
-    </script>
 
-    <script>
-        function validateDOB() {
-            var dobInput = document.getElementById('dob');
-            var dobPattern = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/;
-    
-            if (dobPattern.test(dobInput.value)) {
-                // Valid DOB format
-                dobInput.setCustomValidity('');
-            } else {
-                // Invalid DOB format
-                dobInput.setCustomValidity('Please enter a valid Date of Birth in the format MM/DD/YYYY');
+        function passid_validation(mx, my) {
+            var strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{7,}$/;
+            var passid = document.getElementById("password").value;
+
+            var passid_len = passid.length;
+            if (passid_len == 0) {
+                alert("Password should not be empty");
+                //document.registration.passid.focus();
+                return false;
             }
+            else if (passid_len >= my || passid_len < mx) {
+                alert("Password Length should be between " + mx + " to " + my);
+                //document.registration.passid.focus();
+                return false;
+            }
+            else if (!strongPasswordRegex.test(passid)) {
+                alert("Password not satisfy all the criteria");
+                //document.registration.passid.focus();
+                return false;
+            }
+            return true;
         }
     </script>
 </body>

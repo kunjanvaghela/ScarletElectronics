@@ -35,12 +35,12 @@ router.post('/insert-customer-rep', async (req, res) => {
 
     //Cookie-Presence check. TODO can be used further to validate user.
     console.log(req.cookies);
+    console.log('Receievd data:', req.body)
     
     // Get data from request
     const staffData = req.body;
     const Staff = db.Staff;
-
-    staffData.userId = '1'
+    
     staffData.status = 'A'; // Example value
     staffData.created_on = new Date();
     staffData.created_by = 'Admin';
