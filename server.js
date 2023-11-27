@@ -11,6 +11,7 @@ const cart = require("./routes/cart_routes.js");
 const cookieParser = require('cookie-parser');
 const Admin = require("./routes/admin.js")
 const CustomerRepLogin = require("./routes/staff.js")
+const customerRepresentative = require("./routes/customer_representative.js")
 
 const mysql = require('mysql2');
 const { encrypt, decrypt } = require('./util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory
@@ -50,6 +51,7 @@ app.use('/cart',cart);
 
 app.use('/admin', Admin);
 app.use('/staff', CustomerRepLogin);
+app.use('/customer_representative', customerRepresentative);
 
 
 db.sequelize.sync().then(() => {

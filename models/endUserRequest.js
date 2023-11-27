@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const EndUserRequest = sequelize.define('end_user_request', {
+    const EndUserRequest = sequelize.define('EndUserRequest', {
         requestId: {
           type: DataTypes.INTEGER.UNSIGNED,
           allowNull: false,
