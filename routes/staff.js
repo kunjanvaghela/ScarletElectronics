@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + staff.name + ", Login successful",
-			redirectUrl: "/item-listing",
+			redirectUrl: "/customer_representative/",
 		});
 
     } catch (error) {
