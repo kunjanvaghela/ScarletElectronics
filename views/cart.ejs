@@ -136,7 +136,7 @@
 
         function updateqty(row, qty) {
             // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>
+            var cartDetails = <%- JSON.stringify(cartDetails) %>;
             // console.log(qty);
 
             //send ajax post request to remove item
@@ -167,7 +167,7 @@
 
         function removeRow(button) {
             // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>
+            var cartDetails = <%- JSON.stringify(cartDetails) %>;
             // console.log("Ddddddddddddddd");
             
             var row = button.parentElement.parentElement;

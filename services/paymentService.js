@@ -7,32 +7,10 @@ const { get_cart: get_cart } = require('../routes/cart_routes');
 const authent = userUtil.authent;
 const StripeUser = db.StripeUser;
 // This is your test publishable API key.
-const stripe = require("stripe")("pk_test_51O49dTDB1UugWx3SywDY2xXN6L4PaFneasKFXdfXQnhmjI4leq9druszn9qBvYf0CYJH4LHwF4gAYbKUQHPrc1py00Ac1KPywc");
+const stripe = require("stripe")("sk_test_51O49dTDB1UugWx3SlwFKiiQc8JDwiBU5QX343MsHyZKRmgXN16V4vYSn46NOjm1pSHXgF6kXiDL9FZ2MkuYe17xH00Vx06mKID");
 
 // The items the customer wants to buy
 // const items = [{ id: "xl-tshirt" }];
-
-async function handleSubmit() {
-  const { error } = await stripe.confirmPayment({
-    elements,
-    confirmParams: {
-      // Make sure to change this to your payment completion page
-      return_url: "http://localhost:3000/item-listing",
-    },
-  });
-
-  // This point will only be reached if there is an immediate error when
-  // confirming the payment. Otherwise, your customer will be redirected to
-  // your `return_url`. For some payment methods like iDEAL, your customer will
-  // be redirected to an intermediate site first to authorize the payment, then
-  // redirected to the `return_url`.
-  if (error.type === "card_error" || error.type === "validation_error") {
-    showMessage(error.message);
-  } else {
-    console.log(error.message);
-    showMessage("An unexpected error occurred.");
-  }
-}
 
 const chargeCustomer = async (customerId) => {
   // Lookup the payment methods available for the customer
@@ -93,4 +71,4 @@ const calculateTotal = async function(userDetails) {
   return finalPrice.toFixed(2);
 };
 
-module.exports = { handleSubmit, chargeCustomer, fetchCustomerFromStripe, calculateTotal };
+module.exports = { chargeCustomer, fetchCustomerFromStripe, calculateTotal };

@@ -91,29 +91,29 @@
                 dynamicTable.appendChild(newRow);
             }
     
-            const checkoutButton = document.getElementById('checkout');
-            checkoutButton.addEventListener('click', function () {
+            // const checkoutButton = document.getElementById('checkout');
+            // checkoutButton.addEventListener('click', function () {
 
 
-                // get card details
-                const cardNumber = document.getElementById('cardNumber').value;
-                const cardName = document.getElementById('cardName').value;
-                const cardExpiry = document.getElementById('cardExpiry').value;
-                const cardCVV = document.getElementById('cardCVV').value;
+            //     // get card details
+            //     const cardNumber = document.getElementById('cardNumber').value;
+            //     const cardName = document.getElementById('cardName').value;
+            //     const cardExpiry = document.getElementById('cardExpiry').value;
+            //     const cardCVV = document.getElementById('cardCVV').value;
 
-                //AJAX call to send data to server
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/cart/checkout');
-                xhr.setRequestHeader('Content-Type', 'application/json');
+            //     //AJAX call to send data to server
+            //     const xhr = new XMLHttpRequest();
+            //     xhr.open('POST', '/cart/checkout');
+            //     xhr.setRequestHeader('Content-Type', 'application/json');
                 
 
-                xhr.send(JSON.stringify({
-                    cardNumber: cardNumber,
-                    cardName: cardName,
-                    cardExpiry: cardExpiry,
-                    cardCVV: cardCVV,
-                }));
-            });
+            //     xhr.send(JSON.stringify({
+            //         cardNumber: cardNumber,
+            //         cardName: cardName,
+            //         cardExpiry: cardExpiry,
+            //         cardCVV: cardCVV,
+            //     }));
+            // });
         });
     </script>
         

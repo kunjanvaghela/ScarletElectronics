@@ -37,31 +37,30 @@ async function initialize() {
 
 async function handleSubmit(e) {
   e.preventDefault();
-  setLoading(true);
-  await fetch("/cart/flush", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  });
+  setLoading(true);  
   const { error } = await stripe.confirmPayment({
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
       return_url: "http://localhost:3000/item-listing",
     },
+    redirect: 'if_required',
   });
-
-  // This point will only be reached if there is an immediate error when
-  // confirming the payment. Otherwise, your customer will be redirected to
-  // your `return_url`. For some payment methods like iDEAL, your customer will
-  // be redirected to an intermediate site first to authorize the payment, then
-  // redirected to the `return_url`.
-  if (error.type === "card_error" || error.type === "validation_error") {
-    showMessage(error.message);
-  } else {
-    console.log(error.message);
-    showMessage("An unexpected error occurred.");
+  if(error) {
+    if (error.type === "card_error" || error.type === "validation_error") {
+      showMessage(error.message);
+    } else {
+      console.log(error.message);
+      showMessage("An unexpected error occurred.");
+    }
   }
-
+  else {
+    //Call API to flush cart and store order details. (Victor's/Kush's part).
+    await fetch("/cart/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+  }
   setLoading(false);
   
 }

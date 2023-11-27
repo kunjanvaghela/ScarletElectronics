@@ -527,7 +527,7 @@ router.post('/checkout', async (req, res)=>
     const deleteCartDetails = await Cart.destroy({where:{userId:userid}});
 
     //update quantity in itemlisting
-    I
+    // I
 
 
 
