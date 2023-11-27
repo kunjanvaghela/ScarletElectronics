@@ -38,8 +38,9 @@
                     onSubmit="return formValidation();">
                     
                     <div class="col-md-3 align-self-center mx-auto">
-                        <label for="name" class="form-label text-left">Name</label> <input type="text"
-                            class="form-control text-left" id="name" name="name" onchange="allLetter('a')" required>
+                        <label for="exampleInputEmail1" class="form-label text-left">Email address</label>
+                        <input type="email" class="form-control text-left" id="emailId" name="emailId"
+                            onchange="validateEmail();" required>
                     </div>
                     <br>
                     <br>
@@ -82,18 +83,18 @@
         document.getElementById('staffloginForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            const name = document.getElementById('name').value;
+            const emailId = document.getElementById('emailId').value;
             const password = document.getElementById('password').value;
 
             // Validate email and password
-            if (!name || !password) {
-                document.getElementById('errorMsg').innerText = 'Please enter name and password.';
+            if (!emailId || !password) {
+                document.getElementById('errorMsg').innerText = 'Please enter email and password.';
                 return;
             }
 
             // Create form data
             const formData = new FormData();
-            formData.append('name', name);
+            formData.append('emailId', emailId);
             formData.append('password', password);
 
 
@@ -103,7 +104,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: name,
+                    emailId: emailId,
                     password: password,
                 })
             })
@@ -129,16 +130,16 @@
 
 
     <script>
-        // function validateEmail() {
-        //     var uemail = document.getElementById('emailId');
-        //     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        //     if (uemail.value.match(mailformat)) {
-        //         return true;
-        //     }
-        //     alert("You have entered an invalid email address!");
-        //     uemail.focus();
-        //     return false;
-        // }
+        function validateEmail() {
+            var uemail = document.getElementById('emailId');
+            var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            if (uemail.value.match(mailformat)) {
+                return true;
+            }
+            alert("You have entered an invalid email address!");
+            uemail.focus();
+            return false;
+        }
         function passid_validation(mx, my) {
             var passid = document.getElementById("password");
             console.log(passid.value);

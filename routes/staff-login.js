@@ -17,13 +17,13 @@ router.get("/login", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-	const { name, password } = req.body;
+	const { emailId, password } = req.body;
 	
 	console.log("IN login");
 
     try{
-		const user = await User.findOne({ where: { name } });
-		console.log(user.name);
+		const user = await User.findOne({ where: { emailId } });
+		console.log(user.emailId);
 		if (!user) {
 			console.log("HEre");
 			return res.status(404).json({
@@ -46,7 +46,7 @@ router.post("/login", async (req, res) => {
 		const expiresAt = new Date(Date.now() + tenMinutes);
 
 		// Set the cookie
-		res.cookie("name", user.name, {
+		res.cookie("emailId", user.emailId, {
 			expires: expiresAt,
 			httpOnly: false,
 		});
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
 		// Send a JSON response indicating success and possibly a redirect URL.
 		return res.status(200).json({
 			success: true,
-			message: "Welcome " + user.name + ", Login successful",
+			message: "Welcome " + user.emailId + ", Login successful",
 			redirectUrl: "/customer_representative/",
 		});
 
