@@ -30,9 +30,10 @@ router.post("/create-payment-intent", async (req, res) => {
             enabled: true,
         },
     });
-
+    console.log("------------------->: " + JSON.stringify(paymentIntent.id));
     res.send({
         clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
     });
 });
 

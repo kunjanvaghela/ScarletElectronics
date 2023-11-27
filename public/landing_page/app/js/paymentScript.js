@@ -4,7 +4,7 @@ const stripe = Stripe("pk_test_51O49dTDB1UugWx3SywDY2xXN6L4PaFneasKFXdfXQnhmjI4l
 // The items the customer wants to buy
 // const items = [{ id: "xl-tshirt" }];
 
-let elements;
+let elements, paymentId;
 
 initialize();
 checkStatus();
@@ -20,7 +20,8 @@ async function initialize() {
     headers: { "Content-Type": "application/json" },
     // body: JSON.stringify({ "items": "item" }),
   });
-  const { clientSecret } = await response.json();
+  const { clientSecret, paymentIntentId } = await response.json();
+  paymentId = paymentIntentId;
 
   const appearance = {
     theme: 'stripe',
@@ -56,6 +57,7 @@ async function handleSubmit(e) {
   }
   else {
     //Call API to flush cart and store order details. (Victor's/Kush's part).
+    console.log(paymentId); //This Id can be used by Victor for storing in payments table.
     await fetch("/cart/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
