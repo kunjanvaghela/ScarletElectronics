@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         created_on: {
           type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
         },
         current_status: {
           type: DataTypes.STRING(5),
