@@ -23,21 +23,18 @@ CREATE TABLE `users` (
     UNIQUE KEY `emailId` (`emailId`)
 ); 
 
-CREATE TABLE staff (
-  userId int unsigned NOT NULL AUTO_INCREMENT,
-  name varchar(50) NOT NULL,
-  ssn int DEFAULT NULL,
-  password VARCHAR(30) NOT NULL,
-  designation varchar(20) DEFAULT NULL,
-  status varchar(5) DEFAULT NULL,
-  created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_by varchar(20) DEFAULT NULL,
-  remarks varchar(100) DEFAULT NULL,
-  updated_by varchar(20) DEFAULT NULL,
-  updated_on datetime DEFAULT NULL,
-  PRIMARY KEY (userId)
-  -- Seperate end user and staff tables
-  -- CONSTRAINT ref_staff_ibfk_1 FOREIGN KEY (userId) REFERENCES users (userId) ON DELETE CASCADE
+CREATE TABLE `staff` (
+  `userId` int unsigned NOT NULL,
+  `ssn` int DEFAULT NULL,
+  `designation` varchar(20) DEFAULT NULL,
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` varchar(20) DEFAULT NULL,
+  `remarks` varchar(100) DEFAULT NULL,
+  `updated_by` varchar(20) DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
+  PRIMARY KEY (`userId`),
+  -- Seperate end user and staff tables but common user table
+  CONSTRAINT `ref_staff_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 );
 
 /*Item Master Table*/
