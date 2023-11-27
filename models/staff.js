@@ -4,10 +4,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             primaryKey: true,
         },
-        name: DataTypes.STRING,
+        
+        
         ssn: DataTypes.INTEGER,
-        // date_of_birth: DataTypes.DATE,
-        password: DataTypes.STRING,
         designation: DataTypes.STRING,
         status: DataTypes.STRING,
         created_on: DataTypes.DATE,

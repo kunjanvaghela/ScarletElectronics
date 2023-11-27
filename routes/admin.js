@@ -7,12 +7,10 @@ const mysql = require('mysql2');
 const db = require('../models');
 const { where } = require('sequelize');
 const Staff = db.Staff;
+const User = db.User;
 const UserUtil = require('../util/userUtil');
 
 
-// router.get("/dashboard", (req, res) => {
-// 	res.render("admindashboard");
-// });
 
 router.get("/dashboard", async (req, res) => {
     console.log('Successfully in /admin/dashboard');
@@ -38,22 +36,17 @@ router.post('/insert-customer-rep', async (req, res) => {
     console.log('Receievd data:', req.body)
     
     // Get data from request
-    const staffData = req.body;
-    const Staff = db.Staff;
-    
-    staffData.status = 'A'; // Example value
-    staffData.created_on = new Date();
-    staffData.created_by = 'Admin';
-    staffData.remarks = 'No remarks'; // Example value
-    staffData.updated_by = 'Admin';
-    staffData.updated_on = new Date();
-
-    console.log(staffData);
-    
+    const userData = req.body;
+    console.log(userData);
 
     try {
         
-        const staff = await Staff.create(staffData);
+        await User.create(userData).then((user) => {
+            userData.userId = user.userid;
+            console.log("User Inserted, now have to insert staffUser");
+            console.log(userData);
+            Staff.create(userData);
+        });
         // Handle the response after success
         res.redirect('/admin/dashboard');  // Redirect to login or any other page
     } catch (error) {

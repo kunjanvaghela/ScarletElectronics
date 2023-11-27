@@ -6,8 +6,9 @@ const mysql = require('mysql2');
 
 const db = require('../models');
 const { where } = require('sequelize');
-const Staff = db.Staff;
+const User = db.User;
 const UserUtil = require('../util/userUtil');
+const { encrypt, decrypt } = require("../util/encryptionUtil");
 
            
 router.get("/login", async (req, res) => {
@@ -17,25 +18,26 @@ router.get("/login", async (req, res) => {
 
 router.post("/login", async (req, res) => {
 	const { name, password } = req.body;
-	const Staff = db.Staff;
+	
 	console.log("IN login");
 
     try{
-		const staff = await Staff.findOne({ where: { name } });
-
-		if (!staff) {
+		const user = await User.findOne({ where: { name } });
+		console.log(user.name);
+		if (!user) {
+			console.log("HEre");
 			return res.status(404).json({
 				success: false,
 				message: "You do not exist in our system. Please Sign up",
 			});
 		}
 
-	
+		const decryptedPassword = decrypt(user.encrypted_password);
 
-		if (password !== staff.password) {
+		if (password !== decryptedPassword) {
 			return res.status(401).json({
 				success: false,
-				message: "You have entered an invalid password, " + staff.name,
+				message: "You have entered an invalid password, " + user.name,
 			});
 		}
 
@@ -44,7 +46,7 @@ router.post("/login", async (req, res) => {
 		const expiresAt = new Date(Date.now() + tenMinutes);
 
 		// Set the cookie
-		res.cookie("name", staff.name, {
+		res.cookie("name", user.name, {
 			expires: expiresAt,
 			httpOnly: false,
 		});
@@ -52,7 +54,7 @@ router.post("/login", async (req, res) => {
 		// Send a JSON response indicating success and possibly a redirect URL.
 		return res.status(200).json({
 			success: true,
-			message: "Welcome " + staff.name + ", Login successful",
+			message: "Welcome " + user.name + ", Login successful",
 			redirectUrl: "/customer_representative/",
 		});
 

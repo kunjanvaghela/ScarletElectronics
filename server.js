@@ -10,7 +10,7 @@ const itemListing = require("./routes/item_listing_routes.js");
 const cart = require("./routes/cart_routes.js");
 const cookieParser = require('cookie-parser');
 const Admin = require("./routes/admin.js")
-const CustomerRepLogin = require("./routes/staff.js")
+const CustomerRepLogin = require("./routes/staff-login.js")
 const customerRepresentative = require("./routes/customer_representative.js")
 
 const mysql = require('mysql2');
@@ -50,7 +50,7 @@ app.use('/item-listing', itemListing);
 app.use('/cart',cart);
 
 app.use('/admin', Admin);
-app.use('/staff', CustomerRepLogin);
+app.use('/staff-login', CustomerRepLogin);
 app.use('/customer_representative', customerRepresentative);
 
 

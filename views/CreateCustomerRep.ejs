@@ -23,16 +23,16 @@
                     class="form-control text-left" id="name" name="name" onchange="allLetter('a')" required>
             </div>
             <br>
+
+            <br>
             <div class="col-md-3 align-self-center mx-auto">
-                <label for="ssn" class="form-label text-left">SSN</label>
-                <input type="number" class="form-control text-left" id="ssn" name="ssn" onchange="validateSSN()" required>
+                <label for="emailId" class="form-label">Email:</label> <input type="email" class="form-control"
+                    id="emailId" name="emailId" name="email" placeholder="Enter Your Email" onchange="validateEmail();">
+                <div id="emailHelp" class="form-text">We'll never share your
+                    email with anyone else.</div>
             </div>
             <br>
-            <br>
-            <!-- <div class="col-md-3 align-self-center mx-auto">
-                <label for="password" class="form-label text-left">Password</label> <input type="password"
-                    class="form-control text-left" id="password" name="password" required>
-            </div> -->
+
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="password" class="form-label text-left">Password</label>
                 <input type="password" class="form-control text-left" id="password" name="password"
@@ -41,6 +41,13 @@
                     Capital letter, atleast one digit, atleast one special character</p>
             </div>
             <br>
+            
+            <div class="col-md-3 align-self-center mx-auto">
+                <label for="ssn" class="form-label text-left">SSN</label>
+                <input type="number" class="form-control text-left" id="ssn" name="ssn" onchange="validateSSN()" required>
+            </div>
+            <br>
+            
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="designation" class="form-label text-left">Designation</label> <input type="text"
                     class="form-control text-left" id="designation" name="designation" onchange="allLetter('a')" required>
