@@ -31,17 +31,16 @@ const comment_fetcher = async(item_id, user_id) => {
   let ind_comment;
   if(ind_review)
   {
-    ind_comment = {review_id :ind_review.reviewId ,comment : ind_review.comments}
+    ind_comment = {review_id :ind_review.reviewId ,comment : ind_review.comments, rating :ind_review.rating }
   }
   else
   {
-    ind_comment = {review_id : undefined ,comment : undefined}
+    ind_comment = {review_id : undefined ,comment : undefined,  rating :undefined }
   }
   console.log(ind_comment);
   return {comments : comments , ind_comment : ind_comment};
 }
-
-router.get("/", async(req, res) => {
+const getReview = async(req, res) => {
   console.log("In Get reivew Item");
   try
   {
@@ -57,9 +56,9 @@ router.get("/", async(req, res) => {
     console.log("Error caught in Get method of Review : " + err);
     res.status(500).send("Internal Server Error!!");
   }
-});
+}
 
-router.post("/", async(req, res) => {
+const addReview = async (req, res) => {
   console.log("In POST reivew Item");
   console.log(req);
   try
@@ -90,9 +89,9 @@ router.post("/", async(req, res) => {
     res.status(500).send("Internal Server Error!!");
 
   }
-});
+}
 
-router.delete("/:reviewid", async(req, res) => {
+const deleteReview = async(req, res) => {
   console.log("In delete reivew Item");
   try
   {
@@ -108,7 +107,7 @@ router.delete("/:reviewid", async(req, res) => {
         //res.status(204).send("Review deleted successfully");
         const comments = await comment_fetcher(old_review.itemId, userDetails.userid);
         console.log(comments);
-        res.render("getreview", {comments : comments.comments , ind_comment : comments.ind_comment});
+        res.status(204).send()//.render("getreview", {comments : comments.comments , ind_comment : comments.ind_comment});
         return;
     }
     res.status(404).send("No review found for this item for the given user");
@@ -122,6 +121,12 @@ router.delete("/:reviewid", async(req, res) => {
   }
   
     
-});
+}
+
+router.get("/", getReview);
+router.post("/", addReview);
+router.delete("/:reviewid", deleteReview);
+
+
 
 module.exports = router;

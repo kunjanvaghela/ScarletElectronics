@@ -69,12 +69,13 @@
                             <td><%= comment.comment %></td>
                             <td>
                                 <div class="rating-stars">
-                                    <% for (let i = 0; i < comment.rating; i++) { %>
+                                    <% for (let i = comment.rating; i < 5; i++) { %>
                                         <span>&#x2606;</span>
                                     <% } %>
-                                    <% for (let i = comment.rating; i < 5; i++) { %>
+                                    <% for (let i = 0; i < comment.rating; i++) { %>
                                         <span>&#x2605;</span>
                                     <% } %>
+                                    
                                 </div>
                             </td>
                         </tr>
@@ -91,7 +92,18 @@
         <form id="PostReview" name="PostReview" method="POST" action="/review">
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="commentbox" class="form-label text-left">Add Comment: </label>
-                <input type="text" class="form-control text-left" id="commentval" name="commentval" required>
+                <input type="text" class="form-control text-left" id="commentval" name="comments" required>
+                <label for="ratingbox" class="form-label text-left">Add Ratings: </label>
+                <select class="form-control text-left" id="rating" name="rating" required>
+                    <option value="">Select a rating</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                  
+                <option></option>
             </div>
             <div class="col-md-3 text-center mx-auto">
                 <button type="submit" id="submit_button" class="btn btn-primary align-self-center">Submit</button>
@@ -104,9 +116,18 @@
         <% if (typeof ind_comment.review_id !== 'undefined') { %>
             <form id="DeleteReview" name="DeleteReview" method="POST" action="/review/<%= ind_comment.review_id %>">
                 <input type="hidden" name="_method" value="DELETE">
-                <div class="col-md-3 align-self-center mx-auto">
+                <div class="col-md-3 align-self-center mx-auto" style="display: flex;">
                     <label for="commentbox" class="form-label text-left">Your Review: </label>
                     <p id="commentval" name="commentval"><%= ind_comment.comment %></p> 
+                    <div class="rating-stars">
+                        <% for (let i = ind_comment.rating; i < 5; i++) { %>
+                            <span>&#x2606;</span>
+                        <% } %>
+                        <% for (let i = 0; i < ind_comment.rating; i++) { %>
+                            <span>&#x2605;</span>
+                        <% } %>
+                        
+                    </div>
                 </div>
                 <div class="col-md-3 text-center mx-auto">
                     <button type="submit" id="submit_button" class="btn btn-primary align-self-center">Delete</button>
