@@ -272,11 +272,13 @@ router.get('/fetch-cart-display', async (req, res)=>
 
     //get cart details
     const cartDetails = await get_cart(userId);
+    userDetails = await userUtil.check_email(req.cookies.emailId);
+    const username = userDetails.name;
 
     console.log("cartDetails: ", cartDetails);
 
     //return cart details
-    res.render('cart',{ cartDetails });
+    res.render('cart',{ cartDetails, username });
     // res.status(200).send(cartDetails);
 
 });
@@ -302,6 +304,8 @@ router.get('/fetch-cart', async (req, res)=>
 {
     console.log("fetch-cart inside ------------------------")
 
+    console.log(req.cookies)
+
     //get authentication status and user id
     const [authentication, userId] = await authent(req,res);
 
@@ -324,7 +328,8 @@ router.get('/fetch-cart', async (req, res)=>
 
 
     //return cart details
-    res.status(200).send(cartDetails,{cartDetails});
+    res.status(200)
+    res.send(cartDetails);
 
 });
 
@@ -357,6 +362,7 @@ router.post('/add-payment-information', async (req, res)=>
     console.log("add-payment-information inside ------------------------")
 });
 
+
 router.get('/fetch-address', async (req, res)=>
 {
     console.log("fetch-address inside ------------------------")
@@ -374,12 +380,12 @@ router.post('/check-promo-code', async (req, res)=>
     //parse promoCode from request
     //parse query parameters
     console.log("req.query: ", req.body);
-    const promoCode = req.body.promoCode;
+    const promoCode1 = req.body.promocode;
 
-    console.log("promoCode: ", promoCode);
+    console.log("promoCode: ", promoCode1);
 
     //check if promoCode exists in db
-    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode1}});
 
     if(!promoCodeData)
     {
@@ -404,13 +410,24 @@ router.post('/check-promo-code', async (req, res)=>
 
 });
 
+router.get('/orderplace', async (req, res) => { res.render('orderplace') });
+
+
 router.get('/get-final-cost', async (req, res)=>
 {
     console.log("get-final-cost inside ------------------------")
     
-    const [authentication, userId] = await authent(req,res);
+    // const [authentication, userId] = await authent(req,res);
+
+    const userDetails = await userUtil.check_email(req.cookies.emailId);
+
+    if(!userDetails.userid)
+    {
+        return;
+    }
+    const userId = userDetails.userid;
     
-    if(!authentication)
+    if(!userId)
     {
         return;
     }
@@ -426,9 +443,8 @@ router.get('/get-final-cost', async (req, res)=>
     }
 
 
-    
-    
-    promocode = -50
+    promocode = 50
+
     sales = total_price*0.1
     finalPrice = total_price - promocode + sales
 
@@ -443,11 +459,31 @@ router.get('/get-final-cost', async (req, res)=>
         Sales:sales,
         FinalPrice:finalPrice
     });
-    res.render()
+//    res.render()
 
 
 });
 
+router.post('/checkout', async (req, res)=>
+{
+    console.log("checkout inside ------------------------")
+
+    //get authentication status and user id
+    const [authentication, userid] = await authent(req,res);
+    
+    if(!authentication)
+    {
+        return;
+    }
+
+    //get body from request
+    //parse query parameters
+    console.log("req.query: ", req.body);
+
+    //redirect to order confirmation page
+    res.render('orderplace')
+    res.status(200).send("Order placed successfully");
+});
 
 
 //export router

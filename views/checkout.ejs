@@ -57,41 +57,46 @@
         </div>
         
         <div class="col-md-3 text-center mx-auto">
-            <button type="submit" class="btn btn-primary align-self-center" value="submit">CheckOut</button>
+            <button type="button" class="btn btn-primary align-self-center" onclick="window.location.href = '/orderplace';" id="checkout">CheckOut</button>
         </div>
     </form>
     <br> <br>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dynamicTable = document.getElementById('dynamicTable');
-            const addRowButton = document.getElementById('addRow');
             let rowCounter = 0;
-
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
+    
+            var cartDetails = <%= JSON.stringify(cartDetails) %>;
             cart_row_reference = [];
             for (const itemData of cartDetails) {
                 rowCounter++;
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
-                <tr>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.name}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.quantity}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.price}</label>
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.totalPrice}</label>
-                    </td>
-                <tr>
+                    <tr>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.name}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.quantity}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.price}</label>
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.totalPrice}</label>
+                        </td>
+                    <tr>
                 `;
                 dynamicTable.appendChild(newRow);
             }
+    
+            // const checkoutButton = document.getElementById('checkout');
+            // checkoutButton.addEventListener('click', function () {
+            //     // Redirect to the "orderplace.ejs" file
+            //     window.location.href = '/orderplace.ejs';
+            // });
         });
-
     </script>
+        
 </body>
 </html>
