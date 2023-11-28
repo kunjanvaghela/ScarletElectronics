@@ -1,4 +1,3 @@
-<!-- Your existing HTML code -->
 <!DOCTYPE html>
 <html>
 
@@ -16,7 +15,49 @@
         <br> <br>
         <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
         <br>
-
+    </div> 
+    <div align="center">
+        <br>
+        <h2 class="text-primary text-left mx-auto">Requests Claimed by Me</h2>
+        <%if(typeof serializedRequests !== 'undefined' && serializedRequests !== 'null'){%>
+            <table class="table table-bordered" id="endUserRequests" cellspacing="0" width="100%">
+                <thead>
+                    <th width="5%">Request ID</th>
+                    <th width="10%">User</th>
+                    <th width="5%">Listing ID</th>
+                    <th>Description</th>
+                    <th width="10%">Created On</th>
+                    <th width="2%">Status</th>
+                    <th>CR</th>
+                    <th>Updated On</th>
+                </thead>
+                <tbody>
+                    
+                    <%serializedRequests.forEach((y) => {%>
+                        <tr>
+                            <td><%=y.requestId%></td>
+                            <td><%=y.userId%></td>
+                            <td><%=y.listingId%></td>
+                            <td><%=y.updateDescription%></td>
+                            <td><%=y.createdOn%></td>
+                            <td><%=y.currentStatus%></td>
+                            <td><%=y.customerRep%></td>
+                            <td><%=y.updatedn%></td>
+                            
+                        </th>
+                    <%})%>
+                    <%}%>
+                </tbody>
+            </table>
+        <br>
+    </div>
+    <div>
+        <br>
+        <form method="GET" action="/customer_representative/show-all-request">
+            <button type="submit" class="btn btn-primary align-self-center">View All Requests</button>
+        </form>
+    </div>
+    
 </body>
 
 </html>
