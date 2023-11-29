@@ -527,7 +527,7 @@ router.post('/checkout', async (req, res)=>
     const deleteCartDetails = await Cart.destroy({where:{userId:userid}});
 
     //update quantity in itemlisting
-    I
+    // I
 
 
 
@@ -541,4 +541,4 @@ router.post('/checkout', async (req, res)=>
 
 
 //export router
-module.exports = router;
+module.exports = { router, get_cart};
