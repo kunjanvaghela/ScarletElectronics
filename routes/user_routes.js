@@ -262,7 +262,7 @@ router.get("/support", (req, res) => {
 	res.render("supportpage");
 });
 
-router.get("/newrequest", async (req, res) => {
+router.get("/support/newrequest", async (req, res) => {
 	
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
@@ -270,7 +270,7 @@ router.get("/newrequest", async (req, res) => {
     res.render("newrequest");
     
 });
-router.get("/oldrequests", async (req, res) => {
+router.get("/support/oldrequests", async (req, res) => {
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
     // console.log('username : ',  username);
@@ -280,7 +280,7 @@ router.get("/oldrequests", async (req, res) => {
 
 
 
-router.post("/newrequest", async (req, res) => {
+router.post("/support/newrequest", async (req, res) => {
 	const { name, emailId } = req.body;
 	const User = db.User;
 	const userData = req.body

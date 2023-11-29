@@ -30,7 +30,7 @@ router.get("/", async (req, res) => {
             createdOn: request.created_on,
             currentStatus: request.current_status,
             customerRep: username,
-            updatedn: request.updated_on
+            updatedOn: request.updated_on
           };
         });
     
@@ -41,10 +41,7 @@ router.get("/", async (req, res) => {
         console.error('Error retrieving data:', error);
         res.status(500).send('Internal server error');
       });
-
-
-    //res.render('customer_rep_dasboard', {username});
-    
+  
 });
 
 router.get("/show-all-request", async (req, res) => {
@@ -52,16 +49,30 @@ router.get("/show-all-request", async (req, res) => {
     userDetails = await UserUtil.check_email(req.cookies.emailId);
     console.log(userDetails.userid);
     const username = userDetails.name;
-    const item_listing = EndUserRequest.findAll().then(function(Catalog){
+
+    EndUserRequest.findAll({
+    
+    }).then((requests) => {
+      const serializedRequests = requests.map((request) => {
+        return {
+          requestId: request.requestId,
+          userId: request.userId,
+          listingId: request.listingId,
+          updateDescription: request.update_description,
+          createdOn: request.created_on,
+          currentStatus: request.current_status,
+          customerRep: username,
+          updatedOn: request.updated_on
+        };
+      });
+    //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
         
-        res.render('all-requests', {item_listing, username});
-        //console.log(Catalog);
+        res.render('all_requests', {serializedRequests, username});
+        
         
       }).catch(function(err){
         console.log('Oops! something went wrong, : ', err);
       });
-    //console.log(item_listing);
-    //console.log(typeof(item_listing));
     
 });
 
