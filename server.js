@@ -7,7 +7,8 @@ const landing = require("./routes/user_routes.js")
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
-const cart = require("./routes/cart_routes.js");
+const { router : cart } = require("./routes/cart_routes.js");
+const paymentRoutes = require('./routes/paymentRoutes.js');
 const cookieParser = require('cookie-parser');
 
 const mysql = require('mysql2');
@@ -45,6 +46,7 @@ app.use('/users', userRouter);
 app.use('/add-item', addItem);
 app.use('/item-listing', itemListing);
 app.use('/cart',cart);
+app.use('/payments',paymentRoutes);
 
 app.post('/token', (req, res) => {
 	const refreshToken = req.body.token
