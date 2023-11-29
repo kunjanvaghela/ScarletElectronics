@@ -116,9 +116,11 @@
         <% if (typeof ind_comment.review_id !== 'undefined') { %>
             <form id="DeleteReview" name="DeleteReview" method="POST" action="/review/<%= ind_comment.review_id %>">
                 <input type="hidden" name="_method" value="DELETE">
-                <div class="col-md-3 align-self-center mx-auto" style="display: flex;">
+                <div class="col-md-3 align-self-center mx-auto">
                     <label for="commentbox" class="form-label text-left">Your Review: </label>
-                    <p id="commentval" name="commentval"><%= ind_comment.comment %></p> 
+                    <p id="commentval" name="commentval"><%= ind_comment.comment %></p>
+                    <div style="display: flex;"> 
+                    <label for="commentbox" class="form-label text-left">Your Rating: </label>
                     <div class="rating-stars">
                         <% for (let i = ind_comment.rating; i < 5; i++) { %>
                             <span>&#x2606;</span>
@@ -127,6 +129,7 @@
                             <span>&#x2605;</span>
                         <% } %>
                         
+                    </div>
                     </div>
                 </div>
                 <div class="col-md-3 text-center mx-auto">
