@@ -100,7 +100,10 @@ router.post('/add-itemlisting', async (req, res)=>
 
     //get authentication status and user id
     // const [authentication, userid] = await authent(req,res);
-    
+    if (!userUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
     const userDetails = await userUtil.check_email(req.cookies.emailId);
 
     if(!userDetails.userid)
@@ -275,6 +278,10 @@ router.get('/fetch-cart-display', async (req, res)=>
 
     //get cart details
     const cartDetails = await get_cart(userId);
+    if (!userUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
     userDetails = await userUtil.check_email(req.cookies.emailId);
     const username = userDetails.name;
 
