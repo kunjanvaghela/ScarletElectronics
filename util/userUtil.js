@@ -1,7 +1,7 @@
 const db = require('../models');
 const EndUser = db.EndUsers;
 const User = db.User;
-
+const jwt = require('jsonwebtoken');
 
 async function check_email(emailId)
 {
@@ -34,28 +34,22 @@ async function check_email(emailId)
     }
 }
 
+function authenticateToken(token) {
+    console.log('Working1');
+    console.log('token::', token);
 
+    if (token == null) return false;
 
-async function authent(req,res)
-{
-    console.log("authent inside ------------------------");
-    
-    authentication = await check_email(req.cookies.emailId);
-
-    if(!authentication)
-    {
-        //return invalid authorization token
-        res.status(401).send("Invalid Authorization Token");
-        console.log("Invalid Authorization Token");
-        return [false, null];
+    try {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        return true;
+    } catch (error) {
+        console.log('JWT verification error:', error);
+        return false;
     }
-
-    console.log("user id: ", authentication.dataValues.userid);
-    //get cart details from db
-
-    //return authentication_status and user id
-    return [true, authentication.dataValues.userid];
 }
 
-
-module.exports = { check_email, authent };
+function generateAccessToken(tokenPackage) {
+	return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '900s' });
+}
+module.exports = { check_email,authenticateToken,generateAccessToken };

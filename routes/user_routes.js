@@ -4,12 +4,19 @@ const send_otp_routes = require("./otp_routes");
 const recover_pass_routes = require("./recover_pass_routes");
 const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
+const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
-
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
 
 const multer = require("multer");
 const upload = multer();
+
+//###############################
+let refreshTokens = []
+//###############################
+
 
 router.get("/Home_Landing", (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
@@ -18,19 +25,29 @@ router.get("/Home_Landing", (req, res) => {
 
 
 router.get("/home", (req, res) => {
-    console.log('Successfully in Landing Page');
-    res.render('index_Landing');
+	console.log('Successfully in Landing Page');
+	res.render('index_Landing');
 });
-           
+
 router.get("/login", (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("loginPage");
 });
 
 router.get("/logout", (req, res) => {
-	console.log("Successfully in Root :Inssss:sss:: /");
-	res.clearCookie("emailId");
-	res.redirect("/users/login");
+    console.log("Processing logout");
+
+    // Clearing JWT-related cookies and emailId cookie
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("emailId");
+
+    // Optionally, handle the refresh token list if you store them server-side
+    const refreshToken = req.cookies.refreshToken;
+    refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+
+    // Redirect the user to the login page after logout
+    res.redirect("/users/login");
 });
 
 router.get("/register", (req, res) => {
@@ -155,21 +172,32 @@ router.post("/login", async (req, res) => {
 			});
 		}
 
-		// Calculate the expiration time as the current time + 120 minutes
+		//JWT TOKEN IMPLEMENTATION:
+		const tokenPackage = {userid: user.userid};
+		const accessToken = UserUtil.generateAccessToken(tokenPackage)
+
+		const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET)
+		refreshTokens.push(refreshToken)
+		
 		const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
 		const expiresAt = new Date(Date.now() + tenMinutes);
-
-		// Set the cookie
 		res.cookie("emailId", user.emailId, {
 			expires: expiresAt,
 			httpOnly: false,
 		});
+		res.cookie("accessToken", accessToken, {
+			httpOnly: false,
+		});
+		res.cookie("refreshToken", refreshToken, {
+			httpOnly: false,
+		});
 
-		// Send a JSON response indicating success and possibly a redirect URL.
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + user.name + ", Login successful",
-			redirectUrl: "/item-listing",
+			// accessToken: accessToken,
+			// refreshToken: refreshToken,
+			redirectUrl: "/item-listing"
 		});
 	} catch (error) {
 		console.error("Error during login:", error);
@@ -179,6 +207,11 @@ router.post("/login", async (req, res) => {
 		});
 	}
 });
+
+//###############################
+
+
+
 
 router.use("/send-otp", send_otp_routes);
 router.use("/recover-password", recover_pass_routes);
