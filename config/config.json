@@ -1,19 +1,27 @@
 {
   "development1": {
     "username": "root",
-    "password": "manad",
+    "password": "root",
     "database": "scarletelectronics",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
 
- "development": {
+"development2": {
   "username": "ucqjbqovzep1waym",
   "password": "ERQVg4nWFFhjNrVkyOV3",
   "database": "bjy4c3bfqe9mnlvfzpwb",
   "host": "bjy4c3bfqe9mnlvfzpwb-mysql.services.clever-cloud.com",
   "dialect": "mysql"
 },
+"development": {
+  "username": "uevtyol3gsvknewi",
+  "password": "MAPKiABbXTGVDxCtj763",
+  "database": "b1hhwgydix2qqfqjkimy",
+  "host": "b1hhwgydix2qqfqjkimy-mysql.services.clever-cloud.com",
+  "dialect": "mysql"
+},
+
 
   "test": {
     "username": "root",

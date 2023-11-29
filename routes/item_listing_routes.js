@@ -8,17 +8,25 @@ const ItemListing = db.ItemListing;
 const UserUtil = require('../util/userUtil');
 
 router.get("/", async (req, res) => {
-  console.log('Working');
+  console.log('Working0');
 
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  const username = userDetails.name;
-  // console.log('username : ', userDetails);
-  // console.log('username : ', username);
+  // Check if the user is authenticated
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
 
-  ItemListing.findAll({
-    include: [Catalog],
-  }).then((listings) => {
-    const serializedListings = listings.map((listing) => {
+  try {
+    console.log('Working2');
+    // Retrieve user details
+    const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const username = userDetails.name;
+
+    // Find all item listings with their catalog details
+    const listings = await ItemListing.findAll({ include: [Catalog] });
+
+    // Serialize the listings data
+    const serializedListings = listings.map(listing => {
       return {
         listingId: listing.listingId,
         price: listing.price,
@@ -41,21 +49,23 @@ router.get("/", async (req, res) => {
       };
     });
 
-    // Send the serialized data as a response
-    res.render('listings', {serializedListings, username});
-    // res.render('seller_listing', {serializedListings})
-  }).catch((error) => {
+    // Render the listings page with the serialized data and username
+    res.render('listings', { serializedListings, username });
+  } catch (error) {
+    // Log the error and send a 500 Internal Server Error response
     console.error('Error retrieving data:', error);
     res.status(500).send('Internal server error');
-  });
-
-
-  // res.render('listings');
+  }
 });
 
 router.get("/create", async (req, res) => {
   console.log('Working');
   console.log(req.cookies.emailId);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
+
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   const username = userDetails.name;
@@ -66,41 +76,49 @@ router.get("/create", async (req, res) => {
 });
 
 router.get("/get-existing-listing", async (req, res) => {
-    console.log('Button Working');
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
-    console.log(userDetails.userid);
-    const username = userDetails.name;
-    const item_listing = Catalog.findAll().then(function(Catalog){
-        
-        res.render('seller_listing', {Catalog, username});
-        //console.log(Catalog);
-        
-      }).catch(function(err){
-        console.log('Oops! something went wrong, : ', err);
-      });
-    //console.log(item_listing);
-    //console.log(typeof(item_listing));
-    
+  console.log('Button Working');
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
+  const username = userDetails.name;
+  const item_listing = Catalog.findAll().then(function (Catalog) {
+
+    res.render('seller_listing', { Catalog, username });
+    //console.log(Catalog);
+
+  }).catch(function (err) {
+    console.log('Oops! something went wrong, : ', err);
+  });
+  //console.log(item_listing);
+  //console.log(typeof(item_listing));
+
 });
 
 router.post('/create', async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
   // itemListingData.sellerId = 15; // Temporary
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   itemListingData.sellerId = userDetails.userid;
   console.log(itemListingData);
 
   try {
-      // const user = await User.create(userData);
-      await ItemListing.create(itemListingData);
-      // Handle the response after success
-      res.redirect('/item-listing');  // Redirect to login or any other page
+    // const user = await User.create(userData);
+    await ItemListing.create(itemListingData);
+    // Handle the response after success
+    res.redirect('/item-listing');  // Redirect to login or any other page
   } catch (error) {
-      // Handle the error response
-      console.error('Error occurred:', error);
-      res.status(500).send('Error occurred');
+    // Handle the error response
+    console.error('Error occurred:', error);
+    res.status(500).send('Error occurred');
   }
 });
 
