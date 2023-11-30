@@ -526,6 +526,11 @@ router.post('/checkout', async (req, res)=>
         const purchase = await db.Purchase.create({paymentId: paymentId, total_price: total_price, userId: userid});
         console.log("Auto-generated ID for Purchase: ", purchase.purchaseId);
 
+        for (var i = 0; i < cartDetails.length; i++) {
+            const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, return_status: "not requested"});
+            console.log("Auto-generated Order ID: ", order.orderId);
+        }
+
 
         console.log("cartDetails: ", cartDetails);
 
