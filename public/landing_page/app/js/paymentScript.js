@@ -58,9 +58,12 @@ async function handleSubmit(e) {
   else {
     //Call API to flush cart and store order details. (Victor's/Kush's part).
     console.log(paymentId); //This Id can be used by Victor for storing in payments table.
+    data = {"paymentID" : paymentId};
     await fetch("/cart/checkout", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: { "Content-Type": "application/json" },
+      // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: JSON.stringify(data)
     });
   }
   setLoading(false);

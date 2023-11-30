@@ -25,6 +25,10 @@ const authent = userUtil.authent;
 const User = db.User;
 const Cart = db.Cart;
 const ItemListing = db.ItemListing;
+const Purchase =  db.Purchase;
+const Order = db.Order;
+
+
 const Catalog = db.Catalog;
 const Promocode = db.Promocode;
 
@@ -485,65 +489,61 @@ router.get('/get-final-cost', async (req, res)=>
 router.post('/checkout', async (req, res)=>
 {
     console.log("checkout inside ------------------------")
+    if (req.cookies.emailId) {
+        const emailId = req.cookies.emailId;
+        var userDetails = await db.User.findOne({where: {emailId}});
+        const userid = userDetails.dataValues.userid;
 
-    //get authentication status and user id
-    const [authentication, userid] = await authent(req,res);
-    
-    if(!authentication)
-    {
-        return;
+
+        //get authentication status and user id
+        const [authentication, userId] = await authent(req, res);
+
+        if (!authentication) {
+            return;
+        }
+
+        console.log("req.body: ", req.body);
+
+
+        //get payment details
+
+        //get cart details
+        const cartDetails = await get_cart(userid);
+
+        //get total price
+        total_price = 0;
+        for (var i = 0; i < cartDetails.length; i++) {
+            total_price += cartDetails[i].price * cartDetails[i].quantity;
+        }
+
+        //update quantity in itemlisting
+        for (var i = 0; i < cartDetails.length; i++) {
+            const updateQuantity = await ItemListing.update({quantity: cartDetails[i].quantity - cartDetails[i].quantity}, {where: {listingId: cartDetails[i].listingId}});
+        }
+
+        // Victor's Code
+        const paymentId = req.body["paymentID"];
+        const purchase = await db.Purchase.create({paymentId: paymentId, total_price: total_price, userId: userid});
+        console.log("Auto-generated ID for Purchase: ", purchase.purchaseId);
+
+
+        console.log("cartDetails: ", cartDetails);
+
+        const tax = 0.1 * total_price;
+        const promoCode = 50;
+        const finalPrice = total_price + tax - promoCode;
+
+        console.log("Final Price: ", total_price);
+
+
+        //delete cart details from db
+        const deleteCartDetails = await Cart.destroy({where: {userId: userid}});
+
+        //update quantity in itemlisting
+
+        //victors code
+
     }
-
-    console.log("req.body: ", req.body);
-
-
-    //get payment details
-
-    //get cart details
-    const cartDetails = await get_cart(userid);
-
-    //get total price
-    total_price = 0;
-    for (var i = 0; i < cartDetails.length; i++) 
-    {
-        total_price += cartDetails[i].price * cartDetails[i].quantity;
-    }
-
-    //update quantity in itemlisting
-    for (var i = 0; i < cartDetails.length; i++) 
-    {
-        const updateQuantity = await ItemListing.update({quantity:cartDetails[i].quantity - cartDetails[i].quantity},{where:{listingId:cartDetails[i].listingId}});
-    }
-
-
-
-    
-    console.log("cartDetails: ", cartDetails);
-    
-    const tax = 0.1 * total_price;
-    const promoCode = 50;
-    const finalPrice = total_price + tax - promoCode;
-
-    console.log("Final Price: ", total_price);
-
-
-
-
-
-    //delete cart details from db
-    const deleteCartDetails = await Cart.destroy({where:{userId:userid}});
-
-    //update quantity in itemlisting
-    // I
-
-
-
-
-    //victors code
-
-
-
-
 });
 
 
