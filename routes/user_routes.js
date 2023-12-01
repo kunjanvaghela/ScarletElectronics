@@ -35,6 +35,10 @@ router.get("/login", (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
     console.log("Processing logout");
 
     // Clearing JWT-related cookies and emailId cookie
@@ -55,6 +59,10 @@ router.get("/register", (req, res) => {
 });
 
 router.get("/cart", (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
 	const fields = [
 		{ name: "email", label: "Email", type: "text" },
 		{ name: "password", label: "Password", type: "password" },
@@ -65,6 +73,10 @@ router.get("/cart", (req, res) => {
 });
 
 router.get("/checkout", (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
 	const itemsArray = [
 		{ item: "item1", qty: 2, cost_qty: 10, cost_item: 10 },
 		{ item: "item2", qty: 1, cost_qty: 5, cost_item: 10 },
@@ -217,6 +229,10 @@ router.use("/send-otp", send_otp_routes);
 router.use("/recover-password", recover_pass_routes);
 
 router.get("/", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
 		const userDetails = await db.User.findOne({ where: { emailId } });
@@ -239,6 +255,10 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/modify-user", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
 		const userDetails = await db.User.findOne({ where: { emailId } });
@@ -261,6 +281,10 @@ router.get("/modify-user", async (req, res) => {
 });
 
 router.post("/modify-user", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
