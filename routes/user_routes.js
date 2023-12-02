@@ -143,10 +143,12 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
+		console.log("Try1");
 		// Verify reCAPTCHA
 		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
 		const verificationResponse = await axios.post(verificationURL);
 
+		console.log("Try2");
 		if (!verificationResponse.data.success) {
 			return res.status(400).json({
 				success: false,
@@ -172,6 +174,8 @@ router.post("/login", async (req, res) => {
 				message: "You have entered an invalid password, " + user.name,
 			});
 		}
+
+		console.log("Username and password verified");
 
 		//JWT TOKEN IMPLEMENTATION:
 		const tokenPackage = {userid: user.userid};
