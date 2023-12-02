@@ -294,30 +294,30 @@ router.post("/modify-user", async (req, res) => {
 	}
 });
 
-router.get("/support", (req, res) => {
+const getsupport = async (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("supportpage");
-});
+};
 
-router.get("/support/newrequest", async (req, res) => {
+const getSupportnewrequest =  async (req, res) => {
 	
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
     // console.log('username : ',  username);
     res.render("newrequest");
     
-});
-router.get("/support/oldrequests", async (req, res) => {
+};
+const getSupportoldrequests = async (req, res) => {
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
     // console.log('username : ',  username);
     res.render("oldrequests");
     
-});
+};
 
 
 
-router.post("/support/newrequest", async (req, res) => {
+const postSupportnewrequest = async (req, res) => {
 	const { name, emailId } = req.body;
 	const User = db.User;
 	const userData = req.body
@@ -351,7 +351,73 @@ router.post("/support/newrequest", async (req, res) => {
         
     res.redirect('/users/support'); 
 	
-});
+};
+
+router.get("/support", getsupport);
+router.get("/support/newrequest", getSupportnewrequest);
+router.get("/support/oldrequests", getSupportoldrequests);
+router.post("/support/newrequest", postSupportnewrequest);
+
+
+
+// router.get("/support", (req, res) => {
+// 	console.log("Successfully in Root :Inssss:sss:: /");
+// 	res.render("supportpage");
+// });
+
+// router.get("/support/newrequest", async (req, res) => {
+	
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("newrequest");
+    
+// });
+// router.get("/support/oldrequests", async (req, res) => {
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("oldrequests");
+    
+// });
+
+
+
+// router.post("/support/newrequest", async (req, res) => {
+// 	const { name, emailId } = req.body;
+// 	const User = db.User;
+// 	const userData = req.body
+
+// 	const user = await User.findOne({ where: { emailId } });
+// 	if (!user) {
+// 		return res.status(404).json({
+// 			success: false,
+// 			message: "You do not exist in our system. Please Sign up",
+// 		});
+// 	}
+
+
+// 		// Calculate the expiration time as the current time + 120 minutes
+// 	const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+// 	const expiresAt = new Date(Date.now() + tenMinutes);
+
+// 		// Set the cookie
+// 	res.cookie("emailId", user.emailId, {
+// 		expires: expiresAt,
+// 		httpOnly: false,
+// 	});
+
+
+//     userData.userId = user.userid;
+// 	userData.current_status = 'A'
+//     console.log("User Inserted, now have to insert staffUser");
+//     console.log(userData);
+//     EndUserRequest.create(userData);
+    
+        
+//     res.redirect('/users/support'); 
+	
+// });
 			
 	
 
