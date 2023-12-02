@@ -11,10 +11,17 @@ const UserUtil = require('../util/userUtil');
 const { encrypt, decrypt } = require("../util/encryptionUtil");
 
            
-router.get("/login", async (req, res) => {
-	console.log("Successfully in Root :Inssss:sss:: /");
-	res.render("staffloginPage");
-});
+// router.get("/login", async (req, res) => {
+// 	console.log("Successfully in Root :Inssss:sss:: /");
+// 	res.render("staffloginPage");
+// });
+
+const getlogin = async(req,res) => {
+ 	console.log("Successfully in Root :Inssss:sss:: /");
+ 	res.render("staffloginPage");
+};
+router.get("/login", getlogin)
+
 
 router.post("/login", async (req, res) => {
 	const { emailId, password } = req.body;
