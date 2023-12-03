@@ -10,12 +10,13 @@
 </head>
     
 <body align="center">
+    <%- include('Common/header.ejs') %>
     <br> <br>
     <h1 class="text-primary text-center mx-auto">Cart</h1>
 
     <form action="#" method="post" name="login">
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="cartItemsTable">
             <thead>
                 <tr class="table-primary">
                     <th class="w-25 text-center">Item Name</th>
@@ -50,50 +51,88 @@
             <input type="text" class="form-control" name="address5" id="address5" placeholder="pincode" required><br>
         </div>
         
-        <div class="col-md-3 text-center mx-auto">
+        <div class="col-md-3 text-center mx-auto" id="btn">
             <button type="button" class="btn btn-danger align-self-center" id="removeAll">Flush Cart</button>
             <button type="submit" class="btn btn-primary align-self-center" id="getFinalCost">Get Final Cost</button>
         </div>
     </form>
     <br> <br>
     <script>
+
+        var cartDetails = <%- JSON.stringify(cartDetails) %>;
         document.addEventListener('DOMContentLoaded', () => {
+            const cartItemsTable = document.getElementById('cartItemsTable');
+            const promocode = document.getElementById('promocode');
+            const address = document.getElementById('address');
             const dynamicTable = document.getElementById('dynamicTable');
             const addRowButton = document.getElementById('addRow');
+            const btn = document.getElementById('btn');
             let rowCounter = 0;
 
+            // var cartDetails = <%- JSON.stringify(cartDetails) %>;
 
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            cart_row_reference = [];
-            for (const itemData of cartDetails) {
-                rowCounter++;
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td class="w-25">
-                        <label for="item${rowCounter}">${itemData.name}</label>
-                    </td>
-                    <td class="w-25">
-                        <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1" onchange="updateqty(${rowCounter}, this.value)">
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.price}</label>
-                    </td>
-                    <td class="w-25">
-                        <button type="button" style="width: 100%" class="btn btn-danger btn-block" onclick="removeRow(this)">Remove Item</button>
-                    </td>
-                `;
-                dynamicTable.appendChild(newRow);
+            if (cartDetails.length == 0)
+            {
+                cartItemsTable.style.display = 'none';
+                promocode.style.display = 'none';
+                address.style.display = 'none';
+                dynamicTable.style.display = 'none';
+                btn.style.display = 'none';
+                var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+                hiddenElement.innerHTML = dynamicContent;
+                hiddenElement.style.color = "red";
+                hiddenElement.style.fontSize = "20px";
+                hiddenElement.style.display = "flex";
+                hiddenElement.style.alignItems = "center";
+                hiddenElement.style.justifyContent = "center";
+
+                // window.alert(dynamicContent);
+            }
+            else
+            {
+                cart_row_reference = [];
+                for (const itemData of cartDetails) {
+                    rowCounter++;
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="w-25">
+                            <label for="item${rowCounter}">${itemData.name}</label>
+                        </td>
+                        <td class="w-25">
+                            <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1" onchange="updateqty(${rowCounter}, this.value)">
+                        </td>
+                        <td class="w-25 text-center">
+                            <label for="item${rowCounter}">${itemData.price}</label>
+                        </td>
+                        <td class="w-25">
+                            <button type="button" style="width: 100%" class="btn btn-danger btn-block" onclick="removeRow(this)">Remove Item</button>
+                        </td>
+                    `;
+                    dynamicTable.appendChild(newRow);
+            }
             }
         });
 
         document.getElementById('removeAll').addEventListener('click', () => {
             // Remove all rows from the table
+            const cartItemsTable = document.getElementById('cartItemsTable');
             const dynamicTable = document.getElementById('dynamicTable');
             const address = document.getElementById('address');
             const promocode = document.getElementById('promocode');
+            const btn = document.getElementById('btn');
+            cartItemsTable.innerHTML = '';
             dynamicTable.innerHTML = '';
             address.innerHTML = '';
             promocode.innerHTML = '';
+            btn.innerHTML = '';
+
+            var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+            hiddenElement.innerHTML = dynamicContent;
+            hiddenElement.style.color = "red";
+            hiddenElement.style.fontSize = "20px";
+            hiddenElement.style.display = "flex";
+            hiddenElement.style.alignItems = "center";
+            hiddenElement.style.justifyContent = "center";
 
             //send ajax post request to flush
             var xhttp = new XMLHttpRequest();
@@ -136,7 +175,7 @@
 
         function updateqty(row, qty) {
             // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
+            // var cartDetails = <%- JSON.stringify(cartDetails) %>;
             // console.log(qty);
 
             //send ajax post request to remove item
@@ -166,9 +205,13 @@
         }
 
         function removeRow(button) {
-            // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            // console.log("Ddddddddddddddd");
+            const cartItemsTable = document.getElementById('cartItemsTable');
+            const promocode = document.getElementById('promocode');
+            const address = document.getElementById('address');
+            const dynamicTable = document.getElementById('dynamicTable');
+            const btn = document.getElementById('btn');
+
+            // var cartDetails = <%- JSON.stringify(cartDetails) %>;
             
             var row = button.parentElement.parentElement;
             row.remove();
@@ -179,7 +222,6 @@
             var itemNumber = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
             //convert item number to integer
             itemNumber = parseInt(itemNumber);
-            // console.log(itemNumber);
             // console.log(cartDetails);
 
             //get listing id cartdetails[itemNumber-1].listing_id
@@ -198,6 +240,24 @@
             
             xhttp.send(data);
 
+            cartDetails.splice((itemNumber-1), 1);
+            if (cartDetails.length == 0)
+            {
+                cartItemsTable.style.display = 'none';
+                promocode.style.display = 'none';
+                address.style.display = 'none';
+                dynamicTable.style.display = 'none';
+                btn.style.display = 'none';
+                var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+                hiddenElement.innerHTML = dynamicContent;
+                hiddenElement.style.color = "red";
+                hiddenElement.style.fontSize = "20px";
+                hiddenElement.style.display = "flex";
+                hiddenElement.style.alignItems = "center";
+                hiddenElement.style.justifyContent = "center";
+
+                // window.alert(dynamicContent);
+            }
             //remove item from cartDetails
         }
 
