@@ -23,6 +23,7 @@ const getlogin = async(req,res) => {
 
 const postlogin = async (req, res) => {
 	const { emailId, password } = req.body;
+	const User = db.User;
 	
 	console.log("IN login");
 
