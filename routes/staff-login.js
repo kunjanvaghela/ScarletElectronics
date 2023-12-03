@@ -34,7 +34,7 @@ const postlogin = async (req, res) => {
 			console.log("HEre");
 			return res.status(404).json({
 				success: false,
-				message: "You do not exist in our system. Please Sign up",
+				message: "You do not exist in our system.",
 			});
 		}
 
@@ -61,7 +61,7 @@ const postlogin = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + user.emailId + ", Login successful",
-			redirectUrl: "/customer_representative/",
+			// redirectUrl: "/customer_representative/",
 		});
 
     } catch (error) {
