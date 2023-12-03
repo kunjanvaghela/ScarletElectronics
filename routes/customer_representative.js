@@ -44,37 +44,70 @@ router.get("/", async (req, res) => {
   
 });
 
-router.get("/show-all-request", async (req, res) => {
-    console.log('Button Working');
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
-    console.log(userDetails.userid);
-    const username = userDetails.name;
+const getshowallrequest = async (req, res) => {
+  console.log('Button Working');
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
+  const username = userDetails.name;
 
-    EndUserRequest.findAll({
+  EndUserRequest.findAll({
+  
+  }).then((requests) => {
+    const serializedRequests = requests.map((request) => {
+      return {
+        requestId: request.requestId,
+        userId: request.userId,
+        listingId: request.listingId,
+        updateDescription: request.update_description,
+        createdOn: request.created_on,
+        currentStatus: request.current_status,
+        customerRep: username,
+        updatedOn: request.updated_on
+      };
+    });
+  //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+      
+      res.render('all_requests', {serializedRequests, username});
+      
+      
+    }).catch(function(err){
+      console.log('Oops! something went wrong, : ', err);
+    });
+  
+};
+router.get("/show-all-request", getshowallrequest);
+
+// router.get("/show-all-request", async (req, res) => {
+//     console.log('Button Working');
+//     userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     console.log(userDetails.userid);
+//     const username = userDetails.name;
+
+//     EndUserRequest.findAll({
     
-    }).then((requests) => {
-      const serializedRequests = requests.map((request) => {
-        return {
-          requestId: request.requestId,
-          userId: request.userId,
-          listingId: request.listingId,
-          updateDescription: request.update_description,
-          createdOn: request.created_on,
-          currentStatus: request.current_status,
-          customerRep: username,
-          updatedOn: request.updated_on
-        };
-      });
-    //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+//     }).then((requests) => {
+//       const serializedRequests = requests.map((request) => {
+//         return {
+//           requestId: request.requestId,
+//           userId: request.userId,
+//           listingId: request.listingId,
+//           updateDescription: request.update_description,
+//           createdOn: request.created_on,
+//           currentStatus: request.current_status,
+//           customerRep: username,
+//           updatedOn: request.updated_on
+//         };
+//       });
+//     //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
         
-        res.render('all_requests', {serializedRequests, username});
+//         res.render('all_requests', {serializedRequests, username});
         
         
-      }).catch(function(err){
-        console.log('Oops! something went wrong, : ', err);
-      });
+//       }).catch(function(err){
+//         console.log('Oops! something went wrong, : ', err);
+//       });
     
-});
+// });
 
 // router.get("/get-existing-listing", async (req, res) => {
 //     console.log('Button Working');
