@@ -17,7 +17,7 @@
         <h1 class="text-primary text-center mx-auto">Create Customer Representative</h1>
         <br>
         <h2 class="text-center"></h2>
-        <form method="POST" action="/admin/insert-customer-rep" onsubmit="formatDate()">
+        <form id="create" method="POST" action="/admin/insert-customer-rep" onsubmit="formatDate()">
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="name" class="form-label text-left">Name</label> <input type="text"
                     class="form-control text-left" id="name" name="name" onchange="allLetter('a')" required>
@@ -60,8 +60,50 @@
             </div>
         </form>
     </div>
+    <script type="text/javascript">
 
-    <script src="formValidation.js"></script>
+        document.getElementById('create').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var yourData = {
+                    name: document.getElementById('name').value,
+                    emailId: document.getElementById('emailId').value,
+                    password: document.getElementById('password').value,
+                    ssn: document.getElementById('ssn').value,
+                    designation: document.getElementById('designation').value,
+                    // ... (add other form fields)
+                };
+
+            fetch('/admin/insert-customer-rep', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(yourData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect based on the server response
+                        window.location.href = data.redirectTo || '/admin/dashboard';
+                    } else {
+                        // Handle error case
+                        console.error('Server response indicates failure:', data.message);
+                    }
+                })
+                .catch(error => {
+                    // Handle fetch error
+                    console.error('Error during fetch:', error);
+                });
+
+
+
+
+        });
+
+    </script>
+<!-- 
+    <script src="formValidation.js"></script> -->
     <script type="text/javascript">
         // Your existing JS code here
 
