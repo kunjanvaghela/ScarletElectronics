@@ -297,16 +297,6 @@
         document.getElementById('reg').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            // Create form data
-            const formData = new FormData();
-            formData.append('name', document.getElementById("name").value);
-            formData.append('phone', document.getElementById("phone").value);
-            formData.append('address_line1', document.getElementById("address_line1").value);
-            formData.append('address_line2', document.getElementById("address_line2").value);
-            formData.append('address_city', document.getElementById("address_city").value);
-            formData.append('address_state_code', document.getElementById("address_state_code").value);
-            formData.append('address_zipcode', document.getElementById("address_zipcode").value);
-
             fetch('/users/modify-user', {
                 method: 'POST',
                 headers: {
