@@ -146,6 +146,7 @@ router.get("/thread", async (req, res) => {
   userDetails = await UserUtil.check_email(req.cookies.emailId);
     //console.log(userDetails.userid);
   const username = userDetails.name;
+  
   res.render("threads.ejs",{ username });
 });
 
