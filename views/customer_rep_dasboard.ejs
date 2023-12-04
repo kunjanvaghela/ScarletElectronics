@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/cr_header.ejs') %>
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
@@ -38,7 +38,7 @@
                             <td><%=y.requestId%></td>
                             <td><%=y.userId%></td>
                             <td><%=y.listingId%></td>
-                            <td><%=y.updateDescription%></td>
+                            <td><a href=/customer_representative/thread><%=y.updateDescription%></a></td>
                             <td><%=y.createdOn%></td>
                             <td><%=y.currentStatus%></td>
                             <td><%=y.customerRep%></td>

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/cr_header.ejs') %>
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">All Requests</h1>
@@ -30,6 +30,7 @@
                     <th width="2%">Status</th>
                     <th>CR</th>
                     <th>Updated On</th>
+                    <th>Claim</th>
                 </thead>
                 <tbody>
                     
@@ -43,6 +44,10 @@
                             <td><%=y.currentStatus%></td>
                             <td><%=y.customerRep%></td>
                             <td><%=y.updatedn%></td>
+                            <td><form method="POST" action="/customer_representative/claim-request">
+                                <input type="hidden" name="reqID" value="<%=y.requestId%>"></input>
+                                <button type="submit" class="btn btn-primary align-self-center">Claim</button>
+                            </form></td></tr>
                             
                         </th>
                     <%})%>

@@ -34,6 +34,12 @@ router.get("/logout", (req, res) => {
 	res.redirect("/users/login");
 });
 
+router.get("/logout-staff", (req, res) => {
+	console.log("Successfully in Root :Inssss:sss:: /");
+	res.clearCookie("emailId");
+	res.redirect("/staff-login/login");
+});
+
 router.get("/register", (req, res) => {
 	res.render("register");
 });
@@ -315,6 +321,7 @@ router.post("/support/newrequest", async (req, res) => {
     res.redirect('/users/support'); 
 	
 });
+
 			
 	
 
