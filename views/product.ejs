@@ -16,13 +16,24 @@
                 // Prevent the default form submit action
                 event.preventDefault();
 
-                console.log($(this).data('item-id'));
-                // Get the item details from the data attributes
-                var listingId = $(this).data('item-id');
-                var itemName = $(this).data('item-name');
-                var itemPrice = $(this).data('item-price');
-                var itemCategory = $(this).data('item-category');
-                console.log(listingId, itemName, itemPrice, itemCategory);
+                var selectedRadio = $("input[name='listingId']:checked");
+
+            if (selectedRadio.length > 0) {
+                var listingId = selectedRadio.data("listing-id");
+                var itemName = selectedRadio.data("item-name");
+                var itemPrice = selectedRadio.data("item-price");
+                var itemCategory = selectedRadio.data("item-category");
+
+                console.log("Listing ID: " + listingId);
+                console.log("Item Name: " + itemName);
+                console.log("Item Price: " + itemPrice);
+                console.log("Item Category: " + itemCategory);
+                // console.log($(this).data('item-id'));
+                // var listingId = $(this).data('item-id');
+                // var itemName = $(this).data('item-name');
+                // var itemPrice = $(this).data('item-price');
+                // var itemCategory = $(this).data('item-category');
+                // console.log(listingId, itemName, itemPrice, itemCategory);
 
                 // Create an object with the item details
                 var itemData = {
@@ -46,6 +57,12 @@
                         alert('Error adding item to cart.');
                     }
                 });
+
+            } else {
+                alert("Please select an item before adding to cart.");
+            }
+
+                
             });
         });
     </script>
@@ -63,95 +80,67 @@
 
 <body>
     <%- include('Common/header2.ejs') %>
-    <br><br><br>
-    <h1 class="text-primary text-center mx-auto">Scarlet Electronics</h1>
-    <br><br><br>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-                <form>
-                    <div class="form-row">
-                        <div class="form-group col-md-10">
-                            <label for="price">Price:</label>
-                            <select class="form-control" id="price">
-                                <option value="">Any</option>
-                                <option value="under-100">Under $100</option>
-                                <option value="100-500">$100 - $500</option>
-                                <option value="500-1000">$500 - $1000</option>
-                                <option value="1000-2000">$1000 - $2000</option>
-                                <option value="above-2000">$2000 Above</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-10">
-                            <label for="category">Category:</label>
-                            <select class="form-control" id="category">
-                                <option value="">Any</option>
-                                <option value="laptops">Laptops</option>
-                                <option value="smartphones">Smartphones</option>
-                                <option value="television">Television</option>
-                                <option value="accessories">Accessories</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-10">
-                            <label for="storage">Storage:</label>
-                            <select class="form-control" id="storage">
-                                <option value="">Any</option>
-                                <option value="32gb">32GB</option>
-                                <option value="64gb">64GB</option>
-                                <option value="128gb">128GB</option>
-                                <!-- Add more storage options as needed -->
-                            </select>
-                        </div>
-                        <!-- Add more filter criteria dropdowns as needed -->
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <button type="submit" class="btn btn-primary">Apply Filters</button>
-                        </div>
-                    </div>
-                </form>
+
+    <div class="container mt-5">
+        <h2 class="text-danger text-center"><%= product.name %></h2>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <!-- <img src="<%= product.itemImage %>" alt="Product Image" class="product-image"> -->
+                <img src="https://drive.google.com/uc?export=view&id=<%= imageFiles[0].id %>" style='height: 100%; width: 100%; object-fit: contain' alt="Image Unavailable">
+
             </div>
 
-            <div class="col-md-10">
-                <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <img src="your-image-url.jpg" class="card-img-top" alt="Product Image">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= product.name %></h5>
-                                    <h6 class="card-text">Price: $<%= product.cpu %></h6>
-                                    <h7 class="card-subtitle mb-2 text-muted"><%= product.category %></h7>
-                                    <p class="card-text"><%= product.description %></p>
-                                    <a href="#" class="btn btn-primary"
-                                        data-item-id="<%= product.listingId %>">
-                                        View Details</a>
-                                    <a href="#" class="btn btn-secondary add-to-cart-btn"
-                                        data-item-name="<%= product.name %>"
-                                        data-item-price="<%= product.price %>"
-                                        data-item-category="<%= product.category %>">
-                                        Add to Cart</a>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-md-8 product-details">
+                <div class="row mb-3">
+                    <span class="star-rating">
+                        <% for (let i = 0; i < 5; i++) { %>
+                            &#9733; <!-- Unicode star character -->
+                        <% } %>
+                    </span>
                 </div>
+                <div class="row mb-3">
+                    <p><%= product.description %></p>
+                </div>
+
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Add to Cart</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% product.ItemListings.forEach((item) => { %>
+                                <tr>
+                                    <td><%= item.price %></td>
+                                    <td><%= item.quantity %></td>
+                                    <td>
+                                        <input type="radio" name="listingId"
+                                            data-listing-id="<%= item.listingId %>"
+                                            data-item-name="<%= product.name %>"
+                                            data-item-price="<%= item.price %>"
+                                            data-item-category="<%= product.category %>">
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-primary add-to-cart-btn">Add Selected Item to Cart</button>
             </div>
-
         </div>
-    </div>
 
-    <div class="container">
-        <div class="d-flex justify-content-end">
-            <form action="/cart/fetch-cart-display" method="GET">
-                <button type="submit" class="btn btn-primary">Cart</button>
-            </form>
-        </div>
-    </div>
+        <br><br><br><br>
 
-    <div class="container">
-        <div class="d-flex align-items-end">
-            <form action="/item-listing/create" method="GET">
-                <button type="submit" class="btn btn-primary">Sell Item</button>
-            </form>
+        <div class="mt-5">
+            <h2>Reviews</h2>
+            <br>
+            <div>
+                Review section
+            </div>
         </div>
     </div>
     
