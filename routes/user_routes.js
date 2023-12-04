@@ -51,6 +51,22 @@ router.get("/logout", (req, res) => {
     res.redirect("/users/login");
 });
 
+router.get("/logout-staff", (req, res) => {
+    console.log("Processing logout");
+
+    // Clearing JWT-related cookies and emailId cookie
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("emailId");
+
+    // Optionally, handle the refresh token list if you store them server-side
+    const refreshToken = req.cookies.refreshToken;
+    refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+
+    // Redirect the user to the login page after logout
+    res.redirect("/staff-login/login");
+});
+
 router.get("/register", (req, res) => {
 	res.render("register");
 });
@@ -308,11 +324,36 @@ const getSupportnewrequest =  async (req, res) => {
     
 };
 const getSupportoldrequests = async (req, res) => {
-    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-    // const username = userDetails.name;
-    // console.log('username : ',  username);
-    res.render("oldrequests");
-    
+
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	
+	const username = userDetails.name;
+  
+	EndUserRequest.findAll({
+	
+	}).then((requests) => {
+	  const serializedRequests = requests.map((request) => {
+		return {
+		  requestId: request.requestId,
+		  userId: request.userId,
+		  listingId: request.listingId,
+		  updateDescription: request.update_description,
+		  createdOn: request.created_on,
+		  currentStatus: request.current_status,
+		  customerRep: request.customer_rep,
+		  updatedOn: request.updated_on
+		};
+	  });
+	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+		
+		res.render('oldrequests', {serializedRequests, username});
+		
+		
+	  }).catch(function(err){
+		console.log('Oops! something went wrong, : ', err);
+	  });
+	
+       
 };
 
 

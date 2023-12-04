@@ -61,7 +61,7 @@ const getshowallrequest = async (req, res) => {
         updateDescription: request.update_description,
         createdOn: request.created_on,
         currentStatus: request.current_status,
-        customerRep: username,
+        customerRep: request.customer_rep,
         updatedOn: request.updated_on
       };
     });
@@ -146,7 +146,7 @@ router.get("/thread", async (req, res) => {
   userDetails = await UserUtil.check_email(req.cookies.emailId);
     //console.log(userDetails.userid);
   const username = userDetails.name;
-  
+
   res.render("threads.ejs",{ username });
 });
 
