@@ -13,7 +13,7 @@
     <br> <br>
     <h1 class="text-primary text-center mx-auto">Cart</h1>
 
-    <form action="#" method="post" name="login">
+    <form action="/cart/get-final-cost" name="login">
 
         <table class="table table-bordered">
             <thead>
@@ -118,7 +118,7 @@
                 // Check if the request was successful (status code 200)
                     if (xhttp.status == 200) {
                         // Parse the response JSON if applicable
-                        var jsonResponse = JSON.parse(xhttp.responseText);
+                        var jsonResponse = xhttp.responseText;
                         var dynamicContent = "PROMOCODE found, Hurray!!!!";
                         hiddenElement.innerHTML = dynamicContent;
                         hiddenElement.style.display = "block";
@@ -133,7 +133,8 @@
 
             xhttp.send(data);
         }
-
+        
+        
         function updateqty(row, qty) {
             // Get the parent row and remove it
             var cartDetails = <%- JSON.stringify(cartDetails) %>;
@@ -201,12 +202,13 @@
             //remove item from cartDetails
         }
 
+        /*
         //checkout button
         document.getElementById('getFinalCost').addEventListener('click', () => {
             //get all rows from the table
             const dynamicTable = document.getElementById('dynamicTable');
             const rows = dynamicTable.getElementsByTagName("tr");
-            console.log(rows);
+            console.log(1)
 
             //get all addresses
             const address = document.getElementById('address');
@@ -221,10 +223,12 @@
             console.log(address4);
             console.log(address5);
 
+            console.log(2)
+
             //get promocode
             const promocode = document.getElementById('promocode');
             const promocode1 = promocode.getElementsByTagName("input")[0].value;
-            console.log(promocode1);
+            console.log('3'+ promocode1);
 
             //get all quantities
             var quantities = [];
@@ -233,7 +237,7 @@
                 var quantity = row.getElementsByTagName("input")[0].value;
                 quantities.push(quantity);
             }
-            console.log(quantities);
+            console.log('4' + quantities);
 
             //get all listing ids
             var listingIds = [];
@@ -242,14 +246,14 @@
                 var listingId = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
                 listingIds.push(listingId);
             }
-            console.log(listingIds);
+            console.log('5' + listingIds);
 
             //send ajax post request to checkout
             var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/fetch-cart-display", true);
+            xhttp.open("POST", "/cart/get-final-cost", true);
             xhttp.setRequestHeader("Content-type", "application/json");
-            xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promocode: promocode1}));
-        });
+            xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promoCode: promocode1}));
+        });*/
     </script>
 
 </body>
