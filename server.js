@@ -7,7 +7,10 @@ const landing = require("./routes/user_routes.js")
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
-const cart = require("./routes/cart_routes.js");
+// const cart = require("./routes/cart_routes.js");
+const reivew = require("./routes/review_rating.js");
+const { router : cart } = require("./routes/cart_routes.js");
+const paymentRoutes = require('./routes/paymentRoutes.js');
 const cookieParser = require('cookie-parser');
 const Admin = require("./routes/admin.js")
 const CustomerRepLogin = require("./routes/staff-login.js")
@@ -48,6 +51,21 @@ app.use('/users', userRouter);
 app.use('/add-item', addItem);
 app.use('/item-listing', itemListing);
 app.use('/cart',cart);
+
+app.use('/review', reivew);
+app.use('/payments',paymentRoutes);
+
+app.post('/token', (req, res) => {
+	const refreshToken = req.body.token
+	if (refreshToken == null) return res.sendStatus(401)
+	if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+	jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+		if (err) return res.sendStatus(403)
+		const tokenPackage = { name: user.name, password: user.encrypted_password };
+		const accessToken = generateAccessToken(tokenPackage)
+		res.json({ accessToken: accessToken })
+	})
+})
 
 app.use('/admin', Admin);
 app.use('/staff-login', CustomerRepLogin);

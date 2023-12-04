@@ -4,13 +4,20 @@ const send_otp_routes = require("./otp_routes");
 const recover_pass_routes = require("./recover_pass_routes");
 const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
+const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
 const EndUserRequest = db.EndUserRequest;
-
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
 
 const multer = require("multer");
 const upload = multer();
+
+//###############################
+let refreshTokens = []
+//###############################
+
 
 router.get("/Home_Landing", (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
@@ -19,25 +26,29 @@ router.get("/Home_Landing", (req, res) => {
 
 
 router.get("/home", (req, res) => {
-    console.log('Successfully in Landing Page');
-    res.render('index_Landing');
+	console.log('Successfully in Landing Page');
+	res.render('index_Landing');
 });
-           
+
 router.get("/login", (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("loginPage");
 });
 
 router.get("/logout", (req, res) => {
-	console.log("Successfully in Root :Inssss:sss:: /");
-	res.clearCookie("emailId");
-	res.redirect("/users/login");
-});
+    console.log("Processing logout");
 
-router.get("/logout-staff", (req, res) => {
-	console.log("Successfully in Root :Inssss:sss:: /");
-	res.clearCookie("emailId");
-	res.redirect("/staff-login/login");
+    // Clearing JWT-related cookies and emailId cookie
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("emailId");
+
+    // Optionally, handle the refresh token list if you store them server-side
+    const refreshToken = req.cookies.refreshToken;
+    refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+
+    // Redirect the user to the login page after logout
+    res.redirect("/users/login");
 });
 
 router.get("/register", (req, res) => {
@@ -132,10 +143,12 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
+		console.log("Try1");
 		// Verify reCAPTCHA
 		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
 		const verificationResponse = await axios.post(verificationURL);
 
+		console.log("Try2");
 		if (!verificationResponse.data.success) {
 			return res.status(400).json({
 				success: false,
@@ -162,21 +175,34 @@ router.post("/login", async (req, res) => {
 			});
 		}
 
-		// Calculate the expiration time as the current time + 120 minutes
+		console.log("Username and password verified");
+
+		//JWT TOKEN IMPLEMENTATION:
+		const tokenPackage = {userid: user.userid};
+		const accessToken = UserUtil.generateAccessToken(tokenPackage)
+
+		const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET)
+		refreshTokens.push(refreshToken)
+		
 		const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
 		const expiresAt = new Date(Date.now() + tenMinutes);
-
-		// Set the cookie
 		res.cookie("emailId", user.emailId, {
 			expires: expiresAt,
 			httpOnly: false,
 		});
+		res.cookie("accessToken", accessToken, {
+			httpOnly: false,
+		});
+		res.cookie("refreshToken", refreshToken, {
+			httpOnly: false,
+		});
 
-		// Send a JSON response indicating success and possibly a redirect URL.
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + user.name + ", Login successful",
-			redirectUrl: "/item-listing",
+			// accessToken: accessToken,
+			// refreshToken: refreshToken,
+			redirectUrl: "/item-listing"
 		});
 	} catch (error) {
 		console.error("Error during login:", error);
@@ -186,6 +212,11 @@ router.post("/login", async (req, res) => {
 		});
 	}
 });
+
+//###############################
+
+
+
 
 router.use("/send-otp", send_otp_routes);
 router.use("/recover-password", recover_pass_routes);
@@ -263,30 +294,30 @@ router.post("/modify-user", async (req, res) => {
 	}
 });
 
-router.get("/support", (req, res) => {
+const getsupport = async (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("supportpage");
-});
+};
 
-router.get("/support/newrequest", async (req, res) => {
+const getSupportnewrequest =  async (req, res) => {
 	
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
     // console.log('username : ',  username);
     res.render("newrequest");
     
-});
-router.get("/support/oldrequests", async (req, res) => {
+};
+const getSupportoldrequests = async (req, res) => {
     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
     // const username = userDetails.name;
     // console.log('username : ',  username);
     res.render("oldrequests");
     
-});
+};
 
 
 
-router.post("/support/newrequest", async (req, res) => {
+const postSupportnewrequest = async (req, res) => {
 	const { name, emailId } = req.body;
 	const User = db.User;
 	const userData = req.body
@@ -320,8 +351,73 @@ router.post("/support/newrequest", async (req, res) => {
         
     res.redirect('/users/support'); 
 	
-});
+};
 
+router.get("/support", getsupport);
+router.get("/support/newrequest", getSupportnewrequest);
+router.get("/support/oldrequests", getSupportoldrequests);
+router.post("/support/newrequest", postSupportnewrequest);
+
+
+
+// router.get("/support", (req, res) => {
+// 	console.log("Successfully in Root :Inssss:sss:: /");
+// 	res.render("supportpage");
+// });
+
+// router.get("/support/newrequest", async (req, res) => {
+	
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("newrequest");
+    
+// });
+// router.get("/support/oldrequests", async (req, res) => {
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("oldrequests");
+    
+// });
+
+
+
+// router.post("/support/newrequest", async (req, res) => {
+// 	const { name, emailId } = req.body;
+// 	const User = db.User;
+// 	const userData = req.body
+
+// 	const user = await User.findOne({ where: { emailId } });
+// 	if (!user) {
+// 		return res.status(404).json({
+// 			success: false,
+// 			message: "You do not exist in our system. Please Sign up",
+// 		});
+// 	}
+
+
+// 		// Calculate the expiration time as the current time + 120 minutes
+// 	const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+// 	const expiresAt = new Date(Date.now() + tenMinutes);
+
+// 		// Set the cookie
+// 	res.cookie("emailId", user.emailId, {
+// 		expires: expiresAt,
+// 		httpOnly: false,
+// 	});
+
+
+//     userData.userId = user.userid;
+// 	userData.current_status = 'A'
+//     console.log("User Inserted, now have to insert staffUser");
+//     console.log(userData);
+//     EndUserRequest.create(userData);
+    
+        
+//     res.redirect('/users/support'); 
+	
+// });
 			
 	
 
