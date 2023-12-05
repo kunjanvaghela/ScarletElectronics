@@ -64,6 +64,9 @@ const ItemListing = require('./itemListing.js')(sequelize, Sequelize.DataTypes);
 const Catalog = require('./catalog.js')(sequelize, Sequelize.DataTypes);
 // Catalog.hasMany(ItemListing, { foreignKey: 'itemId' });
 // ItemListing.belongsTo(Catalog, { foreignKey: 'itemId' });
+
+const Review = require('./review.js')(sequelize, Sequelize.DataTypes);
+
 console.log("Assosciations created!!");
 
 // console.log("Db object : ", db);
