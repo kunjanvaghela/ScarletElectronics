@@ -11,51 +11,162 @@
 
 <body>
     <%- include('Common/cr_header.ejs') %>
+
+    <div align="center">
+        <br> <br>
+        <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
+        <br>
+    </div>
+
+    <div align="center" id="claimedRequestsTableDiv">
+        <br>
+        <h2 class="text-primary text-left mx-auto">Requests Claimed by Me</h2>
+        <table class="table table-bordered" id="claimedRequestsTable" cellspacing="0" width="100%">
+            <thead>
+                <th width="5%">Request ID</th>
+                <th width="10%">User</th>
+                <th width="5%">Listing ID</th>
+                <th>Description</th>
+                <th width="10%">Created On</th>
+                <th width="2%">Status</th>
+                <th>CR</th>
+                <th>Updated On</th>
+            </thead>
+            <tbody>
+                <!-- Table rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <br>
+    </div>
+
+    <br>
+        <form method="GET" action="#" id="viewAllRequestsForm">
+            <button type="submit" class="btn btn-primary align-self-center">View All Requests</button>
+        </form>
+    </br>
+
+
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">All Requests</h1>
         <br>
     </div> 
-    <div align="center">
+
+    <div align="center" id="allRequestsTableDiv" style="display: none;">
         <br>
         <h2 class="text-primary text-left mx-auto">View and Claim Requests</h2>
-        <%if(typeof serializedRequests !== 'undefined' && serializedRequests !== 'null'){%>
-            <table class="table table-bordered" id="endUserRequests" cellspacing="0" width="100%">
-                <thead>
-                    <th width="5%">Request ID</th>
-                    <th width="10%">User</th>
-                    <th width="5%">Listing ID</th>
-                    <th>Description</th>
-                    <th width="10%">Created On</th>
-                    <th width="2%">Status</th>
-                    <th>CR</th>
-                    <th>Updated On</th>
-                    <th>Claim</th>
-                </thead>
-                <tbody>
-                    
-                    <%serializedRequests.forEach((y) => {%>
-                        <tr>
-                            <td><%=y.requestId%></td>
-                            <td><%=y.userId%></td>
-                            <td><%=y.listingId%></td>
-                            <td><%=y.updateDescription%></td>
-                            <td><%=y.createdOn%></td>
-                            <td><%=y.currentStatus%></td>
-                            <td><%=y.customerRep%></td>
-                            <td><%=y.updatedn%></td>
-                            <td><form method="POST" action="/customer_representative/claim-request">
-                                <input type="hidden" name="reqID" value="<%=y.requestId%>"></input>
-                                <button type="submit" class="btn btn-primary align-self-center">Claim</button>
-                            </form></td></tr>
-                            
-                        </th>
-                    <%})%>
-                    <%}%>
-                </tbody>
-            </table>
+        <table class="table table-bordered" id="allRequestsTable" cellspacing="0" width="100%">
+            <thead>
+                <th width="5%">Request ID</th>
+                <th width="10%">User</th>
+                <th width="5%">Listing ID</th>
+                <th>Description</th>
+                <th width="10%">Created On</th>
+                <th width="2%">Status</th>
+                <th>CR</th>
+                <th>Updated On</th>
+                <th>Claim</th>
+            </thead>
+            <tbody>
+                <!-- Table rows will be dynamically inserted here -->
+            </tbody>
+        </table>
         <br>
     </div>
+
+    <script>
+
+        $(document).ready(function() {
+            
+            function fetchClaimedRequests() {
+                $.ajax({
+                    type: "POST",
+                    url: "/customer_representative/get-claimed-requests",
+                    success: function(response) {
+                        var tableBody = $('#claimedRequestsTable tbody');
+                        tableBody.empty();
+                        response.serializedRequests.forEach(function(request) {
+                            var row = '<tr>' +
+                                        '<td>' + request.requestId + '</td>' +
+                                        '<td>' + request.userId + '</td>' +
+                                        '<td>' + request.listingId + '</td>' +
+                                        '<td><a href="/customer_representative/thread">' + request.updateDescription + '</a></td>' +
+                                        '<td>' + request.createdOn + '</td>' +
+                                        '<td>' + request.currentStatus + '</td>' +
+                                        '<td>' + request.customerRep + '</td>' +
+                                        '<td>' + request.updatedOn + '</td>' +
+                                      '</tr>';
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching claimed requests:', error);
+                    }
+                });
+            }
+        
+            function fetchAllRequests() {
+                $.ajax({
+                    type: "POST",
+                    url: "/customer_representative/show-all-request",
+                    success: function(response) {
+                        var tableBody = $('#allRequestsTable tbody');
+                        tableBody.empty();
+                        response.serializedRequests.forEach(function(request) {
+                            var row = '<tr>' +
+                                        '<td>' + request.requestId + '</td>' +
+                                        '<td>' + request.userId + '</td>' +
+                                        '<td>' + request.listingId + '</td>' +
+                                        '<td><a href="/customer_representative/thread">' + request.updateDescription + '</a></td>' +
+                                        '<td>' + request.createdOn + '</td>' +
+                                        '<td>' + request.currentStatus + '</td>' +
+                                        '<td>' + request.customerRep + '</td>' +
+                                        '<td>' + request.updatedOn + '</td>' +
+                                        '<td><button class="claim-button" data-reqid="'+ request.requestId +'">Claim</button></td>' +
+                                      '</tr>';
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching all requests:', error);
+                    }
+                });
+            }
+        
+            function claimRequest(requestId) {
+                $.ajax({
+                    type: "POST",
+                    url: "/customer_representative/claim-request",
+                    data: { reqID: requestId },
+                    success: function(response) {
+                        alert('Request claimed successfully');
+                        fetchClaimedRequests(); // Refresh the claimed requests table
+                        fetchAllRequests();     // Refresh the all requests table
+                    },
+                    error: function(error) {
+                        alert('Error claiming request');
+                    }
+                });
+            }
+        
+            // Initial fetch for tables on page load
+            fetchClaimedRequests();
+            //fetchAllRequests();
+
+            $('#viewAllRequestsForm').on('click', 'button', function() {
+                $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
+                fetchAllRequests(); // Fetch and populate all requests
+            });
+        
+            // Event handler for claim buttons
+            $('body').on('click', '.claim-button', function() {
+                var requestId = $(this).data('reqid');
+                claimRequest(requestId); // Call the function to handle the claim
+            });
+        
+        });
+        </script>
+        
 
 </body>
 

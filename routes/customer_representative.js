@@ -10,39 +10,54 @@ const User = db.User;
 const UserUtil = require('../util/userUtil');
 
 router.get("/", async (req, res) => {
-    console.log('Working');
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
-    //console.log(userDetails);
-    const username = userDetails.name;
-    const custRepId = userDetails.userid;
-    console.log("Username is " + username);
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //console.log(userDetails);
+  const username = userDetails.name;
+  const custRepId = userDetails.userid;
+  console.log("Username is " + username);
+  res.render('all_requests', {username});
+});
 
-    EndUserRequest.findAll({
-        where: {
-            customer_rep: custRepId
-        }
-      }).then((requests) => {
-        const serializedRequests = requests.map((request) => {
-          return {
-            requestId: request.requestId,
-            userId: request.userId,
-            listingId: request.listingId,
-            updateDescription: request.update_description,
-            createdOn: request.created_on,
-            currentStatus: request.current_status,
-            customerRep: username,
-            updatedOn: request.updated_on
-          };
-        });
-    
-        // Send the serialized data as a response
-        res.render('customer_rep_dasboard', {serializedRequests, username});
-        // res.render('seller_listing', {serializedListings})
-      }).catch((error) => {
-        console.error('Error retrieving data:', error);
-        res.status(500).send('Internal server error');
+router.post("/get-claimed-requests", async (req, res) => {
+  console.log('Working');
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //console.log(userDetails);
+  const username = userDetails.name;
+  const custRepId = userDetails.userid;
+  console.log("Username is " + username);
+
+  EndUserRequest.findAll({
+      where: {
+          customer_rep: custRepId
+      }
+    }).then((requests) => {
+      const serializedRequests = requests.map((request) => {
+        return {
+          requestId: request.requestId,
+          userId: request.userId,
+          listingId: request.listingId,
+          updateDescription: request.update_description,
+          createdOn: request.created_on,
+          currentStatus: request.current_status,
+          customerRep: username,
+          updatedOn: request.updated_on
+        };
       });
   
+      // Send the serialized data as a response
+      //res.render('customer_rep_dasboard', {serializedRequests, username});
+      return res.status(200).json({
+        success: true,
+        message: "Requests fetched from database",
+        serializedRequests: serializedRequests
+        
+      });
+      // res.render('seller_listing', {serializedListings})
+    }).catch((error) => {
+      console.error('Error retrieving data:', error);
+      res.status(500).send('Internal server error');
+    });
+
 });
 
 const getshowallrequest = async (req, res) => {
@@ -68,7 +83,13 @@ const getshowallrequest = async (req, res) => {
     });
   //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
       
-      res.render('all_requests', {serializedRequests, username});
+      //res.render('all_requests', {serializedRequests, username});
+        return res.status(200).json({
+        success: true,
+        message: "Request assigned to you",
+        serializedRequests: serializedRequests
+        
+      });
       
       
     }).catch(function(err){
@@ -76,7 +97,7 @@ const getshowallrequest = async (req, res) => {
     });
   
 };
-router.get("/show-all-request", getshowallrequest);
+router.post("/show-all-request", getshowallrequest);
 
 // router.get("/show-all-request", async (req, res) => {
 //     console.log('Button Working');
@@ -125,7 +146,14 @@ router.post("/claim-request",async (req, res) => {
     }).then(() => {
        
       // Send the serialized data as a response
-      res.redirect('/customer_representative/show-all-request');
+      //res.redirect('/customer_representative/show-all-request');
+      return res.status(200).json({
+        success: true,
+        message: "Request assigned to you",
+        
+        redirectUrl: "/customer_representative/show-all-request"
+      });
+      // res.render('listings', { serializedListings, username });
       
     }).catch((error) => {
       console.error('Error retrieving data:', error);

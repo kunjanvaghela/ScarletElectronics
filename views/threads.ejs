@@ -13,7 +13,14 @@
     <%- include('Common/cr_header.ejs') %>
      
 
-    
+    <div>
+        <form action="/customer_representative/thread" method="post">
+            <label for="inputField">Enter Text:</label>
+            <input type="text" id="inputField" name="inputField">
+            <button type="submit">Submit</button>
+        </form>
+
+    </div>
 </body>
 
 </html>
