@@ -6,6 +6,7 @@ const { where } = require('sequelize');
 const Catalog = db.Catalog;
 const ItemListing = db.ItemListing;
 const UserUtil = require('../util/userUtil');
+const { Sequelize } = require('sequelize');
 
 router.get("/", async (req, res) => {
   console.log('Working0');
@@ -120,6 +121,70 @@ router.post('/create', async (req, res) => {
     console.error('Error occurred:', error);
     res.status(500).send('Error occurred');
   }
+});
+
+
+//Mitul: Search&Filter APIs
+
+// router.get("/getUniqueValues", async (req, res) => {
+//   const distinctValues = await db.Catalog.findAll({
+//     attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('cpu')), 'cpu']]
+//   });
+//   console.log(distinctValues);
+//   res.status(200).send(distinctValues);
+// });
+
+router.get("/getUniqueValues", async (req, res) => {
+  try {
+    // Define the columns you want to get distinct values for
+    const columns = ['category', 'cpu', 'gpu', 'ram', 'storage', 'operating_system', 'screen_size', 
+    'screen_type', 'screen_resolution', 'front_camera', 'rear_camera'];
+
+    const approval_Status = "Approved";
+
+    // A function to fetch distinct values for a given column
+    const getDistinctValues = async (column) => {
+      const distinctValues = await db.Catalog.findAll({
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col(column)), column]],
+        where: { approval_Status },
+        order: [[column, 'ASC']]
+      });
+      return distinctValues.map(item => item[column]);
+    };
+
+    // Use Promise.all to fetch all distinct values in parallel
+    const results = await Promise.all(columns.map(getDistinctValues));
+
+    // Combine the results into a single object
+    const response = columns.reduce((obj, column, index) => {
+      obj[column.toUpperCase()] = results[index];
+      return obj;
+    }, {});
+
+    console.log("RESPONSE ", response);
+
+    // Send the response
+    res.status(200).json({
+      success: true,
+      body: response
+    });
+
+    // res.status(200).send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+
+router.post("/apply-filter", async (req, res) => {
+  console.log("apply-filter-req ", req.body);
+  //apply the filters.
+  res.send(200).json({
+    success: true,
+    message: req.body
+  });
+
 });
 
 module.exports = router;
