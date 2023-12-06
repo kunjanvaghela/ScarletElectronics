@@ -10,7 +10,7 @@ const Catalog = db.Catalog;
 const UserUtil = require('../util/userUtil');
 
 
-router.get("/add", async (req, res) => {
+const getadd = async (req, res) => {
     console.log('Successfully in /add-item/add');
     if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
         // If not authenticated, send a 401 Unauthorized response
@@ -20,7 +20,7 @@ router.get("/add", async (req, res) => {
     const username = userDetails.name;
     console.log('username : ',  username);
     res.render('additem', { username });
-});
+};
 
 // // Category selection route
 // router.post('/insert-category', async (req, res) => {
@@ -31,7 +31,7 @@ router.get("/add", async (req, res) => {
 // });
 
 // Insert data into the database based on the selected category
-router.post('/insert', async (req, res) => {
+const postinsert = async (req, res) => {
     const catalogData = req.body;
     catalogData.listing_Status = 'Active'; // Example value
     catalogData.approval_Status = 'Approved'; // Example value
@@ -55,6 +55,9 @@ router.post('/insert', async (req, res) => {
         console.error('Error occurred:', error);
         res.status(500).send('Error occurred');
     }
-});
+};
+
+router.get("/add", getadd);
+router.post('/insert', postinsert);
 
 module.exports = router;

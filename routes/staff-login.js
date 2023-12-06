@@ -10,12 +10,12 @@ const User = db.User;
 const Staff = db.Staff;
 
 // GET route to render the login page
-router.get("/login", async (req, res) => {
+const getstafflogin = async (req, res) => {
   res.render("staffloginPage");
-});
+};
 
 // POST route to handle login
-router.post("/login", async (req, res) => {
+const poststafflogin = async (req, res) => {
   const { emailId, password } = req.body;
 
   try {
@@ -62,7 +62,7 @@ router.post("/login", async (req, res) => {
     // Send a JSON response indicating success and possibly a redirect URL.
     return res.status(200).json({
       success: true,
-      message: "Welcome " + user.emailId + ", Login successful",
+      message: "Welcome " + user.name + ", Login successful",
     });
 
   } catch (error) {
@@ -72,6 +72,8 @@ router.post("/login", async (req, res) => {
       message: "Login Failed. Please use valid credentials.",
     });
   }
-});
+};
 
+router.get("/login", getstafflogin);
+router.post("/login", poststafflogin);
 module.exports = router;

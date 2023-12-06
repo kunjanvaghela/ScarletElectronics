@@ -10,16 +10,16 @@ const User = db.User;
 
 const UserUtil = require('../util/userUtil');
 
-router.get("/", async (req, res) => {
+const getAllrequests = async (req, res) => {
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   //console.log(userDetails);
   const username = userDetails.name;
   const custRepId = userDetails.userid;
   console.log("Username is " + username);
   res.render('all_requests', {username});
-});
+};
 
-router.post("/get-claimed-requests", async (req, res) => {
+const postClaimedrequests = async (req, res) => {
   console.log('Working');
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   //console.log(userDetails);
@@ -59,7 +59,7 @@ router.post("/get-claimed-requests", async (req, res) => {
       res.status(500).send('Internal server error');
     });
 
-});
+};
 
 const getshowallrequest = async (req, res) => {
   console.log('Button Working');
@@ -132,7 +132,7 @@ router.post("/show-all-request", getshowallrequest);
     
 // });
 
-router.post("/claim-request",async (req, res) => {
+const postClaimrequest = async (req, res) => {
     
     receivedRequestId = req.body.reqID;
     console.log("The requestID is : ", receivedRequestId);
@@ -170,10 +170,10 @@ router.post("/claim-request",async (req, res) => {
     //   res.status(500).send('Internal server error');
     // });
     
-});
+};
 
 //Renders threads page
-router.get("/thread", async (req, res) => {
+const getthread = async (req, res) => {
   userDetails = await UserUtil.check_email(req.cookies.emailId);
     //console.log(userDetails.userid);
     
@@ -183,7 +183,7 @@ router.get("/thread", async (req, res) => {
   console.log(reqId);
 
   res.render("threads",{ username, reqId });
-});
+};
 
 //Function to get messeges 
 const getAllMesseges = async (req, res) => {
@@ -232,7 +232,7 @@ const getAllMesseges = async (req, res) => {
 
 
 };
-router.post("/show-all-messeges", getAllMesseges);
+
 
 
 const getMessegeToBeInserted = async (req, res) => {
@@ -265,9 +265,9 @@ const getMessegeToBeInserted = async (req, res) => {
   
 
 };
-router.post("/insert-message", getMessegeToBeInserted);
+
 //newcode
-router.get("/rep_listings", async (req, res) => {
+const getReplistings =  async (req, res) => {
 
   try {
     userDetails = await UserUtil.check_email(req.cookies.emailId);
@@ -279,10 +279,10 @@ router.get("/rep_listings", async (req, res) => {
     console.error('Error fetching listings:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
 // Route to handle deletion of a listing
-router.post("/rep_listings/delete/:listingId", async (req, res) => {
+const postdeletereplisting = async (req, res) => {
 
   const listingId = req.params.listingId;
   try {
@@ -295,10 +295,10 @@ router.post("/rep_listings/delete/:listingId", async (req, res) => {
     console.error('Error deleting listing:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
 // Route to render the modification form
-router.get("/rep_listings/modify/:listingId", async (req, res) => {
+const getmodifyreplisting = async (req, res) => {
 
   const listingId = req.params.listingId;
   try {
@@ -311,10 +311,10 @@ router.get("/rep_listings/modify/:listingId", async (req, res) => {
     console.error('Error fetching listing for modification:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
 
 // Route to handle the form submission for modification
-router.post("/rep_listings/modify/:listingId", async (req, res) => {
+const postmodifyreplisting = async (req, res) => {
 
   const listingId = req.params.listingId;
   try {
@@ -329,7 +329,20 @@ router.post("/rep_listings/modify/:listingId", async (req, res) => {
     console.error('Error modifying listing:', error);
     res.status(500).send('Internal Server Error');
   }
-});
+};
+
+router.get("/", getAllrequests);
+router.post("/get-claimed-requests", postClaimedrequests);
+router.post("/claim-request", postClaimrequest);
+router.get("/thread", getthread);
+router.get("/rep_listings", getReplistings);
+router.post("/rep_listings/delete/:listingId", postdeletereplisting);
+router.get("/rep_listings/modify/:listingId", getmodifyreplisting);
+router.post("/rep_listings/modify/:listingId", postmodifyreplisting);
+router.post("/insert-message", getMessegeToBeInserted);
+router.post("/show-all-messeges", getAllMesseges);
+
+
 module.exports = router;
 
 

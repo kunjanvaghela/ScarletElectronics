@@ -6,6 +6,7 @@ const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
 const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
+const User = db.User;
 const EndUserRequest = db.EndUserRequest;
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
@@ -311,16 +312,19 @@ router.post("/modify-user", async (req, res) => {
 });
 
 const getsupport = async (req, res) => {
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	//console.log(userDetails);
+	const username = userDetails.name;
 	console.log("Successfully in Root :Inssss:sss:: /");
-	res.render("supportpage");
+	res.render("supportpage", {username});
 };
 
 const getSupportnewrequest =  async (req, res) => {
-	
-    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-    // const username = userDetails.name;
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	//console.log(userDetails);
+	const username = userDetails.name;
     // console.log('username : ',  username);
-    res.render("newrequest");
+    res.render("newrequest" , {username});
     
 };
 const getSupportoldrequests = async (req, res) => {
