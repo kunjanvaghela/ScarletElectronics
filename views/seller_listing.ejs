@@ -122,14 +122,13 @@
                             <button type="submit" class="btn btn-primary align-self-center">Add Item</button>
                         </form>
                     </div>
-                    <div class="col-md-3 text-center mx-auto">
+                    <!-- <div class="col-md-3 text-center mx-auto">
                         <a class="btn btn-outline-success align-self-center" href="/item-listing/get-existing-listing" role="button">Get Items</a>
-                    </div>
+                    </div> -->
                 </div>
                 
                 <div class="col-md-3 text-center mx-auto">
                     <form action="/item-listing/create" method="POST" id="createitemlisting" name="createitemlisting">
-                        <%if(typeof Catalog !== 'undefined' && Catalog !== 'null'){%>
                         <table class="table table-bordered" id="itemCatalog" cellspacing="0" width="100%">
                             <thead>
                                 <th>Select Item</th>
@@ -154,36 +153,8 @@
                                 <th>updated_on</th>-->
 
                             </thead>
-                            <tbody>
+                            <tbody id="catalogTableBody">
                                 
-                                <%Catalog.forEach((y) => {%>
-                                    <tr>
-                                        <td><input type="radio" id="itemId"
-                                            name="itemId"
-                                            value=<%=y.itemId%> ></td>
-                                        <!-- <td><%=y.itemId%></td> -->
-                                        <td><%=y.name%></td>
-                                        <td><%=y.description%></td>
-                                        <td><%=y.category%></td>
-                                        <td><%=y.cpu%></td>
-                                        <td><%=y.gpu%></td>
-                                        <td><%=y.ram%></td>
-                                        <td><%=y.storage%></td>
-                                        <td><%=y.operating_system%></td>
-                                        <td><%=y.screen_size%></td>
-                                        <td><%=y.front_camera%></td>
-                                        <td><%=y.rear_camera%></td>
-                                        <td><%=y.itemImage%></td>
-                                        <!-- <td><%=y.listing_Status%></td>
-                                        <td><%=y.approval_Status%></td>
-                                        <td><%=y.created_on%></td>
-                                        <td><%=y.created_by%></td>
-                                        <td><%=y.remarks%></td>
-                                        <td><%=y.updated_by%></td>
-                                        <td><%=y.updated_on%></td> -->
-                                    </th>
-                                <%})%>
-                                <%}%>
                             </tbody>
                         </table>
                         <table>
@@ -212,7 +183,6 @@
         const priceInput = document.getElementById('price');
         const quantityInput = document.getElementById('quantity');
         
-        
         var radioButtons = document.getElementsByName("itemId");
         var selected = false;
         for (var i = 0; i < radioButtons.length; i++) {
@@ -239,6 +209,46 @@
             return true;
         }
     }
+
+    function populateTable(catalogData) {
+        var tbody = $('#catalogTableBody');
+        tbody.empty();
+        catalogData.forEach(function(y) {
+            var row = '<tr>' +
+                '<td><input type="radio" id="itemId" name="itemId" value="' + y.itemId + '"></td>' +
+                '<td>' + y.name + '</td>' +
+                '<td>' + y.description + '</td>' +
+                '<td>' + y.category + '</td>' +
+                '<td>' + y.cpu + '</td>' +
+                '<td>' + y.gpu + '</td>' +
+                '<td>' + y.ram + '</td>' +
+                '<td>' + y.storage + '</td>' +
+                '<td>' + y.operating_system + '</td>' +
+                '<td>' + y.screen_size + '</td>' +
+                '<td>' + y.front_camera + '</td>' +
+                '<td>' + y.rear_camera + '</td>' +
+                '<td>' + y.itemImage + '</td>' +
+                '</tr>';
+            tbody.append(row);
+        });
+    }
+
+    $.ajax({
+        url: '/item-listing/get-existing-listing',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                populateTable(response.catalog);
+            } else {
+                console.error('Error fetching data:', response.message);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('AJAX Error:', textStatus, errorThrown);
+        }
+    });
+
 </script>
 
 </html>
