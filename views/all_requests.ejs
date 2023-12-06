@@ -90,7 +90,7 @@
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userId + '</td>' +
                                         '<td>' + request.listingId + '</td>' +
-                                        '<td><a href="/customer_representative/thread">' + request.updateDescription + '</a></td>' +
+                                        '<td><a href="/customer_representative/thread?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + request.currentStatus + '</td>' +
                                         '<td>' + request.customerRep + '</td>' +
@@ -117,7 +117,7 @@
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userId + '</td>' +
                                         '<td>' + request.listingId + '</td>' +
-                                        '<td><a href="/customer_representative/thread">' + request.updateDescription + '</a></td>' +
+                                        '<td><a href="/customer_representative/thread?reqId="'+ request.requestId +'"">' + request.updateDescription + '</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + request.currentStatus + '</td>' +
                                         '<td>' + request.customerRep + '</td>' +

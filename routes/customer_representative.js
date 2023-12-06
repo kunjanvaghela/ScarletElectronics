@@ -5,6 +5,7 @@ const db = require('../models');
 const { where } = require('sequelize');
 const EndUserRequest = db.EndUserRequest;
 const ItemListing = db.ItemListing; //newcode
+const Messages = db.Messages;
 const User = db.User;
 
 const UserUtil = require('../util/userUtil');
@@ -171,13 +172,67 @@ router.post("/claim-request",async (req, res) => {
     
 });
 
+//Renders threads page
 router.get("/thread", async (req, res) => {
   userDetails = await UserUtil.check_email(req.cookies.emailId);
     //console.log(userDetails.userid);
+    
+  const username = userDetails.name;
+  const reqId = req.query.reqId;
+  //console.log(req);
+  console.log(reqId);
+
+  res.render("threads",{ username, reqId });
+});
+
+//Function to get messeges 
+const getAllMesseges = async (req, res) => {
+
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
   const username = userDetails.name;
 
-  res.render("threads.ejs",{ username });
-});
+  const reqId = req.body.reqId;
+  console.log("RequestId received = ", reqId);
+
+  Messages.findAll({
+    where: {
+      requestId: reqId
+  }
+  
+  }).then((messages) => {
+    const serializedMessages = messages.map((getMessage) => {
+      return {
+        messageId: getMessage.messageId,
+        requestId: getMessage.requestId,
+        userId: getMessage.userId,
+        customerRep: getMessage.customer_rep,
+        listingId: getMessage.listingId,
+        updateDescription: getMessage.update_description,
+        createdOn: getMessage.created_on
+      };
+    });
+  //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+      
+      //res.render('all_requests', {serializedRequests, username});
+        return res.status(200).json({
+        success: true,
+        message: "Request assigned to you",
+        serializedMessages: serializedMessages
+        
+      });
+      
+      
+    }).catch(function(err){
+      console.log('Oops! something went wrong, : ', err);
+    });
+  
+
+
+
+};
+router.post("/show-all-messeges", getAllMesseges);
+
 
 //newcode
 router.get("/rep_listings", async (req, res) => {
