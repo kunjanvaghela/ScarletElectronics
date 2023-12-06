@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         listingId: {
           type: DataTypes.INTEGER.UNSIGNED,
+          allowNull: true,
           defaultValue: null
         },
         update_description: {

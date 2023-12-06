@@ -381,13 +381,29 @@ const postSupportnewrequest = async (req, res) => {
 		expires: expiresAt,
 		httpOnly: false,
 	});
-
+	if(userData.listingId === ''){
+		userData.listingId = null;
+	}
 
     userData.userId = user.userid;
 	userData.current_status = 'A'
     console.log("User Inserted, now have to insert staffUser");
-    console.log(userData);
-    EndUserRequest.create(userData);
+    //console.log(userData);
+    const created = await EndUserRequest.create(userData);
+
+	//Adding into message table
+	const row = await EndUserRequest.findOne({where: {update_description: userData.update_description}});
+	// console.log("!!!!   Row printed is herere !!!!!",row);
+	// console.log(userData.update_description)
+	const Messages = db.Messages;
+	Messages.create({
+		requestId: row.requestId,
+		userId: user.userid,
+		customer_rep: null,
+		update_description: userData.update_description,
+		created_on: new Date(),
+		created_by: "enduser"
+	   });
     
         
     res.redirect('/users/support'); 

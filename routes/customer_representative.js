@@ -242,9 +242,12 @@ const getMessegeToBeInserted = async (req, res) => {
   const Messages = db.Messages;
   //console.log(req);
   const reqId=req.body.reqId;
+  const row = await Messages.findOne({where: {requestId: reqId}});
+  //console.log("********   Row data *******", row.userId);
   Messages.create({
     requestId: reqId,
-    userId: 23,
+    userId: row.userId,
+    customer_rep: userDetails.userid,
     update_description: req.body.updateDescription,
     created_on: new Date(),
     created_by: "cr"
