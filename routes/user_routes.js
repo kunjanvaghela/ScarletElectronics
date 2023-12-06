@@ -200,9 +200,9 @@ router.post("/login", async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + user.name + ", Login successful",
+			redirectUrl: "/item-listing/listings",
 			// accessToken: accessToken,
 			// refreshToken: refreshToken,
-			redirectUrl: "/item-listing"
 		});
 	} catch (error) {
 		console.error("Error during login:", error);
