@@ -18,11 +18,12 @@
     <table class="table table-bordered">
         <thead>
         <tr class="table-primary">
-            <th class="w-25 text-center">Item Name</th>
-            <th class="w-25 text-center">Purchase Date</th>
-            <th class="w-25 text-center">Quantity (qty)</th>
-            <th class="w-25 text-center">Cost</th>
-            <th class="w-25 text-center">Actions</th>
+            <th class="w-15 text-center">Item Id</th>
+            <th class="w-15 text-center">Item Name</th>
+            <th class="w-15 text-center">Purchase Date</th>
+            <th class="w-15 text-center">Quantity (qty)</th>
+            <th class="w-15 text-center">Cost</th>
+            <th class="w-15 text-center">Actions</th>
         </tr>
         </thead>
         <tbody id="dynamicTable">
@@ -47,20 +48,23 @@
             rowCounter++;
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                    <td class="w-25 text-center">
+                    <td id="w-15 text-center">
+                        <input type="hidden" for="item${rowCounter}" id="${itemData.listingId}" value="${itemData.listingId}">
+                    </td>
+                    <td class="w-15 text-center">
                         <label for="item${rowCounter}">${itemData.name}</label>
                     </td>
-                    <td class="w-25 text-center">
+                    <td class="w-15 text-center">
                         <label for="item${rowCounter}">${itemData.purchase_date}</label>
                     </td>
-                    <td class="w-25 text-center" >
+                    <td class="w-15 text-center" >
                         <label for="item${rowCounter}">${itemData.quantity}</label>
                     </td>
-                    <td class="w-25 text-center">
+                    <td class="w-15 text-center">
                         <label for="item${rowCounter}">${itemData.total_cost_of_item}</label>
                     </td>
-                    <td class="w-25">
-                        <button type="button" class="btn btn-danger btn-block" onclick="removeRow(this)">Return Item</button>
+                    <td class="w-15 text-center">
+                        <button type="button" class="btn btn-danger btn-block" onclick="returnOrder(this)">Return Item</button>
                     </td>
                 `;
             dynamicTable.appendChild(newRow);
@@ -69,9 +73,10 @@
 
 
 
-    function removeRow(button) {
+    function returnOrder(button) {
         // Get the parent row and remove it
-        const row = button.parentElement.parentElement;
+        debugger;
+        const row = button.parentElement.parentElement.children[0].children[0].value;
         row.remove();
     }
 </script>
