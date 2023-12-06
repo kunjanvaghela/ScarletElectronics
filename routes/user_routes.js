@@ -6,6 +6,7 @@ const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
 const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
+const EndUserRequest = db.EndUserRequest;
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
@@ -154,10 +155,12 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
+		console.log("Try1");
 		// Verify reCAPTCHA
 		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
 		const verificationResponse = await axios.post(verificationURL);
 
+		console.log("Try2");
 		if (!verificationResponse.data.success) {
 			return res.status(400).json({
 				success: false,
@@ -184,6 +187,8 @@ router.post("/login", async (req, res) => {
 			});
 		}
 
+		console.log("Username and password verified");
+
 		//JWT TOKEN IMPLEMENTATION:
 		const tokenPackage = {userid: user.userid};
 		const accessToken = UserUtil.generateAccessToken(tokenPackage)
@@ -207,9 +212,9 @@ router.post("/login", async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: "Welcome " + user.name + ", Login successful",
+			redirectUrl: "/item-listing/listings",
 			// accessToken: accessToken,
 			// refreshToken: refreshToken,
-			redirectUrl: "/item-listing"
 		});
 	} catch (error) {
 		console.error("Error during login:", error);
@@ -248,10 +253,31 @@ router.get("/", async (req, res) => {
 			state: endUserDetails.address_state_code,
 			zipcode: endUserDetails.address_zipcode,
 		};
-		res.render("userProfile", { user: user });
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			body: user
+		});
+
+		// res.render("userProfile", { user: user });
 	} else {
-		res.redirect("login");
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
 	}
+});
+
+router.get("/", getUser);
+
+router.get("/profile", async (req,res) => {
+	res.render("userProfile");
 });
 
 router.get("/modify-user", async (req, res) => {
@@ -260,21 +286,22 @@ router.get("/modify-user", async (req, res) => {
         return res.status(401).send('Authentication failed');
       }
 	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
-		const userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
-		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
-		const user = {
-			name: userDetails.name,
-			emailId: userDetails.emailId,
-			phone: endUserDetails.phone_nr,
-			address1: endUserDetails.address_line1,
-			address2: endUserDetails.address_line2,
-			city: endUserDetails.address_city,
-			state: endUserDetails.address_state_code,
-			zipcode: endUserDetails.address_zipcode,
-		};
-		res.render("editProfile", { user: user });
+		// const emailId = req.cookies.emailId;
+		// const userDetails = await db.User.findOne({ where: { emailId } });
+		// const userId = userDetails.dataValues.userid;
+		// const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+		// const user = {
+		// 	name: userDetails.name,
+		// 	emailId: userDetails.emailId,
+		// 	phone: endUserDetails.phone_nr,
+		// 	address1: endUserDetails.address_line1,
+		// 	address2: endUserDetails.address_line2,
+		// 	city: endUserDetails.address_city,
+		// 	state: endUserDetails.address_state_code,
+		// 	zipcode: endUserDetails.address_zipcode,
+		// };
+		// res.render("editProfile", { user: user });
+		res.render("editProfile");
 	} else {
 		res.redirect("login");
 	}
@@ -289,14 +316,14 @@ router.post("/modify-user", async (req, res) => {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
-		db.User.update(
+		await db.User.update(
 			{
 				name: req.body.name,
 			},
 			{ where: { userid: userId } }
 		);
 
-		db.EndUsers.update(
+		await db.EndUsers.update(
 			{
 				phone_nr: req.body.phone,
 				address_line1: req.body.address_line1,
@@ -307,10 +334,158 @@ router.post("/modify-user", async (req, res) => {
 			},
 			{ where: { userid: userId } }
 		);
-		res.redirect("/users/");
+
+		// userDetails = await db.User.findOne({ where: { emailId } , include: [{
+		// 		model: db.EndUsers // Include the EndUser model in the response
+		// 	}] 
+		// });
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: "Updated successfully",
+			redirectUrl: "/users/profile"
+		});
+
+		// res.redirect("/users/");
 	} else {
-		res.redirect("login");
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
 	}
 });
+
+const getsupport = async (req, res) => {
+	console.log("Successfully in Root :Inssss:sss:: /");
+	res.render("supportpage");
+};
+
+const getSupportnewrequest =  async (req, res) => {
+	
+    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // const username = userDetails.name;
+    // console.log('username : ',  username);
+    res.render("newrequest");
+    
+};
+const getSupportoldrequests = async (req, res) => {
+    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // const username = userDetails.name;
+    // console.log('username : ',  username);
+    res.render("oldrequests");
+    
+};
+
+
+
+const postSupportnewrequest = async (req, res) => {
+	const { name, emailId } = req.body;
+	const User = db.User;
+	const userData = req.body
+
+	const user = await User.findOne({ where: { emailId } });
+	if (!user) {
+		return res.status(404).json({
+			success: false,
+			message: "You do not exist in our system. Please Sign up",
+		});
+	}
+
+
+		// Calculate the expiration time as the current time + 120 minutes
+	const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+	const expiresAt = new Date(Date.now() + tenMinutes);
+
+		// Set the cookie
+	res.cookie("emailId", user.emailId, {
+		expires: expiresAt,
+		httpOnly: false,
+	});
+
+
+    userData.userId = user.userid;
+	userData.current_status = 'A'
+    console.log("User Inserted, now have to insert staffUser");
+    console.log(userData);
+    EndUserRequest.create(userData);
+    
+        
+    res.redirect('/users/support'); 
+	
+};
+
+router.get("/support", getsupport);
+router.get("/support/newrequest", getSupportnewrequest);
+router.get("/support/oldrequests", getSupportoldrequests);
+router.post("/support/newrequest", postSupportnewrequest);
+
+
+
+// router.get("/support", (req, res) => {
+// 	console.log("Successfully in Root :Inssss:sss:: /");
+// 	res.render("supportpage");
+// });
+
+// router.get("/support/newrequest", async (req, res) => {
+	
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("newrequest");
+    
+// });
+// router.get("/support/oldrequests", async (req, res) => {
+//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+//     // const username = userDetails.name;
+//     // console.log('username : ',  username);
+//     res.render("oldrequests");
+    
+// });
+
+
+
+// router.post("/support/newrequest", async (req, res) => {
+// 	const { name, emailId } = req.body;
+// 	const User = db.User;
+// 	const userData = req.body
+
+// 	const user = await User.findOne({ where: { emailId } });
+// 	if (!user) {
+// 		return res.status(404).json({
+// 			success: false,
+// 			message: "You do not exist in our system. Please Sign up",
+// 		});
+// 	}
+
+
+// 		// Calculate the expiration time as the current time + 120 minutes
+// 	const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+// 	const expiresAt = new Date(Date.now() + tenMinutes);
+
+// 		// Set the cookie
+// 	res.cookie("emailId", user.emailId, {
+// 		expires: expiresAt,
+// 		httpOnly: false,
+// 	});
+
+
+//     userData.userId = user.userid;
+// 	userData.current_status = 'A'
+//     console.log("User Inserted, now have to insert staffUser");
+//     console.log(userData);
+//     EndUserRequest.create(userData);
+    
+        
+//     res.redirect('/users/support'); 
+	
+// });
+			
+	
 
 module.exports = router;
