@@ -221,8 +221,10 @@ router.post("/login", async (req, res) => {
 router.use("/send-otp", send_otp_routes);
 router.use("/recover-password", recover_pass_routes);
 
-router.get("/", async (req, res) => {
-	if (req.cookies.emailId) {
+const getUser = async (req, res) => {
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+
+	if (userDetails) {
 		const emailId = req.cookies.emailId;
 		const userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
@@ -237,29 +239,51 @@ router.get("/", async (req, res) => {
 			state: endUserDetails.address_state_code,
 			zipcode: endUserDetails.address_zipcode,
 		};
-		res.render("userProfile", { user: user });
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			body: user
+		});
+
+		// res.render("userProfile", { user: user });
 	} else {
-		res.redirect("login");
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
 	}
+};
+
+router.get("/", getUser);
+
+router.get("/profile", async (req,res) => {
+	res.render("userProfile");
 });
 
 router.get("/modify-user", async (req, res) => {
 	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
-		const userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
-		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
-		const user = {
-			name: userDetails.name,
-			emailId: userDetails.emailId,
-			phone: endUserDetails.phone_nr,
-			address1: endUserDetails.address_line1,
-			address2: endUserDetails.address_line2,
-			city: endUserDetails.address_city,
-			state: endUserDetails.address_state_code,
-			zipcode: endUserDetails.address_zipcode,
-		};
-		res.render("editProfile", { user: user });
+		// const emailId = req.cookies.emailId;
+		// const userDetails = await db.User.findOne({ where: { emailId } });
+		// const userId = userDetails.dataValues.userid;
+		// const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+		// const user = {
+		// 	name: userDetails.name,
+		// 	emailId: userDetails.emailId,
+		// 	phone: endUserDetails.phone_nr,
+		// 	address1: endUserDetails.address_line1,
+		// 	address2: endUserDetails.address_line2,
+		// 	city: endUserDetails.address_city,
+		// 	state: endUserDetails.address_state_code,
+		// 	zipcode: endUserDetails.address_zipcode,
+		// };
+		// res.render("editProfile", { user: user });
+		res.render("editProfile");
 	} else {
 		res.redirect("login");
 	}
@@ -270,14 +294,14 @@ router.post("/modify-user", async (req, res) => {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
-		db.User.update(
+		await db.User.update(
 			{
 				name: req.body.name,
 			},
 			{ where: { userid: userId } }
 		);
 
-		db.EndUsers.update(
+		await db.EndUsers.update(
 			{
 				phone_nr: req.body.phone,
 				address_line1: req.body.address_line1,
@@ -288,9 +312,30 @@ router.post("/modify-user", async (req, res) => {
 			},
 			{ where: { userid: userId } }
 		);
-		res.redirect("/users/");
+
+		// userDetails = await db.User.findOne({ where: { emailId } , include: [{
+		// 		model: db.EndUsers // Include the EndUser model in the response
+		// 	}] 
+		// });
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: "Updated successfully",
+			redirectUrl: "/users/profile"
+		});
+
+		// res.redirect("/users/");
 	} else {
-		res.redirect("login");
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
 	}
 });
 
