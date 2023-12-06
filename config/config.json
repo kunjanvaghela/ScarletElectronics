@@ -1,5 +1,5 @@
 {
-  "development": {
+  "development1": {
     "username": "root",
     "password": "Mitul14$",
     "database": "scarletelectronics",
@@ -7,14 +7,13 @@
     "dialect": "mysql"
   },
 
-  "development1": {
-    "username": "ucqjbqovzep1waym",
-    "password": "ERQVg4nWFFhjNrVkyOV3",
-    "database": "bjy4c3bfqe9mnlvfzpwb",
-    "host": "bjy4c3bfqe9mnlvfzpwb-mysql.services.clever-cloud.com",
-    "dialect": "mysql"
-  },
-
+ "development": {
+  "username": "ucqjbqovzep1waym",
+  "password": "ERQVg4nWFFhjNrVkyOV3",
+  "database": "bjy4c3bfqe9mnlvfzpwb",
+  "host": "bjy4c3bfqe9mnlvfzpwb-mysql.services.clever-cloud.com",
+  "dialect": "mysql"
+},
 
   "test": {
     "username": "root",
