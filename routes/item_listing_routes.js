@@ -10,6 +10,11 @@ const GoogleDriveUtil = require('../util/googleDriveUtil');
 
 const getItemListings = async (req, res) => {
   try {
+    // Check if the user is authenticated
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+      // If not authenticated, send a 401 Unauthorized response
+      return res.status(401).send('Authentication failed');
+    }
     userDetails = await UserUtil.check_email(req.cookies.emailId);
     const username = userDetails.name;
 
@@ -67,11 +72,15 @@ const getItemListings = async (req, res) => {
 const getProductInformation = async (req, res) => {
   console.log('Working');
   try {
+  console.log(req.cookies.emailId);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
 
-    console.log('Item-Id : ', req.query['item-id'])
-
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
-    const username = userDetails.name;
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  console.log(userDetails.userid);
+  const username = userDetails.name;
     const itemId = req.query['item-id'];
 
     const product = await Catalog.findOne({
@@ -101,7 +110,7 @@ const getProductInformation = async (req, res) => {
       console.log("Got imageFiles value in if : " + imageFiles);
     }
     console.log("Got imageFiles value after if : "+ imageFiles);
-
+    
     // console.log('product : ', product);
     // console.log('product.ItemListings : ', product.ItemListings);
     // return res.status(200).json({
@@ -125,6 +134,10 @@ const getProductInformation = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   console.log('Button Working');
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   const username = userDetails.name;
@@ -150,6 +163,10 @@ const createItemListing = async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
   // itemListingData.sellerId = 15; // Temporary
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   itemListingData.sellerId = userDetails.userid;

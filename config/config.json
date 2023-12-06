@@ -1,7 +1,7 @@
 {
   "development1": {
     "username": "root",
-    "password": "password",
+    "password": "root",
     "database": "scarletelectronics",
     "host": "127.0.0.1",
     "dialect": "mysql"

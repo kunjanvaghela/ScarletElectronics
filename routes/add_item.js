@@ -30,6 +30,10 @@ const {google} = require('googleapis');
 
 router.get("/add", async (req, res) => {
     console.log('Successfully in /add-item/add');
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed');
+      }
     const userDetails = await UserUtil.check_email(req.cookies.emailId);
     const username = userDetails.name;
     console.log('username : ',  username);

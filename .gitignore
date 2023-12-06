@@ -1,3 +1,6 @@
 .DS_Store
 util/scarletelectronics-key.json
 routes/try.js
+config/
+node_modules/
+package-lock.json/
