@@ -9,13 +9,21 @@ const UserUtil = require('../util/userUtil');
 const GoogleDriveUtil = require('../util/googleDriveUtil');
 
 const getItemListings = async (req, res) => {
+  console.log('in item_listing_routes.js route :/ ');
+
+  // Check if the user is authenticated
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
+
   try {
-    // Check if the user is authenticated
-    // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-    //   // If not authenticated, send a 401 Unauthorized response
-    //   return res.status(401).send('Authentication failed');
-    // }
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    console.log('in TRY');
+    // Retrieve user details
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+		console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    const userDetails = await UserUtil.check_email(payload.emailId);
     const username = userDetails.name;
 
     const listings = await ItemListing.findAll({
@@ -73,12 +81,23 @@ const getProductInformation = async (req, res) => {
   console.log('Working');
   try {
   console.log(req.cookies.emailId);
-  // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-  //   // If not authenticated, send a 401 Unauthorized response
-  //   return res.status(401).send('Authentication failed');
-  // }
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed');
+  }
+  //UTILIZING THE JWT : UNPACKAGING ENCRYPTED DATA
 
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //CURRENT IMPLEMENTATION (DIRECTLY FETCHES EMAIL ID FROM COOKIE {INCORRECT & VULNERABLE})
+  //userDetails = await UserUtil.check_email(req.cookies.emailId);
+  
+  //NEW IMPLEMENTATION -RETURNS THE ORIGINAL PAYLOAD OBJECT (DECIPHERS THE JSON PACKAGE : EMAIL AND USERID FROM THE ENCRYPTED JWT PAYLOAD)
+  const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+  //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
+  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+  //USING THE EMAIL ID FROM PAYLOAD OBJECT
+  userDetails = await UserUtil.check_email(payload.emailId);
+
   console.log(userDetails.userid);
   const username = userDetails.name;
     const itemId = req.query['item-id'];

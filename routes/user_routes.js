@@ -18,12 +18,10 @@ const upload = multer();
 let refreshTokens = []
 //###############################
 
-
 router.get("/Home_Landing", (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("Home_Landing");
 });
-
 
 router.get("/home", (req, res) => {
 	console.log('Successfully in Landing Page');
@@ -35,197 +33,185 @@ router.get("/login", (req, res) => {
 	res.render("loginPage");
 });
 
-router.get("/logout", (req, res) => {
+const logoutUser = (req, res) => {
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
     console.log("Processing logout");
 
-    // Clearing JWT-related cookies and emailId cookie
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     res.clearCookie("emailId");
 
-    // Optionally, handle the refresh token list if you store them server-side
     const refreshToken = req.cookies.refreshToken;
     refreshTokens = refreshTokens.filter(token => token !== refreshToken);
 
-    // Redirect the user to the login page after logout
     res.redirect("/users/login");
-});
+};
+
 
 router.get("/register", (req, res) => {
 	res.render("register");
 });
 
-router.get("/cart", (req, res) => {
-	const fields = [
-		{ name: "email", label: "Email", type: "text" },
-		{ name: "password", label: "Password", type: "password" },
-		// Add more fields as needed
-	];
+// router.get("/cart", (req, res) => {
+// 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+// 		// If not authenticated, send a 401 Unauthorized response
+// 		return res.status(401).send('Authentication failed');
+// 	}
+// 	const fields = [
+// 		{ name: "email", label: "Email", type: "text" },
+// 		{ name: "password", label: "Password", type: "password" },
+// 		// Add more fields as needed
+// 	];
 
-	res.render("cartPage", { fields });
-});
+// 	res.render("cartPage", { fields });
+// });
 
-router.get("/checkout", (req, res) => {
-	const itemsArray = [
-		{ item: "item1", qty: 2, cost_qty: 10, cost_item: 10 },
-		{ item: "item2", qty: 1, cost_qty: 5, cost_item: 10 },
-		// Add more items as needed
-	];
+// router.get("/checkout", (req, res) => {
+// 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+// 		// If not authenticated, send a 401 Unauthorized response
+// 		return res.status(401).send('Authentication failed');
+// 	}
+// 	const itemsArray = [
+// 		{ item: "item1", qty: 2, cost_qty: 10, cost_item: 10 },
+// 		{ item: "item2", qty: 1, cost_qty: 5, cost_item: 10 },
+// 		// Add more items as needed
+// 	];
 
-	res.render("checkoutPage", { itemsArray });
-});
+// 	res.render("checkoutPage", { itemsArray });
+// });
 
 router.get("/forgot-password", (req, res, next) => {
 	res.render("forgot-password");
 });
 
-router.post("/registerUser", upload.none(), async (req, res) => {
-	const recaptchaResponse = req.body["g-recaptcha-response"];
-	console.log("IN REGISTER USER NOW WILL PRINT REQ");
-	//console.log(req)
-	// Check if CAPTCHA response is present
-	if (!recaptchaResponse) {
-		return res
-			.status(400)
-			.json({ success: false, message: "Please complete the CAPTCHA" });
-	}
+const registerUser = async (req, res) => {
+    const recaptchaResponse = req.body["g-recaptcha-response"];
+    console.log("IN REGISTER USER NOW WILL PRINT REQ");
 
-	try {
-		// Verify reCAPTCHA
-		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
-		const verificationResponse = await axios.post(verificationURL);
+    if (!recaptchaResponse) {
+        return res
+            .status(400)
+            .json({ success: false, message: "Please complete the CAPTCHA" });
+    }
 
-		if (!verificationResponse.data.success) {
-			return res.status(400).json({
-				success: false,
-				message:
-					"CAPTCHA verification Failed/ Expired. Reload and Try again",
-			});
-		}
+    try {
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+        const verificationResponse = await axios.post(verificationURL);
 
-		const userData = req.body;
-		const User = db.User;
-		console.log("USERDATA BEFORE INSERT", userData);
+        if (!verificationResponse.data.success) {
+            return res.status(400).json({
+                success: false,
+                message: "CAPTCHA verification Failed/ Expired. Reload and Try again",
+            });
+        }
 
-		await User.create(userData).then((user) => {
-			userData.userId = user.userid;
-			console.log("User Inserted, now have to insert EndUser");
-			console.log(userData);
-			EndUser.create(userData);
-		});
+        const userData = req.body;
+        const User = db.User;
+        console.log("USERDATA BEFORE INSERT", userData);
 
-		return res.status(200).json({
-			success: true,
-			message: "Welcome " + User.name + ",  Registration Successful",
-		});
-	} catch (error) {
-		console.error("Error occurred:", error);
-		res.status(409).json({
-			success: false,
-			message:
-				"Email already exists in the system, Please Login or use Forget Password Option.",
-		});
-	}
-});
+        await User.create(userData).then((user) => {
+            userData.userId = user.userid;
+            console.log("User Inserted, now have to insert EndUser");
+            EndUser.create(userData);
+        });
 
-router.post("/login", async (req, res) => {
-	const { emailId, password } = req.body;
-	const User = db.User;
-	console.log("IN login");
+        return res.status(200).json({
+            success: true,
+            message: "Welcome " + User.name + ",  Registration Successful",
+        });
+    } catch (error) {
+        console.error("Error occurred:", error);
+        res.status(409).json({
+            success: false,
+            message: "Email already exists in the system, Please Login or use Forget Password Option.",
+        });
+    }
+};
 
-	const recaptchaResponse = req.body["g-recaptcha-response"];
+const loginUser = async (req, res) => {
+    const { emailId, password } = req.body;
+    const User = db.User;
+    console.log("IN login");
 
-	// Check if CAPTCHA response is present
-	if (!recaptchaResponse) {
-		return res
-			.status(400)
-			.json({ success: false, message: "Please complete the CAPTCHA." });
-	}
+    const recaptchaResponse = req.body["g-recaptcha-response"];
+    if (!recaptchaResponse) {
+        return res
+            .status(400)
+            .json({ success: false, message: "Please complete the CAPTCHA." });
+    }
 
-	try {
-		console.log("Try1");
-		// Verify reCAPTCHA
-		const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
-		const verificationResponse = await axios.post(verificationURL);
+    try {
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+        const verificationResponse = await axios.post(verificationURL);
 
-		console.log("Try2");
-		if (!verificationResponse.data.success) {
-			return res.status(400).json({
-				success: false,
-				message:
-					"CAPTCHA verification Failed/ Expired. Reload and Try again",
-			});
-		}
+        if (!verificationResponse.data.success) {
+            return res.status(400).json({
+                success: false,
+                message: "CAPTCHA verification Failed/ Expired. Reload and Try again",
+            });
+        }
 
-		const user = await User.findOne({ where: { emailId } });
+        const user = await User.findOne({ where: { emailId } });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "You do not exist in our system. Please Sign up",
+            });
+        }
 
-		if (!user) {
-			return res.status(404).json({
-				success: false,
-				message: "You do not exist in our system. Please Sign up",
-			});
-		}
+        const decryptedPassword = decrypt(user.encrypted_password);
+        if (password !== decryptedPassword) {
+            return res.status(401).json({
+                success: false,
+                message: "You have entered an invalid password, " + user.name,
+            });
+        }
 
-		const decryptedPassword = decrypt(user.encrypted_password);
+        // JWT TOKEN IMPLEMENTATION
+        const tokenPackage = { userId: user.userid, emailId: user.emailId };
+        const accessToken = UserUtil.generateAccessToken(tokenPackage);
+        const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET);
+        refreshTokens.push(refreshToken);
 
-		if (password !== decryptedPassword) {
-			return res.status(401).json({
-				success: false,
-				message: "You have entered an invalid password, " + user.name,
-			});
-		}
+        res.cookie("accessToken", accessToken, {
+            httpOnly: false,
+        });
 
-		console.log("Username and password verified");
+        const object = UserUtil.retrieveTokenPayload(accessToken);
+        console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", object.userId);
 
-		//JWT TOKEN IMPLEMENTATION:
-		const tokenPackage = {userid: user.userid};
-		const accessToken = UserUtil.generateAccessToken(tokenPackage)
+        return res.status(200).json({
+            success: true,
+            message: "Welcome " + user.name + ", Login successful",
+            redirectUrl: "/item-listing"
+        });
+    } catch (error) {
+        console.error("Error during login:", error);
+        return res.status(401).json({
+            success: false,
+            message: "Login Failed. Please use valid credentials.",
+        });
+    }
+};
 
-		const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET)
-		refreshTokens.push(refreshToken)
-		
-		const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
-		const expiresAt = new Date(Date.now() + tenMinutes);
-		res.cookie("emailId", user.emailId, {
-			expires: expiresAt,
-			httpOnly: false,
-		});
-		res.cookie("accessToken", accessToken, {
-			httpOnly: false,
-		});
-		res.cookie("refreshToken", refreshToken, {
-			httpOnly: false,
-		});
-
-		return res.status(200).json({
-			success: true,
-			message: "Welcome " + user.name + ", Login successful",
-			redirectUrl: "/item-listing/listings",
-			// accessToken: accessToken,
-			// refreshToken: refreshToken,
-		});
-	} catch (error) {
-		console.error("Error during login:", error);
-		return res.status(401).json({
-			success: false,
-			message: "Login Failed. Please use valid credentials.",
-		});
-	}
-});
 
 //###############################
-
-
-
 
 router.use("/send-otp", send_otp_routes);
 router.use("/recover-password", recover_pass_routes);
 
-const getUser = async (req, res) => {
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
-
-	if (userDetails) {
-		const emailId = req.cookies.emailId;
+router.get("/", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+	console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+	console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+	if (payload.emailId) {
+		const emailId = payload.emailId;
 		const userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
@@ -258,86 +244,86 @@ const getUser = async (req, res) => {
 
 		// res.redirect("login");
 	}
+});
+
+const modifyUser = async (req, res) => {
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
+
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+
+    if (payload.emailId) {
+        const emailId = payload.emailId;
+        const userDetails = await db.User.findOne({ where: { emailId } });
+        const userId = userDetails.dataValues.userid;
+        const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+
+        const user = {
+            name: userDetails.name,
+            emailId: userDetails.emailId,
+            phone: endUserDetails.phone_nr,
+            address1: endUserDetails.address_line1,
+            address2: endUserDetails.address_line2,
+            city: endUserDetails.address_city,
+            state: endUserDetails.address_state_code,
+            zipcode: endUserDetails.address_zipcode,
+        };
+        res.render("editProfile", { user: user });
+    } else {
+        res.redirect("login");
+    }
 };
 
-router.get("/", getUser);
+const postModifyUser = async (req, res) => {
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
 
-router.get("/profile", async (req,res) => {
-	res.render("userProfile");
-});
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
 
-router.get("/modify-user", async (req, res) => {
-	if (req.cookies.emailId) {
-		// const emailId = req.cookies.emailId;
-		// const userDetails = await db.User.findOne({ where: { emailId } });
-		// const userId = userDetails.dataValues.userid;
-		// const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
-		// const user = {
-		// 	name: userDetails.name,
-		// 	emailId: userDetails.emailId,
-		// 	phone: endUserDetails.phone_nr,
-		// 	address1: endUserDetails.address_line1,
-		// 	address2: endUserDetails.address_line2,
-		// 	city: endUserDetails.address_city,
-		// 	state: endUserDetails.address_state_code,
-		// 	zipcode: endUserDetails.address_zipcode,
-		// };
-		// res.render("editProfile", { user: user });
-		res.render("editProfile");
-	} else {
-		res.redirect("login");
-	}
-});
+    if (payload.emailId) {
+        const emailId = payload.emailId;
+        var userDetails = await db.User.findOne({ where: { emailId } });
+        const userId = userDetails.dataValues.userid;
 
-router.post("/modify-user", async (req, res) => {
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
-		var userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
-		await db.User.update(
-			{
-				name: req.body.name,
-			},
-			{ where: { userid: userId } }
-		);
+        await db.User.update(
+            {
+                name: req.body.name,
+            },
+            { where: { userid: userId } }
+        );
 
-		await db.EndUsers.update(
-			{
-				phone_nr: req.body.phone,
-				address_line1: req.body.address_line1,
-				address_line2: req.body.address_line2,
-				address_city: req.body.address_city,
-				address_state_code: req.body.address_state_code,
-				address_zipcode: req.body.address_zipcode,
-			},
-			{ where: { userid: userId } }
-		);
-
-		// userDetails = await db.User.findOne({ where: { emailId } , include: [{
-		// 		model: db.EndUsers // Include the EndUser model in the response
-		// 	}] 
-		// });
-
-		return res.status(200).json({
+        await db.EndUsers.update(
+            {
+                phone_nr: req.body.phone,
+                address_line1: req.body.address_line1,
+                address_line2: req.body.address_line2,
+                address_city: req.body.address_city,
+                address_state_code: req.body.address_state_code,
+                address_zipcode: req.body.address_zipcode,
+            },
+            { where: { userid: userId } }
+        );
+        return res.status(200).json({
 			success: true,
 			status: 200,
 			message: "Updated successfully",
 			redirectUrl: "/users/profile"
 		});
-
-		// res.redirect("/users/");
-	} else {
-
-		return res.status(401).json({
+    } else {
+        return res.status(401).json({
 			success: false,
 			status: 401,
 			message: "Invalid cookie",
 			redirectUrl: "/users/login"
 		});
-
-		// res.redirect("login");
-	}
-});
+    }
+};
 
 const getsupport = async (req, res) => {
 	console.log("Successfully in Root :Inssss:sss:: /");
@@ -404,66 +390,10 @@ router.get("/support/oldrequests", getSupportoldrequests);
 router.post("/support/newrequest", postSupportnewrequest);
 
 
-
-// router.get("/support", (req, res) => {
-// 	console.log("Successfully in Root :Inssss:sss:: /");
-// 	res.render("supportpage");
-// });
-
-// router.get("/support/newrequest", async (req, res) => {
-	
-//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-//     // const username = userDetails.name;
-//     // console.log('username : ',  username);
-//     res.render("newrequest");
-    
-// });
-// router.get("/support/oldrequests", async (req, res) => {
-//     // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-//     // const username = userDetails.name;
-//     // console.log('username : ',  username);
-//     res.render("oldrequests");
-    
-// });
-
-
-
-// router.post("/support/newrequest", async (req, res) => {
-// 	const { name, emailId } = req.body;
-// 	const User = db.User;
-// 	const userData = req.body
-
-// 	const user = await User.findOne({ where: { emailId } });
-// 	if (!user) {
-// 		return res.status(404).json({
-// 			success: false,
-// 			message: "You do not exist in our system. Please Sign up",
-// 		});
-// 	}
-
-
-// 		// Calculate the expiration time as the current time + 120 minutes
-// 	const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
-// 	const expiresAt = new Date(Date.now() + tenMinutes);
-
-// 		// Set the cookie
-// 	res.cookie("emailId", user.emailId, {
-// 		expires: expiresAt,
-// 		httpOnly: false,
-// 	});
-
-
-//     userData.userId = user.userid;
-// 	userData.current_status = 'A'
-//     console.log("User Inserted, now have to insert staffUser");
-//     console.log(userData);
-//     EndUserRequest.create(userData);
-    
-        
-//     res.redirect('/users/support'); 
-	
-// });
-			
-	
+router.post("/registerUser", upload.none(), registerUser);
+router.post("/login", loginUser);
+router.get("/modify-user", modifyUser);
+router.post("/modify-user", postModifyUser);
+router.get("/logout", logoutUser);
 
 module.exports = router;
