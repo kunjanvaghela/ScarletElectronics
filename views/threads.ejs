@@ -46,46 +46,75 @@
 
     
     <div>
+        
 
-        <form action="/customer_representative/thread" method="post">
-            <label for="inputField">Enter Text:</label>
+        <form id="replyForm" >
+            <label for="inputField">Reply:</label>
             <input type="text" id="inputField" name="inputField">
             <button type="submit">Submit</button>
         </form>
 
     </div>
     <script>
-        $(document).ready(function() {
-            function fetchThreadMessages() {
-                $.ajax({
-                    type: "POST",
-                    url: "/customer_representative/show-all-messeges",
-                    data: {reqId : '<%= reqId%>'},
-                    success: function(response) {
-                        var messagesContainer = $('#messagesContainer');
-                        messagesContainer.empty();
-                        response.serializedMessages.forEach(function(message) {
+        var reqId = '<%= reqId %>';
+    
+        function fetchThreadMessages(receivedReqId) {
+            $.ajax({
+                type: "POST",
+                url: "/customer_representative/show-all-messeges",
+                data: { reqId: receivedReqId },
+                success: function(response) {
+                    var messagesContainer = $('#messagesContainer');
+                    messagesContainer.empty();
+                    response.serializedMessages.forEach(function(message) {
                         var messageDiv = '<div class="message">' +
-                                    '<div>Request ID: ' + message.requestId + '</div>' +
-                                    '<div>User ID: ' + message.userId + '</div>' +
-                                    '<div>Customer Rep: ' + message.customerRep + '</div>' +
-                                    '<div>Listing ID: ' + message.listingId + '</div>' +
-                                    '<div>Description: ' + message.updateDescription + '</div>' +
-                                    '<div>Created On: ' + message.createdOn + '</div>' +
-                                    '<div>Updated On: ' + message.updatedOn + '</div>'
-                                 '</div>';
+                            '<div>Request ID: ' + message.requestId + '</div>' +
+                            '<div>User ID: ' + message.userId + '</div>' +
+                            '<div>Customer Rep: ' + message.customerRep + '</div>' +
+                            '<div>Listing ID: ' + message.listingId + '</div>' +
+                            '<div>Description: ' + message.updateDescription + '</div>' +
+                            '<div>Created On: ' + message.createdOn + '</div>' +
+                            '<div>Updated By: ' + message.updatedBy + '</div>' +
+                            '</div>';
                         messagesContainer.append(messageDiv);
-                        });
-                    },
-                    error: function(error) {
-                        console.error('Error fetching claimed requests:', error);
-                    }
-                });
-            }
-            fetchThreadMessages();
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching messages:', error);
+                }
+            });
+        }
+    
+        function insertThreadMessages() {
+            var desc = $('#inputField').val();
+            var message = {
+                reqId: reqId,
+                updateDescription: desc
+            };
+            $.ajax({
+                type: "POST",
+                url: "/customer_representative/insert-message",
+                data: message,
+                success: function(response) {
+                    console.log('Message sent successfully:', response);
+                    fetchThreadMessages(response.reqId);
+                },
+                error: function(error) {
+                    console.error('Error sending message:', error);
+                }
+            });
+        }
+    
+        $(document).ready(function() {
+            fetchThreadMessages(reqId);
+    
+            $('#replyForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent the default form submission behavior
+                insertThreadMessages();
+            });
         });
-            
     </script>
+    
 </body>
 
 </html>

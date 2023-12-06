@@ -209,7 +209,8 @@ const getAllMesseges = async (req, res) => {
         customerRep: getMessage.customer_rep,
         listingId: getMessage.listingId,
         updateDescription: getMessage.update_description,
-        createdOn: getMessage.created_on
+        createdOn: getMessage.created_on,
+        createdBy: getMessage.created_by
       };
     });
   //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
@@ -234,6 +235,34 @@ const getAllMesseges = async (req, res) => {
 router.post("/show-all-messeges", getAllMesseges);
 
 
+const getMessegeToBeInserted = async (req, res) => {
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //const reqId = req.body.reqId;
+  console.log("!!!!!!!!!    Reqest received   !!!!!!!");
+  const Messages = db.Messages;
+  //console.log(req);
+  const reqId=req.body.reqId;
+  Messages.create({
+    requestId: reqId,
+    userId: 23,
+    update_description: req.body.updateDescription,
+    created_on: new Date(),
+    created_by: "cr"
+   });
+
+   return res.status(200).json({
+    success: true,
+    message: "Message Inserted",
+    reqId:reqId
+  });
+  
+  //Fetch remaining data from db
+
+  //console.log(req);
+  
+
+};
+router.post("/insert-message", getMessegeToBeInserted);
 //newcode
 router.get("/rep_listings", async (req, res) => {
 
