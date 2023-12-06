@@ -3,24 +3,23 @@ const EndUser = db.EndUsers;
 const User = db.User;
 const jwt = require('jsonwebtoken');
 
-async function check_email(emailId)
-{
-    try{
+async function check_email(emailId) {
+    try {
         //parse emailId from request
         //parse query parameters
-        console.log("emailId: ", emailId);
+        console.log("check_email: ");
+        // console.log("emailId: ", emailId);
         // const emailId = req.body.emailId;
-    
-        if(emailId === undefined) {
+
+        if (emailId === undefined) {
             return false;
         }
-        const user_email = await  User.findOne({where: {'emailId': emailId}});
-        if(user_email !== null) {
+        const user_email = await User.findOne({ where: { 'emailId': emailId } });
+        if (user_email !== null) {
             const dbemail = user_email.get({ plain: true });
-            //console.log("Found User: ", dbemail);
-            
+
             //get details of user from db
-            const user_details = await User.findOne({where:{emailId:emailId}});
+            const user_details = await User.findOne({ where: { emailId: emailId } });
             return user_details;
         }
         else {
@@ -28,15 +27,15 @@ async function check_email(emailId)
             return false;
         }
     }
-    catch(err) {
+    catch (err) {
         console.log("Error Caught" + err);
         return false;
     }
 }
 
 function authenticateToken(token) {
-    console.log('Working1');
-    console.log('token::', token);
+    console.log('authenticateToken');
+    //console.log('token::', token);
 
     if (token == null) return false;
 
@@ -48,17 +47,32 @@ function authenticateToken(token) {
         return false;
     }
 }
-async function authent(req,res)
-{
-    console.log("authent inside ------------------------");
+
+function retrieveTokenPayload(token) {
+    console.log('retrieveTokenPayload');
+    //console.log('token::', token);
+
+    if (token == null) return false;
+
+    try {
+        payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        //console.log(payload)
+        return payload;
+    } catch (error) {
+        console.log('JWT verification error:', error);
+        return null;
+    }
+}
+
+async function authent(req, res) {
+    console.log("authent");
     if (!authenticateToken(req.cookies.accessToken)) {
         res.status(401).send('Authentication failed');
         return [false, null];
     }
-    authentication = await check_email(req.cookies.emailId);
+    const authentication = await check_email(req.cookies.emailId);
 
-    if(!authentication)
-    {
+    if (!authentication) {
         //return invalid authorization token
         res.status(401);
         console.log("Invalid Authorization Token");
@@ -66,7 +80,7 @@ async function authent(req,res)
         return [false, null];
     }
 
-    console.log("user id: ", authentication.dataValues.userid);
+    //console.log("user id: ", authentication.dataValues.userid);
     //get cart details from db
 
     //return authentication_status and user id
@@ -74,6 +88,10 @@ async function authent(req,res)
 }
 
 function generateAccessToken(tokenPackage) {
+<<<<<<< HEAD
 	return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6000s' });
+=======
+    return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '600s' });
+>>>>>>> develop
 }
-module.exports = { check_email,authenticateToken,generateAccessToken ,authent};
+module.exports = { check_email, authenticateToken, generateAccessToken, authent, retrieveTokenPayload };
