@@ -7,10 +7,14 @@ const landing = require("./routes/user_routes.js")
 const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
+// const cart = require("./routes/cart_routes.js");
 const reivew = require("./routes/review_rating.js");
 const { router : cart } = require("./routes/cart_routes.js");
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const cookieParser = require('cookie-parser');
+const Admin = require("./routes/admin.js")
+const CustomerRepLogin = require("./routes/staff-login.js")
+const customerRepresentative = require("./routes/customer_representative.js")
 
 const mysql = require('mysql2');
 const { encrypt, decrypt } = require('./util/encryptionUtil'); // Assuming the encryptionUtil.js file is in the same directory
@@ -62,6 +66,10 @@ app.post('/token', (req, res) => {
 		res.json({ accessToken: accessToken })
 	})
 })
+
+app.use('/admin', Admin);
+app.use('/staff-login', CustomerRepLogin);
+app.use('/customer_representative', customerRepresentative);
 
 
 db.sequelize.sync().then(() => {
