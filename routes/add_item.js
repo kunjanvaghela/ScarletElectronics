@@ -90,17 +90,20 @@ router.post('/insert', upload.single('itemImage'), async (req, res) => {
                         result.itemImage = result2;
                         result.save()
                             .then((result) => {
-                                console.log("Updated FolderID in new catalog table.");
+                                if (result.itemImage == -1) {console.log("Error in creating Folder.");}
+                                else {console.log("Updated FolderID in new catalog table.");}
                             }).catch((err) => {
                                 console.log("Error while updating catalog image folder : " + err);
-                            });;
-                        GoogleDriveUtil.uploadFile(result2, req.file.path, req.file.filename, req.file.mimetype)
-                            .then((result3) => {
-                                console.log("File uploaded successfully : " + result3);
-                            })
-                            .catch((err) => {
-                                console.log("Error encountered in uploadFile() : " + err);
                             });
+                        if (result.itemImage != -1) {
+                            GoogleDriveUtil.uploadFile(result2, req.file.path, req.file.filename, req.file.mimetype)
+                                .then((result3) => {
+                                    console.log("File uploaded successfully : " + result3);
+                                })
+                                .catch((err) => {
+                                    console.log("Error encountered in uploadFile() : " + err);
+                                });
+                        }
                     })
                     .catch((err) => {
                         console.log("Error while createDrive = " + err)

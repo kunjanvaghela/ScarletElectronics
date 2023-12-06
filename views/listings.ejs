@@ -63,7 +63,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/header2.ejs') %>
     <br><br><br>
     <h1 class="text-primary text-center mx-auto">Scarlet Electronics</h1>
     <br><br><br>
@@ -113,33 +113,9 @@
                 </form>
             </div>
 
-            <div class="col-md-10">
-                <div class="row">
-                    <% serializedListings.forEach((item) => { %>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="image-container">
-                                    <!-- <img src="your-image-url.jpg" class="card-img-top" alt="Product Image"> -->
-                                    <img src="https://drive.google.com/uc?export=view&id=<%= item.imageFiles[0].id %>" class="img_contain" alt="Image Unavailable">
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= item.name %></h5>
-                                    <h6 class="card-text">Price: $<%= item.price %></h6>
-                                    <h7 class="card-subtitle mb-2 text-muted"><%= item.category %></h7>
-                                    <p class="card-text"><%= item.description %></p>
-                                    <a href="/item-listing/product?item-id=<%= item.itemId %>" class="btn btn-primary"
-                                        data-item-id="<%= item.listingId %>">
-                                        View Details</a>
-                                    <a href="#" class="btn btn-secondary add-to-cart-btn"   
-                                        data-item-id="<%= item.listingId %>"
-                                        data-item-name="<%= item.name %>"
-                                        data-item-price="<%= item.price %>"
-                                        data-item-category="<%= item.category %>">
-                                        Add to Cart</a>
-                                </div>
-                            </div>
-                        </div>
-                    <% }) %>
+            <div class="col-md-10" id="cont1">
+                <div class="row" id="listings-div">
+                    
                 </div>
             </div>
 
@@ -162,6 +138,60 @@
         </div>
     </div>
     
+
+    <script>
+
+        $(document).ready(function() {
+            
+            function fetchClaimedRequests() {
+        $.ajax({
+            type: "GET",
+            url: "/item-listing",
+            success: function(response) {
+                var divParent = $('#listings-div');
+                divParent.empty(); // Clear existing content in the parent div
+
+                response.serializedListings.forEach(function(item) {
+                    // Create a new card for each item in serializedListings
+                    var cardHtml = `
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="image-container">
+                                        <img src="https://drive.google.com/uc?export=view&id=${item.imageFiles[0].id}" class="img_contain" alt="Image Unavailable">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.name}</h5>
+                                        <h6 class="card-text">Price: $${item.price}</h6>
+                                        <h7 class="card-subtitle mb-2 text-muted">${item.category}</h7>
+                                        <p class="card-text">${item.description}</p>
+                                        <a href="/item-listing/product?item-id=${item.itemId}" class="btn btn-primary"
+                                            data-item-id="${item.listingId}">
+                                            View Details
+                                        </a>
+                                        <a href="#" class="btn btn-secondary add-to-cart-btn"   
+                                            data-item-id="${item.listingId}"
+                                            data-item-name="${item.name}"
+                                            data-item-price="${item.price}"
+                                            data-item-category="${item.category}">
+                                            Add to Cart
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>`;
+                        divParent.append(cardHtml); // Append the new card to the parent div
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching claimed requests:', error);
+                    }
+                });
+            }
+
+            fetchClaimedRequests();
+
+        });
+    </script>
+
 </body>
 
 
