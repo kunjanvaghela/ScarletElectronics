@@ -81,29 +81,26 @@
 <body>
     <%- include('Common/header2.ejs') %>
 
-    <div class="container mt-5">
-        <h2 class="text-danger text-center"><%= product.name %></h2>
+    <div class="container mt-5" id="product-div-main">
+        <h2 class="text-danger text-center" id="product-name-header"><!-- product.name %>--></h2>
 
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <!-- <img src="<%= product.itemImage %>" alt="Product Image" class="product-image"> -->
-                <img src="https://drive.google.com/uc?export=view&id=<%= imageFiles[0].id %>" style='height: 100%; width: 100%; object-fit: contain' alt="Image Unavailable">
+        <div class="row mt-5" id="product-div-details">
+            <div class="col-md-4" id="product-image-div">
+                <img src="https://drive.google.com/uc?export=view&id=" style='height: 100%; width: 100%; object-fit: contain' alt="Image Unavailable">
 
             </div>
 
-            <div class="col-md-8 product-details">
-                <div class="row mb-3">
+            <div class="col-md-8" id="product-div-2">
+                <div class="row mb-3" id="product-div-rating">
                     <span class="star-rating">
-                        <% for (let i = 0; i < 5; i++) { %>
                             &#9733; <!-- Unicode star character -->
-                        <% } %>
                     </span>
                 </div>
-                <div class="row mb-3">
-                    <p><%= product.description %></p>
+                <div class="row mb-3" id="product-div-description">
+                    <p><!--= product.description %>--></p>
                 </div>
 
-                <div class="row">
+                <div class="row" id="product-div-listings">
                     <table class="table">
                         <thead>
                             <tr>
@@ -112,20 +109,20 @@
                                 <th scope="col">Add to Cart</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <% product.ItemListings.forEach((item) => { %>
+                        <tbody id="product-div-listings-list">
+                            <!-- product.ItemListings.forEach((item) => { %>-->
                                 <tr>
-                                    <td><%= item.price %></td>
-                                    <td><%= item.quantity %></td>
+                                    <td> item.price %></td>
+                                    <td> item.quantity %></td>
                                     <td>
                                         <input type="radio" name="listingId"
-                                            data-listing-id="<%= item.listingId %>"
-                                            data-item-name="<%= product.name %>"
-                                            data-item-price="<%= item.price %>"
-                                            data-item-category="<%= product.category %>">
+                                            data-listing-id="= item.listingId %>"
+                                            data-item-name="= product.name %>"
+                                            data-item-price="= item.price %>"
+                                            data-item-category="= product.category %>">
                                     </td>
                                 </tr>
-                            <% }) %>
+                            <!-- }) %>-->
                         </tbody>
                     </table>
                 </div>
@@ -143,6 +140,92 @@
             </div>
         </div>
     </div>
+
+
+
+    <script>
+        // Function to retrieve URL parameters by name
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+    
+        // Function to make the AJAX call and update HTML content
+        function fetchItemDetails() {
+            var itemId = getParameterByName('item-id');
+    
+            if (!itemId) {
+                console.error('Item ID not found in the URL parameters.');
+                return;
+            }
+            console.log('Item ID found : '+itemId);
+            // Make AJAX call
+            $.ajax({
+                url: '/item-listing/product?item-id=' + itemId,
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        updateProductDetails(response.product, response.imageFiles);
+                    } else {
+                        console.error('Failed to retrieve item information.');
+                    }
+                },
+                error: function () {
+                    console.error('Failed to make the AJAX call.');
+                }
+            });
+        }
+    
+        // Function to update HTML content with received data
+        function updateProductDetails(product, imageFiles) {
+            // Update product name
+            var productNameHeader = document.querySelector('#product-name-header');
+            productNameHeader.innerHTML = product.name;
+    
+            // Update product image
+            var productImage = document.querySelector('#product-image-div img');
+            productImage.src = 'https://drive.google.com/uc?export=view&id=' + imageFiles[0].id;
+    
+            // Update other product details
+            var productDiv2 = document.querySelector('#product-div-2');
+            productDiv2.querySelector('#product-div-rating .star-rating').innerHTML = '&#9733;&#9733;&#9733;&#9733;&#9733;';
+            productDiv2.querySelector('#product-div-description p').innerHTML = product.description;
+    
+            // Update table with item listings
+            var tableBody = productDiv2.querySelector('#product-div-listings-list');
+            tableBody.innerHTML = ''; // Clear existing rows
+    
+            product.ItemListings.forEach(function (item) {
+                var row = tableBody.insertRow();
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+    
+                cell1.innerHTML = item.price;
+                cell2.innerHTML = item.quantity;
+    
+                // Create radio button and attach data attributes
+                var radioBtn = document.createElement('input');
+                radioBtn.type = 'radio';
+                radioBtn.name = 'listingId';
+                radioBtn.dataset.listingId = item.listingId;
+                radioBtn.dataset.itemName = product.name;
+                radioBtn.dataset.itemPrice = item.price;
+                radioBtn.dataset.itemCategory = product.category;
+    
+                cell3.appendChild(radioBtn);
+            });
+    
+        }
+    
+        // Call the function to fetch item details on page load
+        fetchItemDetails();
+    </script>
     
 </body>
 

@@ -132,14 +132,14 @@ const getProductInformation = async (req, res) => {
     
     // console.log('product : ', product);
     // console.log('product.ItemListings : ', product.ItemListings);
-    // return res.status(200).json({
-		// 	success: true,
-		// 	message: "Item Information retrieved.",
-    //   product: product,
-    //   username: username,
-    //   imageFiles: imageFiles,
-		// });
-    res.render('product', {product, username, imageFiles});
+    return res.status(200).json({
+			success: true,
+			message: "Item Information retrieved.",
+      product: product,
+      username: username,
+      imageFiles: imageFiles,
+		});
+    // res.render('product', {product, username, imageFiles});
   } catch (error) {
     console.error('Error retrieving data:', error);
     return res.status(500).json({
@@ -153,21 +153,21 @@ const getProductInformation = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   console.log('Button Working');
-  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-    // If not authenticated, send a 401 Unauthorized response
-    return res.status(401).send('Authentication failed');
-  }
+  // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+  //   // If not authenticated, send a 401 Unauthorized response
+  //   return res.status(401).send('Authentication failed');
+  // }
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   const username = userDetails.name;
   const item_listing = Catalog.findAll().then(function(Catalog){
       
-      // return res.status(200).json({
-      //   success: true,
-      //   message: "Item Information retrieved.",
-      //   catalog: Catalog,
-      // });
-      res.render('seller_listing', {Catalog, username});
+      return res.status(200).json({
+        success: true,
+        message: "Item Information retrieved.",
+        catalog: Catalog,
+      });
+      // res.render('seller_listing', {Catalog, username});
       //console.log(Catalog);
       
     }).catch(function(err){
@@ -182,10 +182,10 @@ const createItemListing = async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
   // itemListingData.sellerId = 15; // Temporary
-  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-    // If not authenticated, send a 401 Unauthorized response
-    return res.status(401).send('Authentication failed');
-  }
+  // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+  //   // If not authenticated, send a 401 Unauthorized response
+  //   return res.status(401).send('Authentication failed');
+  // }
   userDetails = await UserUtil.check_email(req.cookies.emailId);
   console.log(userDetails.userid);
   itemListingData.sellerId = userDetails.userid;
@@ -214,6 +214,10 @@ router.get("/listings", async (req, res) => {
 })
 
 router.get("/product", getProductInformation);
+
+router.get("/catalog",  async (req, res) => {
+  res.render('product');
+});
 
 router.get("/create", async (req, res) => {
   console.log('Working');
