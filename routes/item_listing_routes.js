@@ -12,19 +12,22 @@ const getItemListings = async (req, res) => {
   console.log('in item_listing_routes.js route :/ ');
 
   // Check if the user is authenticated
-  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-    // If not authenticated, send a 401 Unauthorized response
-    return res.status(401).send('Authentication failed');
-  }
+  // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+  //   // If not authenticated, send a 401 Unauthorized respons
+  //   return res.status(401).json({
+  //     success: false,
+  //     message: "Authentication failed",
+  //     redirectUrl: "/item-listing/listings"
+  //   });
+  // }
 
   try {
-    console.log('in TRY');
     // Retrieve user details
-    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-		console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
-    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
-    const userDetails = await UserUtil.check_email(payload.emailId);
-    const username = userDetails.name;
+    // const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+		// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    // console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    // const userDetails = await UserUtil.check_email(payload.emailId);
+    // const username = userDetails.name;
 
     const listings = await ItemListing.findAll({
         where: {
@@ -66,13 +69,16 @@ const getItemListings = async (req, res) => {
 			success: true,
 			message: "Item Listings retrieved.",
       serializedListings: serializedListings,
-      username: username,
       redirectUrl: "/item-listing/listings"
 		});
     // res.render('listings', { serializedListings, username });
   } catch (error) {
       console.error('Error retrieving data:', error);
-      res.status(400).send('Unable to fetch the listings');
+      return res.status(400).json({
+        success: false,
+        message: "Unable to fetch the listings.",
+        redirectUrl: "/item-listing/listings"
+      });
   }
 
 }
@@ -80,66 +86,64 @@ const getItemListings = async (req, res) => {
 const getProductInformation = async (req, res) => {
   console.log('Working');
   try {
-  console.log(req.cookies.emailId);
-  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-    // If not authenticated, send a 401 Unauthorized response
-    return res.status(401).send('Authentication failed');
-  }
-  //UTILIZING THE JWT : UNPACKAGING ENCRYPTED DATA
+    // console.log(req.cookies.emailId);
+    // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    //   // If not authenticated, send a 401 Unauthorized response
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Authentication failed",
+    //     redirectUrl: "/item-listing/listings"
+    //   });
+    // }
+    //UTILIZING THE JWT : UNPACKAGING ENCRYPTED DATA
 
-  //CURRENT IMPLEMENTATION (DIRECTLY FETCHES EMAIL ID FROM COOKIE {INCORRECT & VULNERABLE})
-  //userDetails = await UserUtil.check_email(req.cookies.emailId);
-  
-  //NEW IMPLEMENTATION -RETURNS THE ORIGINAL PAYLOAD OBJECT (DECIPHERS THE JSON PACKAGE : EMAIL AND USERID FROM THE ENCRYPTED JWT PAYLOAD)
-  const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-  //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
-  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
-  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
-  //USING THE EMAIL ID FROM PAYLOAD OBJECT
-  userDetails = await UserUtil.check_email(payload.emailId);
+    //CURRENT IMPLEMENTATION (DIRECTLY FETCHES EMAIL ID FROM COOKIE {INCORRECT & VULNERABLE})
+    //userDetails = await UserUtil.check_email(req.cookies.emailId);
+    
+    //NEW IMPLEMENTATION -RETURNS THE ORIGINAL PAYLOAD OBJECT (DECIPHERS THE JSON PACKAGE : EMAIL AND USERID FROM THE ENCRYPTED JWT PAYLOAD)
+    // const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    // //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
+    // console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    // console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    // //USING THE EMAIL ID FROM PAYLOAD OBJECT
+    // userDetails = await UserUtil.check_email(payload.emailId);
 
-  console.log(userDetails.userid);
-  const username = userDetails.name;
-    const itemId = req.query['item-id'];
+    // console.log(userDetails.userid);
+    // const username = userDetails.name;
+      const itemId = req.query['item-id'];
 
-    const product = await Catalog.findOne({
-        where: { itemId },
-        include: [{
-          model: ItemListing,
-          attributes: ['listingId', 'price', 'quantity'],
-        }],
-    });
-
-    if (!product) {
-      console.log('Product not found');
-      // res.status(404).send('Product not found');
-      // return;
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-        redirectUrl: "/item-listing/listings"
+      const product = await Catalog.findOne({
+          where: { itemId },
+          include: [{
+            model: ItemListing,
+            attributes: ['listingId', 'price', 'quantity'],
+          }],
       });
-    }
-    
-    // Adding imageFiles
-    console.log("product.itemImage : "+ product.itemImage);
-    let imageFiles = ['Null'];
-    if (product.itemImage) {
-      imageFiles = await GoogleDriveUtil.getImagesInFolder(product.itemImage);
-      console.log("Got imageFiles value in if : " + imageFiles);
-    }
-    console.log("Got imageFiles value after if : "+ imageFiles);
-    
-    // console.log('product : ', product);
-    // console.log('product.ItemListings : ', product.ItemListings);
-    return res.status(200).json({
-			success: true,
-			message: "Item Information retrieved.",
-      product: product,
-      username: username,
-      imageFiles: imageFiles,
-		});
-    // res.render('product', {product, username, imageFiles});
+
+      if (!product) {
+        console.log('Product not found');
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+          redirectUrl: "/item-listing/listings"
+        });
+      }
+      
+      console.log("product.itemImage : "+ product.itemImage);
+      let imageFiles = ['Null'];
+      if (product.itemImage) {
+        imageFiles = await GoogleDriveUtil.getImagesInFolder(product.itemImage);
+        console.log("Got imageFiles value in if : " + imageFiles);
+      }
+      console.log("Got imageFiles value after if : "+ imageFiles);
+      
+      return res.status(200).json({
+        success: true,
+        message: "Item Information retrieved.",
+        product: product,
+        imageFiles: imageFiles,
+      });
+      // res.render('product', {product, username, imageFiles});
   } catch (error) {
     console.error('Error retrieving data:', error);
     return res.status(500).json({
@@ -157,9 +161,9 @@ const getAllProducts = async (req, res) => {
   //   // If not authenticated, send a 401 Unauthorized response
   //   return res.status(401).send('Authentication failed');
   // }
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  console.log(userDetails.userid);
-  const username = userDetails.name;
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
+  // const username = userDetails.name;
   const item_listing = Catalog.findAll().then(function(Catalog){
       
       return res.status(200).json({
@@ -182,28 +186,66 @@ const createItemListing = async (req, res) => {
   // Get data from request
   const itemListingData = req.body;
   // itemListingData.sellerId = 15; // Temporary
-  // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
-  //   // If not authenticated, send a 401 Unauthorized response
-  //   return res.status(401).send('Authentication failed');
-  // }
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  console.log(userDetails.userid);
-  itemListingData.sellerId = userDetails.userid;
-  console.log(itemListingData);
-
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).json({
+      success: false,
+      message: "Authentication failed",
+      redirectUrl: "/item-listing/listings"
+    });
+  }
   try {
-      // const user = await User.create(userData);
-      await ItemListing.create(itemListingData);
-      // Handle the response after success
-      // return res.status(200).json({
-      //   success: true,
-      //   message: "Item Listing created."
-      // });
-      res.redirect('/item-listing/listings');  // Redirect to login or any other page
-  } catch (error) {
-      // Handle the error response
-      console.error('Error occurred:', error.message);
-      res.status(500).send('Error occurred: ' + error.message);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+      // If not authenticated, send a 401 Unauthorized response
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed",
+        redirectUrl: "/item-listing/listings"
+      });
+    }
+    //UTILIZING THE JWT : UNPACKAGING ENCRYPTED DATA
+
+    //CURRENT IMPLEMENTATION (DIRECTLY FETCHES EMAIL ID FROM COOKIE {INCORRECT & VULNERABLE})
+    //userDetails = await UserUtil.check_email(req.cookies.emailId);
+    
+    //NEW IMPLEMENTATION -RETURNS THE ORIGINAL PAYLOAD OBJECT (DECIPHERS THE JSON PACKAGE : EMAIL AND USERID FROM THE ENCRYPTED JWT PAYLOAD)
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    //USING THE EMAIL ID FROM PAYLOAD OBJECT
+    userDetails = await UserUtil.check_email(payload.emailId);
+  
+    console.log(userDetails.userid);
+    itemListingData.sellerId = userDetails.userid;
+    console.log(itemListingData);
+
+    try {
+        // const user = await User.create(userData);
+        await ItemListing.create(itemListingData);
+        // Handle the response after success
+        return res.status(201).json({
+          success: true,
+          message: "Item Listing created."
+        });
+        // res.redirect('/item-listing/listings');  // Redirect to login or any other page
+    } catch (error) {
+        // Handle the error response
+        console.error('Error occurred:', error.message);
+        // res.status(500).send('Error occurred: ' + error.message);
+        return res.status(500).json({
+          success: false,
+          message: "Error occured: " + error.message,
+          redirectUrl: "/item-listing/listings"
+        });
+    }
+  } catch (err) {
+      console.log("Error encountered while creating using /item-listing/create : "+err);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error! Contact admin!",
+        redirectUrl: "/item-listing/listings"
+      });
   }
 }
 

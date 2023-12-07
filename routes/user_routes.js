@@ -185,7 +185,7 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Welcome " + user.name + ", Login successful",
-            redirectUrl: "/item-listing"
+            redirectUrl: "/item-listing/listings"
         });
     } catch (error) {
         console.error("Error during login:", error);
