@@ -15,7 +15,7 @@
 
     <form action="#" method="post" name="login">
 
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="cartItemsTable">
             <thead>
                 <tr class="table-primary">
                     <th class="w-25 text-center">Item Name</th>
@@ -50,7 +50,7 @@
             <input type="text" class="form-control" name="address5" id="address5" placeholder="pincode" required><br>
         </div>
         
-        <div class="col-md-3 text-center mx-auto">
+        <div class="col-md-3 text-center mx-auto"  id="btn">
             <button type="button" class="btn btn-danger align-self-center" id="removeAll">Flush Cart</button>
             <button type="submit" class="btn btn-primary align-self-center" id="getFinalCost">Get Final Cost</button>
         </div>
@@ -58,6 +58,8 @@
     <br> <br>
     <script>
         var cartDetails;
+        var cartDetailsLength;
+        
         document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
 			fetch('/cart/fetch-cart')
@@ -65,7 +67,61 @@
 			.then(data => {
                 console.log("data");
 				if (data) {
-					console.log(data.cartDetails);
+					// console.log(".....",data);
+                    cartDetails = data['cartDetails'];
+                    // console.log(typeof data['cartDetails']);
+                    const dynamicTable = document.getElementById('dynamicTable');
+                    const addRowButton = document.getElementById('addRow');
+                    const cartItemsTable = document.getElementById('cartItemsTable');
+                    const promocode = document.getElementById('promocode');
+                    const address = document.getElementById('address');
+                    const btn = document.getElementById('btn');
+                    let rowCounter = 0;
+
+                    cartDetailsLength = cartDetails.reduce((count, value) => {
+                        return count + (value === null ? 0 : 1);
+                    }, 0);
+
+                    if (cartDetails.length == 0)
+                    {
+                        cartItemsTable.style.display = 'none';
+                        promocode.style.display = 'none';
+                        address.style.display = 'none';
+                        dynamicTable.style.display = 'none';
+                        btn.style.display = 'none';
+                        var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+                        hiddenElement.innerHTML = dynamicContent;
+                        hiddenElement.style.color = "red";
+                        hiddenElement.style.fontSize = "20px";
+                        hiddenElement.style.display = "flex";
+                        hiddenElement.style.alignItems = "center";
+                        hiddenElement.style.justifyContent = "center";
+                        // window.alert(dynamicContent);
+                    }
+
+                    else
+                    {
+                        cart_row_reference = [];
+                        for (const itemData of cartDetails) {
+                            rowCounter++;
+                            const newRow = document.createElement('tr');
+                            newRow.innerHTML = `
+                                <td class="w-25">
+                                    <label for="item${rowCounter}">${itemData.name}</label>
+                                </td>
+                                <td class="w-25">
+                                    <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1" onchange="updateqty(${rowCounter}, this.value)">
+                                </td>
+                                <td class="w-25 text-center">
+                                    <label for="item${rowCounter}">${itemData.price}</label>
+                                </td>
+                                <td class="w-25">
+                                    <button type="button" style="width: 100%" class="btn btn-danger btn-block" onclick="removeRow(this)">Remove Item</button>
+                                </td>
+                            `;
+                            dynamicTable.appendChild(newRow);
+                        }
+                    }
 				}
 			})
 		});
@@ -73,11 +129,23 @@
         document.getElementById('removeAll').addEventListener('click', () => {
             // Remove all rows from the table
             const dynamicTable = document.getElementById('dynamicTable');
+            const cartItemsTable = document.getElementById('cartItemsTable');
             const address = document.getElementById('address');
             const promocode = document.getElementById('promocode');
+            const btn = document.getElementById('btn');
             dynamicTable.innerHTML = '';
+            cartItemsTable.innerHTML = '';
             address.innerHTML = '';
             promocode.innerHTML = '';
+            btn.innerHTML = '';
+            var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+            
+            hiddenElement.innerHTML = dynamicContent;
+            hiddenElement.style.color = "red";
+            hiddenElement.style.fontSize = "20px";
+            hiddenElement.style.display = "flex";
+            hiddenElement.style.alignItems = "center";
+            hiddenElement.style.justifyContent = "center";
 
             //send ajax post request to flush
             var xhttp = new XMLHttpRequest();
@@ -117,6 +185,151 @@
 
             xhttp.send(data);
         }
+
+        function updateqty(row, qty) {
+            //send ajax post request to remove item
+
+            //get item number from row from substring after 4th character of for attribute of label
+            var itemNumber = row;
+            //convert item number to integer
+            itemNumber = parseInt(itemNumber);
+            // console.log(itemNumber);
+            // console.log(qty);
+
+            //get listing id cartdetails[itemNumber-1].listing_id
+            var listingId = cartDetails[itemNumber-1].listingId;
+
+            console.log(listingId);
+
+            // send ajax post request to remove item with listing_id
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/cart/update-itemlisting", true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            var data = JSON.stringify({ "listingId": listingId , "updateCount": qty });
+            
+            xhttp.send(data);
+
+            //remove item from cartDetails
+        }
+
+        function removeRow(button) {
+            // Get the parent row and remove it
+            const cartItemsTable = document.getElementById('cartItemsTable');
+            const promocode = document.getElementById('promocode');
+            const address = document.getElementById('address');
+            const dynamicTable = document.getElementById('dynamicTable');
+            const btn = document.getElementById('btn');
+            
+            var row = button.parentElement.parentElement;
+            row.remove();
+
+            // console.log(row.getElementsByTagName("label")[0].getAttribute("for"));
+
+            //send ajax post request to remove item
+
+            //get item number from row from substring after 4th character of for attribute of label
+            var itemNumber = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
+            //convert item number to integer
+            itemNumber = parseInt(itemNumber);
+
+            console.log(itemNumber, cartDetails);
+            // console.log(cartDetails);
+
+            //get listing id cartdetails[itemNumber-1].listing_id
+            var listingId = cartDetails[itemNumber-1].listingId;
+            
+            // console.log(listingId);
+            cartDetails[itemNumber-1] = null;
+
+            let countNull = cartDetails.reduce((count, value) => {
+                return count + (value === null ? 1 : 0);
+            }, 0);
+            
+            console.log(itemNumber,cartDetailsLength, countNull, cartDetails);
+
+            if (cartDetailsLength == countNull)
+            {
+                cartItemsTable.style.display = 'none';
+                promocode.style.display = 'none';
+                address.style.display = 'none';
+                dynamicTable.style.display = 'none';
+                btn.style.display = 'none';
+                var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
+                hiddenElement.innerHTML = dynamicContent;
+                hiddenElement.style.color = "red";
+                hiddenElement.style.fontSize = "20px";
+                hiddenElement.style.display = "flex";
+                hiddenElement.style.alignItems = "center";
+                hiddenElement.style.justifyContent = "center";
+                // window.alert(dynamicContent);
+            }
+            
+
+            // send ajax post request to remove item with listing_id
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/cart/remove-itemlisting", true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            var data = JSON.stringify({ "listingId": listingId });
+
+            
+            xhttp.send(data);
+
+            
+
+            //remove item from cartDetails
+        }
+
+        //checkout button
+        document.getElementById('getFinalCost').addEventListener('click', () => {
+            //get all rows from the table
+            const dynamicTable = document.getElementById('dynamicTable');
+            const rows = dynamicTable.getElementsByTagName("tr");
+            console.log(rows);
+
+            //get all addresses
+            const address = document.getElementById('address');
+            const address1 = address.getElementsByTagName("input")[0].value;
+            const address2 = address.getElementsByTagName("input")[1].value;
+            const address3 = address.getElementsByTagName("input")[2].value;
+            const address4 = address.getElementsByTagName("input")[3].value;
+            const address5 = address.getElementsByTagName("input")[4].value;
+            console.log(address1);
+            console.log(address2);
+            console.log(address3);
+            console.log(address4);
+            console.log(address5);
+
+            //get promocode
+            const promocode = document.getElementById('promocode');
+            const promocode1 = promocode.getElementsByTagName("input")[0].value;
+            console.log(promocode1);
+
+            //get all quantities
+            var quantities = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var quantity = row.getElementsByTagName("input")[0].value;
+                quantities.push(quantity);
+            }
+            console.log(quantities);
+
+            //get all listing ids
+            var listingIds = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var listingId = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
+                listingIds.push(listingId);
+            }
+            console.log(listingIds);
+
+            //send ajax post request to checkout
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/fetch-cart-display", true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+            xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promocode: promocode1}));
+        });
     </script>
 
 </body>
