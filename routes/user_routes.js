@@ -8,6 +8,7 @@ const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
 const User = db.User;
 const EndUserRequest = db.EndUserRequest;
+const Messages = db.Messages;
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
@@ -327,38 +328,39 @@ const getSupportnewrequest =  async (req, res) => {
     res.render("newrequest" , {username});
     
 };
-const getSupportoldrequests = async (req, res) => {
 
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
+// const getSupportoldrequests = async (req, res) => {
+
+// 	userDetails = await UserUtil.check_email(req.cookies.emailId);
 	
-	const username = userDetails.name;
+// 	const username = userDetails.name;
   
-	EndUserRequest.findAll({
+// 	EndUserRequest.findAll({
 	
-	}).then((requests) => {
-	  const serializedRequests = requests.map((request) => {
-		return {
-		  requestId: request.requestId,
-		  userId: request.userId,
-		  listingId: request.listingId,
-		  updateDescription: request.update_description,
-		  createdOn: request.created_on,
-		  currentStatus: request.current_status,
-		  customerRep: request.customer_rep,
-		  updatedOn: request.updated_on
-		};
-	  });
-	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+// 	}).then((requests) => {
+// 	  const serializedRequests = requests.map((request) => {
+// 		return {
+// 		  requestId: request.requestId,
+// 		  userId: request.userId,
+// 		  listingId: request.listingId,
+// 		  updateDescription: request.update_description,
+// 		  createdOn: request.created_on,
+// 		  currentStatus: request.current_status,
+// 		  customerRep: request.customer_rep,
+// 		  updatedOn: request.updated_on
+// 		};
+// 	  });
+// 	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
 		
-		res.render('oldrequests', {serializedRequests, username});
+// 		res.render('oldrequests', {serializedRequests, username});
 		
 		
-	  }).catch(function(err){
-		console.log('Oops! something went wrong, : ', err);
-	  });
+// 	  }).catch(function(err){
+// 		console.log('Oops! something went wrong, : ', err);
+// 	  });
 	
        
-};
+// };
 
 
 
@@ -404,6 +406,7 @@ const postSupportnewrequest = async (req, res) => {
 		requestId: row.requestId,
 		userId: user.userid,
 		customer_rep: null,
+		listingId: row.listingId,
 		update_description: userData.update_description,
 		created_on: new Date(),
 		created_by: "enduser"
@@ -414,9 +417,146 @@ const postSupportnewrequest = async (req, res) => {
 	
 };
 
+const postFiledrequests = async (req, res) => {
+	console.log('Working');
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	//console.log(userDetails);
+	const username = userDetails.name;
+	const userid= userDetails.userid;
+	console.log("Username is " + username);
+  
+	EndUserRequest.findAll({
+		where: {
+			userId: userid
+		}
+	  }).then((requests) => {
+		const serializedRequests = requests.map((request) => {
+		  return {
+			requestId: request.requestId,
+			userId: request.userId,
+			listingId: request.listingId,
+			updateDescription: request.update_description,
+			createdOn: request.created_on,
+			currentStatus: request.current_status,
+			customerRep: request.customer_rep,
+			updatedOn: request.updated_on
+		  };
+		});
+	
+		// Send the serialized data as a response
+		//res.render('customer_rep_dasboard', {serializedRequests, username});
+		return res.status(200).json({
+		  success: true,
+		  message: "Requests fetched from database",
+		  serializedRequests: serializedRequests
+		  
+		});
+		// res.render('seller_listing', {serializedListings})
+	  }).catch((error) => {
+		console.error('Error retrieving data:', error);
+		res.status(500).send('Internal server error');
+	  });
+  
+  };
+router.post("/get-filed-requests", postFiledrequests);
+
+//Renders threads page
+const getThread1 = async (req, res) => {
+	console.log("!!!!!!!!!!!!!!!!  coming here  !!!!!!!!!!!!!!@@@@")
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	  //console.log(userDetails.userid);
+	  
+	const username = userDetails.name;
+	const reqId = req.query.reqId;
+	//console.log(req);
+	console.log(reqId);
+  
+	res.render("threads_user",{ username, reqId });
+  };
+router.get("/threads", getThread1);
+
+
+//Getting messeges to display
+const getAllMessages = async (req, res) => {
+
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	console.log(userDetails.userid);
+	const username = userDetails.name;
+  
+	const reqId = req.body.reqId;
+	console.log("RequestId received = ", reqId);
+  
+	Messages.findAll({
+	  where: {
+		requestId: reqId
+	}
+	
+	}).then((messages) => {
+	  const serializedMessages = messages.map((getMessage) => {
+		return {
+		  messageId: getMessage.messageId,
+		  requestId: getMessage.requestId,
+		  userId: getMessage.userId,
+		  customerRep: getMessage.customer_rep,
+		  listingId: getMessage.listingId,
+		  updateDescription: getMessage.update_description,
+		  createdOn: getMessage.created_on,
+		  createdBy: getMessage.created_by
+		};
+	  });
+	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+		
+		//res.render('all_requests', {serializedRequests, username});
+		  return res.status(200).json({
+		  success: true,
+		  message: "Request filed by you",
+		  serializedMessages: serializedMessages
+		  
+		});
+		
+		
+	  }).catch(function(err){
+		console.log('Oops! something went wrong, : ', err);
+	  });
+	
+};
+router.post("/show-all-messages", getAllMessages);
+
+
+//Inserting messages in the table
+const getMessegeToBeInserted = async (req, res) => {
+	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	//const reqId = req.body.reqId;
+	console.log("!!!!!!!!!    Reqest received   !!!!!!!");
+	const Messages = db.Messages;
+	//console.log(req);
+	const reqId=req.body.reqId;
+	const row = await Messages.findOne({where: {requestId: reqId}});
+	//console.log("********   Row data *******", row.userId);
+	Messages.create({
+	  requestId: reqId,
+	  userId: row.userId,
+	  customer_rep: row.customer_rep,
+	  listingId: row.listingId,
+	  update_description: req.body.updateDescription,
+	  created_on: new Date(),
+	  created_by: "enduser"
+	 });
+  
+	 return res.status(200).json({
+	  success: true,
+	  message: "Message Inserted",
+	  reqId:reqId
+	});
+ 
+  };
+router.post("/insert-message", getMessegeToBeInserted);
+
+
+
 router.get("/support", getsupport);
 router.get("/support/newrequest", getSupportnewrequest);
-router.get("/support/oldrequests", getSupportoldrequests);
+//router.get("/support/oldrequests", getSupportoldrequests);
 router.post("/support/newrequest", postSupportnewrequest);
 
 

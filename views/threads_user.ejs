@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    <%- include('Common/cr_header.ejs') %>
+    <%- include('Common/header.ejs') %>
     <div align="center">
         <br>
         <h2 class="text-primary text-left mx-auto">Thread Messages</h2>
@@ -69,7 +69,7 @@
         function fetchThreadMessages(receivedReqId) {
             $.ajax({
                 type: "POST",
-                url: "/customer_representative/show-all-messeges",
+                url: "/users/show-all-messages",
                 data: { reqId: receivedReqId },
                 success: function(response) {
                     var messagesContainer = $('#messagesContainer');
@@ -82,7 +82,7 @@
                             '<div>Listing ID: ' + message.listingId + '</div>' +
                             '<div>Description: ' + message.updateDescription + '</div>' +
                             '<div>Created On: ' + message.createdOn + '</div>' +
-                            '<div>Updated By: ' + message.createdBy + '</div>' +
+                            '<div>Updated By: ' + message.updatedBy + '</div>' +
                             '</div>';
                         messagesContainer.append(messageDiv);
                     });
@@ -101,7 +101,7 @@
             };
             $.ajax({
                 type: "POST",
-                url: "/customer_representative/insert-message",
+                url: "/users/insert-message",
                 data: message,
                 success: function(response) {
                     console.log('Message sent successfully:', response);
