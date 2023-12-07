@@ -14,10 +14,21 @@ const getadd = async (req, res) => {
     console.log('Successfully in /add-item/add');
     if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
         // If not authenticated, send a 401 Unauthorized response
-        return res.status(401).send('Authentication failed');
-    }
-    const userDetails = await UserUtil.check_email(req.cookies.emailId);
-    const username = userDetails.name;
+        return res.status(401).send('Authentication failed, working:)');
+      }
+      const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+      console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+      console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+      userDetails = await UserUtil.check_email(payload.emailId);
+      console.log(userDetails.userid);
+      const username = userDetails.name;
+    
+    // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    //     // If not authenticated, send a 401 Unauthorized response
+    //     return res.status(401).send('Authentication failed');
+    // }
+    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // const username = userDetails.name;
     console.log('username : ',  username);
     res.render('additem', { username });
 };
@@ -32,6 +43,11 @@ const getadd = async (req, res) => {
 
 // Insert data into the database based on the selected category
 const postinsert = async (req, res) => {
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+
     const catalogData = req.body;
     catalogData.listing_Status = 'Active'; // Example value
     catalogData.approval_Status = 'Approved'; // Example value
@@ -41,8 +57,15 @@ const postinsert = async (req, res) => {
     console.log(catalogData);
 
     try {
-        // Get the user details using the emailId from the cookie
-        const userDetails = await UserUtil.check_email(req.cookies.emailId);
+        // // Get the user details using the emailId from the cookie
+        // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+        const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+        console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+        console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+        userDetails = await UserUtil.check_email(payload.emailId);
+        console.log(userDetails.userid);
+        const username = userDetails.name;
+        
         const userid = userDetails.userId;
 
         // Add created_by to catalogData

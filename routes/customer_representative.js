@@ -21,9 +21,6 @@ const getAllrequests = async (req, res) => {
   console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
   userDetails = await UserUtil.check_email(payload.emailId);
   console.log(userDetails.userid);
-
-  // userDetails = await UserUtil.check_email(req.cookies.emailId);
-  // console.log(userDetails.userid);
   const username = userDetails.name;
 
   // userDetails = await UserUtil.check_email(req.cookies.emailId);

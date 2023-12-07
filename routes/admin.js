@@ -10,22 +10,46 @@ const Staff = db.Staff;
 const User = db.User;
 const UserUtil = require('../util/userUtil');
 const { encrypt, decrypt } = require("../util/encryptionUtil");
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
+
+let refreshTokens = []
 
 
 
 
 const getdashboard = async (req, res) => {
     console.log('Successfully in /admin/dashboard');
-    const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
     const username = userDetails.name;
+    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // const username = userDetails.name;
     console.log('username : ',  username);
     res.render('admindashboard', { username });
     
 };
 
 const getCustomerrep = async (req, res) => {
-    const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
     const username = userDetails.name;
+    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // const username = userDetails.name;
     console.log('username : ',  username);
     res.render('CreateCustomerRep', { username });
     
@@ -65,6 +89,14 @@ const getCustomerrep = async (req, res) => {
 
 const postinsertCustomerrep =  async (req, res) => {
     // Cookie-Presence check. TODO can be used further to validate user.
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
+
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    
     console.log(req.cookies);
     console.log('Received data:', req.body);
 
@@ -146,16 +178,28 @@ const postAdminlogin = async (req, res) => {
           message: "You have entered an invalid password, " + user.name,
         });
       }
+        // JWT TOKEN IMPLEMENTATION
+        const tokenPackage = { userId: user.userid, emailId: user.emailId };
+        const accessToken = UserUtil.generateAccessToken(tokenPackage);
+        const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET);
+        refreshTokens.push(refreshToken);
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: false,
+        });
+
+        const object = UserUtil.retrieveTokenPayload(accessToken);
+        console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", object.userId);
   
-      // Calculate the expiration time as the current time + 120 minutes
-      const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
-      const expiresAt = new Date(Date.now() + tenMinutes);
+    //   // Calculate the expiration time as the current time + 120 minutes
+    //   const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
+    //   const expiresAt = new Date(Date.now() + tenMinutes);
   
-      // Set the cookie
-      res.cookie("emailId", user.emailId, {
-        expires: expiresAt,
-        httpOnly: false,
-      });
+    //   // Set the cookie
+    //   res.cookie("emailId", user.emailId, {
+    //     expires: expiresAt,
+    //     httpOnly: false,
+    //   });
   
       // Send a JSON response indicating success and possibly a redirect URL.
       return res.status(200).json({

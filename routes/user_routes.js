@@ -344,17 +344,39 @@ const postModifyUser = async (req, res) => {
 };
 
 const getsupport = async (req, res) => {
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
-	//console.log(userDetails);
-	const username = userDetails.name;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+ 
+
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
 	console.log("Successfully in Root :Inssss:sss:: /");
 	res.render("supportpage", {username});
 };
 
 const getSupportnewrequest =  async (req, res) => {
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
-	//console.log(userDetails);
-	const username = userDetails.name;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
     // console.log('username : ',  username);
     res.render("newrequest" , {username});
     
@@ -396,6 +418,14 @@ const getSupportnewrequest =  async (req, res) => {
 
 
 const postSupportnewrequest = async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
+
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+
 	const { name, emailId } = req.body;
 	const User = db.User;
 	const userData = req.body
@@ -450,9 +480,18 @@ const postSupportnewrequest = async (req, res) => {
 
 const postFiledrequests = async (req, res) => {
 	console.log('Working');
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
-	//console.log(userDetails);
-	const username = userDetails.name;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
 	const userid= userDetails.userid;
 	console.log("Username is " + username);
   
@@ -494,9 +533,17 @@ router.post("/get-filed-requests", postFiledrequests);
 //Renders threads page
 const getThread1 = async (req, res) => {
 	console.log("!!!!!!!!!!!!!!!!  coming here  !!!!!!!!!!!!!!@@@@")
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
 	  //console.log(userDetails.userid);
-	  
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+
 	const username = userDetails.name;
 	const reqId = req.query.reqId;
 	//console.log(req);
@@ -509,10 +556,15 @@ router.get("/threads", getThread1);
 
 //Getting messeges to display
 const getAllMessages = async (req, res) => {
-
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
-	console.log(userDetails.userid);
-	const username = userDetails.name;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
   
 	const reqId = req.body.reqId;
 	console.log("RequestId received = ", reqId);
@@ -556,7 +608,16 @@ router.post("/show-all-messages", getAllMessages);
 
 //Inserting messages in the table
 const getMessegeToBeInserted = async (req, res) => {
-	userDetails = await UserUtil.check_email(req.cookies.emailId);
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
 	//const reqId = req.body.reqId;
 	console.log("!!!!!!!!!    Reqest received   !!!!!!!");
 	const Messages = db.Messages;
