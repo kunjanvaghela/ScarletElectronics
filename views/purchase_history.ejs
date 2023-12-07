@@ -12,7 +12,33 @@
 <body align="center">
 <br> <br>
 <h1 class="text-primary text-center mx-auto">Purchase History</h1>
-
+<div>
+    <ul class="nav">
+        <li class="nav-item">
+            <form action="/item-listing" method="get">
+                <button type="submit" class="btn btn-primary">
+                    Home
+                </button>
+            </form>
+        </li>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <li class="nav-item">
+            <form action="/users/modify-user" method="get">
+                <button type="submit" class="btn btn-primary">
+                    Edit
+                </button>
+            </form>
+        </li>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <li class="nav-item">
+            <form action="/users" method="get">
+                <button type="submit" class="btn btn-primary">
+                    Go Back to Profile Page
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>
 <form action="#" method="post" name="login">
 
     <table class="table table-bordered">
@@ -21,6 +47,7 @@
             <th class="w-15 text-center">Item Id</th>
             <th class="w-15 text-center">Item Name</th>
             <th class="w-15 text-center">Purchase Date</th>
+            <th class="w-15 text-center">Shipment ID</th>
             <th class="w-15 text-center">Quantity (qty)</th>
             <th class="w-15 text-center">Cost</th>
             <th class="w-15 text-center">Actions</th>
@@ -59,6 +86,9 @@
                     </td>
                     <td class="w-15 text-center">
                         <label for="item${rowCounter}">${itemData.purchase_date}</label>
+                    </td>
+                    <td class="w-15 text-center">
+                        <label for="item${rowCounter}">${itemData.shipmentId}</label>
                     </td>
                     <td class="w-15 text-center" >
                         <label for="item${rowCounter}">${itemData.quantity}</label>

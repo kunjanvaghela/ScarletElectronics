@@ -10,7 +10,12 @@ module.exports = (sequelize, DataTypes) => {
                 },
             paymentId:
                 {
-                    type: DataTypes.STRING(100),
+                    type: DataTypes.STRING(50),
+                    allowNull: false,
+                },
+            shipmentId:
+                {
+                    type: DataTypes.STRING(50),
                     allowNull: false,
                 },
             purchase_date:
