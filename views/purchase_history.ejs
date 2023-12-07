@@ -35,19 +35,22 @@
 </form>
 <br> <br>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const dynamicTable = document.getElementById('dynamicTable');
+            document.addEventListener('DOMContentLoaded', () => {
+                const dynamicTable = document.getElementById('dynamicTable');
 
-        let rowCounter = 0;
+                let rowCounter = 0;
 
-        // Populate table rows from an array
-
-
-        var order_details = <%- JSON.stringify(order)  %>;
-        for (const itemData of order_details) {
-            rowCounter++;
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
+                // Populate table rows from an array
+                var order_details = <%- JSON.stringify(order)  %>;
+                for (const itemData of order_details) {
+                rowCounter++;
+                const newRow = document.createElement('tr');
+                    if (itemData.return_status === 'not requested') {
+                        content = `<button type="button" class="btn btn-danger btn-block" onclick="returnOrder(this)">Return Item</button>`;
+                    } else if (itemData.return_status === 'Return Requested') {
+                        content = `<div class="text-success">Return requested and in process</div>`;
+                    }
+                newRow.innerHTML = `
                     <td id="w-15 text-center">
                         <input type="hidden" for="item${rowCounter}" id="${itemData.listingId}" value="${itemData.listingId}">
                     </td>
@@ -64,21 +67,38 @@
                         <label for="item${rowCounter}">${itemData.total_cost_of_item}</label>
                     </td>
                     <td class="w-15 text-center">
-                        <button type="button" class="btn btn-danger btn-block" onclick="returnOrder(this)">Return Item</button>
+                        ${content}
                     </td>
                 `;
-            dynamicTable.appendChild(newRow);
-        }
-    });
+                dynamicTable.appendChild(newRow);
+            }
+            });
 
+            function returnOrder(button) {
+                const listingId = button.parentElement.parentElement.children[0].children[0].value;
 
+                // Use AJAX to send the POST request
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/users/return-order', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
 
-    function returnOrder(button) {
-        // Get the parent row and remove it
-        debugger;
-        const row = button.parentElement.parentElement.children[0].children[0].value;
-        row.remove();
-    }
+                // Define the data to be sent in the request body
+                const data = JSON.stringify({ listingId: listingId });
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        // Handle the response if needed
+                        console.log(xhr.responseText);
+
+                        // Refresh the page after a successful response
+                        window.location.reload();
+                    }
+                };
+
+                // Send the request
+                xhr.send(data);
+
+            }
 </script>
 
 </body>

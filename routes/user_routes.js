@@ -6,6 +6,7 @@ const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
 const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
+const Order = db.Order;
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
@@ -290,17 +291,41 @@ router.post("/modify-user", async (req, res) => {
 });
 
 router.get("/get-purchase-history", async (req, res) => {
+	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 
-		var [orderDetails, metadata] = await db.sequelize.query("Select `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item` from `order_detail` " +
+		var [orderDetails, metadata] = await db.sequelize.query("Select `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`return_status` from `order_detail` " +
 																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
 																				"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
 																				"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
 																				"where `purchase`.`userId` = " + userId + ";");
 		res.render("purchase_history", { user: userDetails, order: orderDetails });
+	} else {
+		res.redirect("login");
+	}
+});
+
+router.post("/return-order", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		var userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+
+
+		Order.update(
+			{
+				return_status: "Return Requested"
+			},
+			{
+				where: { listingId: req.body.listingId }
+			}
+			)
+		res.redirect("get-purchase-history");
 	} else {
 		res.redirect("login");
 	}
