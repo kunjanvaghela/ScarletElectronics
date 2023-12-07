@@ -114,10 +114,27 @@ CREATE TABLE `end_user_request` (
   PRIMARY KEY (`requestId`),
   KEY `userId` (`userId`),
   KEY `listingId` (`listingId`),
-  CONSTRAINT `enduserrequests_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE,
-  CONSTRAINT `enduserrequests_ibfk_2` FOREIGN KEY (`listingId`) REFERENCES `item_listing` (`listingId`) ON DELETE CASCADE
+  CONSTRAINT `enduserrequests_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE
+  -- CONSTRAINT `enduserrequests_ibfk_2` FOREIGN KEY (`listingId`) REFERENCES `item_listing` (`listingId`) ON DELETE CASCADE
   -- No need to create a foriegn key for staff table as only customer rep can access this
   /*CONSTRAINT `enduserrequests_ibfk_3` FOREIGN KEY (`customer_rep`) REFERENCES `staff` (`userId`) ON DELETE CASCADE*/
+);
+
+/*This table contains messages corresponding to different and same requestIDs*/
+create table messages(
+	`messageId` int unsigned NOT NULL AUTO_INCREMENT,
+	`requestId` int unsigned NOT NULL,
+	`userId` int unsigned NOT NULL,
+    `customer_rep` int unsigned DEFAULT NULL,
+	`listingId` int unsigned DEFAULT NULL,
+	`update_description` varchar(200) DEFAULT NULL,
+	`created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` varchar(20) NOT NULL,
+	PRIMARY KEY (`messageId`),
+	KEY `userId` (`userId`),
+	KEY `requestId` (`requestId`),
+	CONSTRAINT `messegas_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`) ON DELETE CASCADE,
+	CONSTRAINT `messegas_ibfk_2` FOREIGN KEY (`requestId`) REFERENCES `end_user_request` (`requestId`) ON DELETE CASCADE
 );
 
 -- CREATE TABLE `frequentlyaskedquestions` (
