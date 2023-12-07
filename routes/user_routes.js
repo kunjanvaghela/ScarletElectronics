@@ -324,7 +324,28 @@ router.post("/return-order", async (req, res) => {
 			{
 				where: { listingId: req.body.listingId }
 			}
-			)
+		)
+		res.redirect("get-purchase-history");
+	} else {
+		res.redirect("login");
+	}
+});
+
+router.post("/cancel-return", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		var userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+
+
+		Order.update(
+			{
+				return_status: "not requested"
+			},
+			{
+				where: { listingId: req.body.listingId }
+			}
+		)
 		res.redirect("get-purchase-history");
 	} else {
 		res.redirect("login");
