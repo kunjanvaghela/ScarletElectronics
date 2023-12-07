@@ -57,34 +57,18 @@
     </form>
     <br> <br>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dynamicTable = document.getElementById('dynamicTable');
-            const addRowButton = document.getElementById('addRow');
-            let rowCounter = 0;
-
-
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            cart_row_reference = [];
-            for (const itemData of cartDetails) {
-                rowCounter++;
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td class="w-25">
-                        <label for="item${rowCounter}">${itemData.name}</label>
-                    </td>
-                    <td class="w-25">
-                        <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1" onchange="updateqty(${rowCounter}, this.value)">
-                    </td>
-                    <td class="w-25 text-center">
-                        <label for="item${rowCounter}">${itemData.price}</label>
-                    </td>
-                    <td class="w-25">
-                        <button type="button" style="width: 100%" class="btn btn-danger btn-block" onclick="removeRow(this)">Remove Item</button>
-                    </td>
-                `;
-                dynamicTable.appendChild(newRow);
-            }
-        });
+        var cartDetails;
+        document.addEventListener('DOMContentLoaded', function() {
+            event.preventDefault();
+			fetch('/cart/fetch-cart')
+			.then(response => response.json())
+			.then(data => {
+                console.log("data");
+				if (data) {
+					console.log(data.cartDetails);
+				}
+			})
+		});
 
         document.getElementById('removeAll').addEventListener('click', () => {
             // Remove all rows from the table
@@ -133,123 +117,6 @@
 
             xhttp.send(data);
         }
-
-        function updateqty(row, qty) {
-            // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            // console.log(qty);
-
-            //send ajax post request to remove item
-
-            //get item number from row from substring after 4th character of for attribute of label
-            var itemNumber = row;
-            //convert item number to integer
-            itemNumber = parseInt(itemNumber);
-            // console.log(itemNumber);
-            // console.log(qty);
-
-            //get listing id cartdetails[itemNumber-1].listing_id
-            var listingId = cartDetails[itemNumber-1].listingId;
-
-            console.log(listingId);
-
-            // send ajax post request to remove item with listing_id
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/cart/update-itemlisting", true);
-            xhttp.setRequestHeader("Content-type", "application/json");
-
-            var data = JSON.stringify({ "listingId": listingId , "updateCount": qty });
-            
-            xhttp.send(data);
-
-            //remove item from cartDetails
-        }
-
-        function removeRow(button) {
-            // Get the parent row and remove it
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            // console.log("Ddddddddddddddd");
-            
-            var row = button.parentElement.parentElement;
-            row.remove();
-
-            //send ajax post request to remove item
-
-            //get item number from row from substring after 4th character of for attribute of label
-            var itemNumber = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
-            //convert item number to integer
-            itemNumber = parseInt(itemNumber);
-            // console.log(itemNumber);
-            // console.log(cartDetails);
-
-            //get listing id cartdetails[itemNumber-1].listing_id
-            var listingId = cartDetails[itemNumber-1].listingId;
-            
-            // console.log(listingId);
-            
-
-            // send ajax post request to remove item with listing_id
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/cart/remove-itemlisting", true);
-            xhttp.setRequestHeader("Content-type", "application/json");
-
-            var data = JSON.stringify({ "listingId": listingId });
-
-            
-            xhttp.send(data);
-
-            //remove item from cartDetails
-        }
-
-        //checkout button
-        document.getElementById('getFinalCost').addEventListener('click', () => {
-            //get all rows from the table
-            const dynamicTable = document.getElementById('dynamicTable');
-            const rows = dynamicTable.getElementsByTagName("tr");
-            console.log(rows);
-
-            //get all addresses
-            const address = document.getElementById('address');
-            const address1 = address.getElementsByTagName("input")[0].value;
-            const address2 = address.getElementsByTagName("input")[1].value;
-            const address3 = address.getElementsByTagName("input")[2].value;
-            const address4 = address.getElementsByTagName("input")[3].value;
-            const address5 = address.getElementsByTagName("input")[4].value;
-            console.log(address1);
-            console.log(address2);
-            console.log(address3);
-            console.log(address4);
-            console.log(address5);
-
-            //get promocode
-            const promocode = document.getElementById('promocode');
-            const promocode1 = promocode.getElementsByTagName("input")[0].value;
-            console.log(promocode1);
-
-            //get all quantities
-            var quantities = [];
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                var quantity = row.getElementsByTagName("input")[0].value;
-                quantities.push(quantity);
-            }
-            console.log(quantities);
-
-            //get all listing ids
-            var listingIds = [];
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                var listingId = row.getElementsByTagName("label")[0].getAttribute("for").substring(4);
-                listingIds.push(listingId);
-            }
-            console.log(listingIds);
-
-            //send ajax post request to checkout
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/fetch-cart-display", true);
-            xhttp.setRequestHeader("Content-type", "application/json");
-            xhttp.send(JSON.stringify({listing_ids: listingIds, quantities: quantities, address1: address1, address2: address2, address3: address3, address4: address4, address5: address5, promocode: promocode1}));
-        });
     </script>
 
 </body>
