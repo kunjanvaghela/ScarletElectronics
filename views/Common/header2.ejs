@@ -28,15 +28,16 @@
         <button href="#" class="hearder__cart__btn flex flex-jc-c flex-ai-c"><img class="header__cart__icon" src="../../public/landing_page/images/cart.png" alt="shopping cart"></button>
       </div>
 
-		<div class="header__links hide-for-mobile">
-			<a href="/users/profile">Profile</a>
-			<a href="/users/logout">Logout</a>
-		</div>
-		
-		<form action="/users/login" method="get">
-			<button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
-		</form>
-
+      <div id="user-login-container">
+        <!-- <div class="header__links hide-for-mobile">
+          <a href="/users/profile">Profile</a>
+          <a href="/users/logout">Logout</a>
+        </div>
+        
+        <form action="/users/login" method="get">
+          <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
+        </form> -->
+      </div>
     </nav>
 
     <div class="header__menu has-fade hide-for-desktop">
@@ -46,5 +47,52 @@
       <a href="#">Services</a>
       <a href="#">Register</a>
     </div>
+
+    <script>
+
+      $(document).ready(function() {
+          $.ajax({
+              type: "GET",
+              url: "/users", // Replace with the actual endpoint
+              success: function(response) {
+                  if (response.success) {
+                      var user = response.body;
+                      console.log("User logged in!");
+                      updateLoggedInUI(user);
+                  } else {
+                      console.log("Something wrong in checking login. Check if user logged in successful!");
+                      updateLoggedOutUI();
+                  }
+              },
+              error: function(error) {
+                  console.error('Error checking login status:', error);
+                  console.log("User logged out!");
+                  updateLoggedOutUI();
+              }
+          });
+      
+          function updateLoggedInUI(user) {
+              $('#user-login-container').html(`
+                  <div class="header__links hide-for-mobile">
+                    <a>Welcome ${user.name}</a>
+                    <a href="/users/profile">Profile</a>
+                    <!-- <a href="/users/modify-user">Profile</a>-->
+                    <a href="/users/logout">Logout</a>
+                  </div>
+              `);
+          }
+      
+          function updateLoggedOutUI() {
+              // Update the UI for a logged-out user
+              $('#user-login-container').html(`
+                  <form action="/users/login" method="get">
+                    <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
+                  </form>
+              `);
+          }
+      
+      });
+      
+    </script>
 
 </header>

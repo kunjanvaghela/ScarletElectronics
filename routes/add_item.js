@@ -69,18 +69,6 @@ router.post('/insert', upload.single('itemImage'), async (req, res) => {
     
 
     try {
-        // const response = await drive.files.create({
-        //     resource: fileMetadata,
-        //     media: media,
-        //     fields: 'id,webViewLink',
-        // });
-
-        // const folderPath = response.data.webViewLink; // Use this URL to access the folder
-
-        // // Now, you can store `folderPath` in your MySQL database along with other data
-        // const catalogData = req.body;
-        // catalogData.itemImage = folderPath;
-
         const catalog = await Catalog
             .create(catalogData)
             .then((result) => {
@@ -113,13 +101,11 @@ router.post('/insert', upload.single('itemImage'), async (req, res) => {
                         console.log("Error while createDrive = " + err)
                     });
 
-                // Insert Images in the folder
             }).catch((err) => {
                 console.log('Error : '+ err);
             });
         
-        // Handle the response after success
-        res.redirect('/item-listing');  // Redirect to login or any other page
+        res.redirect('/item-listing/listings');  // Redirect to login or any other page
     } catch (error) {
         // Handle the error response
         console.error('Error occurred:', error);
