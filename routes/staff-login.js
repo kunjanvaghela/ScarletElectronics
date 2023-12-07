@@ -5,6 +5,10 @@ const db = require('../models');
 const { where } = require('sequelize');
 const UserUtil = require('../util/userUtil');
 const { encrypt, decrypt } = require("../util/encryptionUtil");
+const jwt = require('jsonwebtoken');
+require('dotenv').config()
+
+let refreshTokens = []
 
 const User = db.User;
 const Staff = db.Staff;
@@ -14,7 +18,7 @@ const getstafflogin = async (req, res) => {
   res.render("staffloginPage");
 };
 
-// POST route to handle login
+// POST route to handle loging
 const poststafflogin = async (req, res) => {
   const { emailId, password } = req.body;
 
@@ -48,16 +52,18 @@ const poststafflogin = async (req, res) => {
 			message: "You have entered an invalid password, " + user.name,
 		});
 	}
+    // JWT TOKEN IMPLEMENTATION
+    const tokenPackage = { userId: user.userid, emailId: user.emailId };
+    const accessToken = UserUtil.generateAccessToken(tokenPackage);
+    const refreshToken = jwt.sign(tokenPackage, process.env.REFRESH_TOKEN_SECRET);
+    refreshTokens.push(refreshToken);
 
-    // Calculate the expiration time as the current time + 120 minutes
-    const tenMinutes = 1000 * 60 * 120; // 120 minutes in milliseconds
-    const expiresAt = new Date(Date.now() + tenMinutes);
-
-    // Set the cookie
-    res.cookie("emailId", user.emailId, {
-      expires: expiresAt,
-      httpOnly: false,
+    res.cookie("accessToken", accessToken, {
+        httpOnly: false,
     });
+
+    const object = UserUtil.retrieveTokenPayload(accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", object.userId);
 
     // Send a JSON response indicating success and possibly a redirect URL.
     return res.status(200).json({

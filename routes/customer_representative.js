@@ -11,19 +11,49 @@ const User = db.User;
 const UserUtil = require('../util/userUtil');
 
 const getAllrequests = async (req, res) => {
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  //console.log(userDetails);
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
+  const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+  userDetails = await UserUtil.check_email(payload.emailId);
+  console.log(userDetails.userid);
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
   const username = userDetails.name;
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // //console.log(userDetails);
+  // const username = userDetails.name;
   const custRepId = userDetails.userid;
   console.log("Username is " + username);
   res.render('all_requests', {username});
 };
 
 const postClaimedrequests = async (req, res) => {
-  console.log('Working');
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  //console.log(userDetails);
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
+  const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+  userDetails = await UserUtil.check_email(payload.emailId);
+  console.log(userDetails.userid);
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
   const username = userDetails.name;
+
+  console.log('Working');
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // //console.log(userDetails);
+  // const username = userDetails.name;
   const custRepId = userDetails.userid;
   console.log("Username is " + username);
 
@@ -64,9 +94,26 @@ const postClaimedrequests = async (req, res) => {
 
 const getshowallrequest = async (req, res) => {
   console.log('Button Working');
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
+
+  //new jwt implementation
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
+  const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+  userDetails = await UserUtil.check_email(payload.emailId);
   console.log(userDetails.userid);
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
   const username = userDetails.name;
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
+  // const username = userDetails.name;
 
   EndUserRequest.findAll({
   
@@ -103,13 +150,31 @@ router.post("/show-all-request", getshowallrequest);
 
 
 const postClaimrequest = async (req, res) => {
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
     
     receivedRequestId = req.body.reqID;
     console.log("The requestID is : ", receivedRequestId);
     //console.log("!!!!!!!!!!!!!hsjabfkaskhf: ", receivedRequestId);
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
-    //console.log(userDetails.userid);
-    const username = userDetails.name;
+
+      //new jwt implementation
+  console.log("token ", req.cookies.accessToken);
+
+  const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+  console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+  console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+  userDetails = await UserUtil.check_email(payload.emailId);
+  console.log(userDetails.userid);
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
+  const username = userDetails.name;
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // //console.log(userDetails.userid);
+    // const username = userDetails.name;
+
     EndUserRequest.findOne({where: {requestId: receivedRequestId}}).then((table) => {
       table.customer_rep = userDetails.userid
       
@@ -143,12 +208,31 @@ const postClaimrequest = async (req, res) => {
 };
 
 const updateStatus = async (req, res) => {
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
+
   receivedRequestId = req.body.reqID;
   console.log("The requestID is : ", receivedRequestId);
   //console.log("!!!!!!!!!!!!!hsjabfkaskhf: ", receivedRequestId);
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  //console.log(userDetails.userid);
-  const username = userDetails.name;
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // //console.log(userDetails.userid);
+  // const username = userDetails.name;
+
+    //new jwt implementation
+
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    const username = userDetails.name;
+
   EndUserRequest.findOne({where: {requestId: receivedRequestId}}).then((table) => {
     table.current_status = req.body.status
     
@@ -175,10 +259,25 @@ router.post("/update-request-status", updateStatus);
 
 //Renders threads page
 const getthread = async (req, res) => {
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-    //console.log(userDetails.userid);
+    //new jwt implementation
+    console.log("token ", req.cookies.accessToken);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+      // If not authenticated, send a 401 Unauthorized response
+      return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    const username = userDetails.name;
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //   //console.log(userDetails.userid);
     
-  const username = userDetails.name;
+  // const username = userDetails.name;
   const reqId = req.query.reqId;
   //console.log(req);
   console.log(reqId);
@@ -188,10 +287,25 @@ const getthread = async (req, res) => {
 
 //Function to get messeges 
 const getAllMesseges = async (req, res) => {
+    //new jwt implementation
+    console.log("token ", req.cookies.accessToken);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+      // If not authenticated, send a 401 Unauthorized response
+      return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    const username = userDetails.name;
 
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
-  console.log(userDetails.userid);
-  const username = userDetails.name;
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
+  // console.log(userDetails.userid);
+  // const username = userDetails.name;
 
   const reqId = req.body.reqId;
   console.log("RequestId received = ", reqId);
@@ -237,7 +351,23 @@ const getAllMesseges = async (req, res) => {
 
 
 const getMessegeToBeInserted = async (req, res) => {
-  userDetails = await UserUtil.check_email(req.cookies.emailId);
+    //new jwt implementation
+    console.log("token ", req.cookies.accessToken);
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+      // If not authenticated, send a 401 Unauthorized response
+      return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    const username = userDetails.name;
+
+  // userDetails = await UserUtil.check_email(req.cookies.emailId);
   //const reqId = req.body.reqId;
   console.log("!!!!!!!!!    Reqest received   !!!!!!!");
   const Messages = db.Messages;
@@ -269,10 +399,20 @@ const getMessegeToBeInserted = async (req, res) => {
 
 //newcode
 const getReplistings =  async (req, res) => {
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
 
   try {
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
     console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
     const username = userDetails.name;
     const rep_listings = await ItemListing.findAll();
     res.render('rep_listings', { rep_listings, username });
@@ -284,12 +424,26 @@ const getReplistings =  async (req, res) => {
 
 // Route to handle deletion of a listing
 const postdeletereplisting = async (req, res) => {
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
 
   const listingId = req.params.listingId;
   try {
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
     console.log(userDetails.userid);
+  
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
     const username = userDetails.name;
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    // const username = userDetails.name;
     await ItemListing.destroy({ where: { listingId } });
     res.redirect('/customer_representative/rep_listings');
   } catch (error) {
@@ -300,11 +454,21 @@ const postdeletereplisting = async (req, res) => {
 
 // Route to render the modification form
 const getmodifyreplisting = async (req, res) => {
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
 
   const listingId = req.params.listingId;
   try {
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
     console.log(userDetails.userid);
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
     const username = userDetails.name;
     const listing = await ItemListing.findByPk(listingId);
     res.render('modify_listing', { listing, username });
@@ -316,12 +480,21 @@ const getmodifyreplisting = async (req, res) => {
 
 // Route to handle the form submission for modification
 const postmodifyreplisting = async (req, res) => {
-
+  console.log("token ", req.cookies.accessToken);
+  if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+    // If not authenticated, send a 401 Unauthorized response
+    return res.status(401).send('Authentication failed, working:)');
+  }
   const listingId = req.params.listingId;
   try {
-    userDetails = await UserUtil.check_email(req.cookies.emailId);
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
     console.log(userDetails.userid);
-    const username = userDetails.name;
+    // userDetails = await UserUtil.check_email(req.cookies.emailId);
+    // console.log(userDetails.userid);
+    // const username = userDetails.name;
     // Update the ItemListing with the new values from the form
     await ItemListing.update(req.body, { where: { listingId } });
 
