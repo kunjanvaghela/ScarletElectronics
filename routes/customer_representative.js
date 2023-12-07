@@ -61,6 +61,7 @@ const postClaimedrequests = async (req, res) => {
 
 };
 
+
 const getshowallrequest = async (req, res) => {
   console.log('Button Working');
   userDetails = await UserUtil.check_email(req.cookies.emailId);
@@ -100,37 +101,6 @@ const getshowallrequest = async (req, res) => {
 };
 router.post("/show-all-request", getshowallrequest);
 
-// router.get("/show-all-request", async (req, res) => {
-//     console.log('Button Working');
-//     userDetails = await UserUtil.check_email(req.cookies.emailId);
-//     console.log(userDetails.userid);
-//     const username = userDetails.name;
-
-//     EndUserRequest.findAll({
-    
-//     }).then((requests) => {
-//       const serializedRequests = requests.map((request) => {
-//         return {
-//           requestId: request.requestId,
-//           userId: request.userId,
-//           listingId: request.listingId,
-//           updateDescription: request.update_description,
-//           createdOn: request.created_on,
-//           currentStatus: request.current_status,
-//           customerRep: username,
-//           updatedOn: request.updated_on
-//         };
-//       });
-//     //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
-        
-//         res.render('all_requests', {serializedRequests, username});
-        
-        
-//       }).catch(function(err){
-//         console.log('Oops! something went wrong, : ', err);
-//       });
-    
-// });
 
 const postClaimrequest = async (req, res) => {
     
@@ -171,6 +141,37 @@ const postClaimrequest = async (req, res) => {
     // });
     
 };
+
+const updateStatus = async (req, res) => {
+  receivedRequestId = req.body.reqID;
+  console.log("The requestID is : ", receivedRequestId);
+  //console.log("!!!!!!!!!!!!!hsjabfkaskhf: ", receivedRequestId);
+  userDetails = await UserUtil.check_email(req.cookies.emailId);
+  //console.log(userDetails.userid);
+  const username = userDetails.name;
+  EndUserRequest.findOne({where: {requestId: receivedRequestId}}).then((table) => {
+    table.current_status = req.body.status
+    
+    return table.save();
+  }).then(() => {
+     
+    // Send the serialized data as a response
+    //res.redirect('/customer_representative/show-all-request');
+    return res.status(200).json({
+      success: true,
+      message: "Request status Updated",
+      
+      redirectUrl: "/customer_representative/show-all-request"
+    });
+    // res.render('listings', { serializedListings, username });
+    
+  }).catch((error) => {
+    console.error('Error retrieving data:', error);
+    res.status(500).send('Internal server error');
+  });
+};
+router.post("/update-request-status", updateStatus);
+
 
 //Renders threads page
 const getthread = async (req, res) => {

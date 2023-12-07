@@ -87,13 +87,18 @@
                         var tableBody = $('#claimedRequestsTable tbody');
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
+                            var dropdown = '<select class="status-dropdown" data-reqid="'+ request.requestId +'">' +
+                                            '<option value="A" ' + (request.currentStatus === 'A' ? 'selected' : '') + '>A</option>' +
+                                            '<option value="I" ' + (request.currentStatus === 'I' ? 'selected' : '') + '>I</option>' +
+                                            '<option value="C" ' + (request.currentStatus === 'C' ? 'selected' : '') + '>C</option>' +
+                                           '</select>';
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userId + '</td>' +
                                         '<td>' + request.listingId + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
-                                        '<td>' + request.currentStatus + '</td>' +
+                                        '<td>' + dropdown + '</td>' +
                                         '<td>' + request.customerRep + '</td>' +
                                         '<td>' + request.updatedOn + '</td>' +
                                       '</tr>';
@@ -149,10 +154,34 @@
                     }
                 });
             }
-        
+
+            // Event handler for status dropdown change
+            $('body').on('change', '.status-dropdown', function() {
+                var requestId = $(this).data('reqid');
+                var newStatus = $(this).val();
+                updateRequestStatus(requestId, newStatus);
+            });
+
+            function updateRequestStatus(requestId, newStatus) {
+                $.ajax({
+                    type: "POST",
+                    url: "/customer_representative/update-request-status",
+                    data: { reqID: requestId, status: newStatus },
+                    success: function(response) {
+                        alert('Request status updated successfully');
+                        fetchClaimedRequests(); // Refresh the claimed requests table
+                        fetchAllRequests();     // Refresh the all requests table
+                    },
+                    error: function(error) {
+                        alert('Error updating request status');
+                    }
+                });
+            }
+
             // Initial fetch for tables on page load
             fetchClaimedRequests();
             //fetchAllRequests();
+
 
             $('#viewAllRequestsForm').on('click', 'button', function() {
                 $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
