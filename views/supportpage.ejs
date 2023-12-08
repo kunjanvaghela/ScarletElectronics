@@ -34,14 +34,13 @@
         <table class="table table-bordered" id="allRequestsTable" cellspacing="0" width="100%">
             <thead>
                 <th width="5%">Request ID</th>
-                <th width="10%">User</th>
                 <th width="5%">Listing ID</th>
                 <th>Description</th>
                 <th width="10%">Created On</th>
                 <th width="2%">Status</th>
                 <th>CR</th>
                 <th>Updated On</th>
-                <th>Claim</th>
+                
             </thead>
             <tbody>
                 <!-- Table rows will be dynamically inserted here -->
@@ -62,14 +61,16 @@
                         var tableBody = $('#allRequestsTable tbody');
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
+                            var listingIdDisplay = request.listingId ? request.listingId : "N/A";
+                            var customerRepDisplay = request.customerRep ? request.customerRep : "Unclaimed";
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
-                                        '<td>' + request.userId + '</td>' +
-                                        '<td>' + request.listingId + '</td>' +
+                                        
+                                        '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/users/threads?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + request.currentStatus + '</td>' +
-                                        '<td>' + request.customerRep + '</td>' +
+                                        '<td>' + customerRepDisplay + '</td>' +
                                         '<td>' + request.updatedOn + '</td>' +
                                       '</tr>';
                             tableBody.append(row);
