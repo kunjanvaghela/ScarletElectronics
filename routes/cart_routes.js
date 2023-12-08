@@ -308,9 +308,10 @@ router.get('/fetch-cart-display', async (req, res)=>
     const username = userDetails.name;
 
     console.log("cartDetails: ", cartDetails);
+    // res.status(200).json({"cartDetails" : cartDetails});
 
     //return cart details
-    res.render('cart',{ cartDetails, username });
+    res.render('cart');
     // res.status(200).send(cartDetails);
 
 });
@@ -350,8 +351,7 @@ router.get('/fetch-cart', async (req, res)=>
 
 
     //return cart details
-    res.status(200)
-    res.send(cartDetails);
+    res.status(200).json({cartDetails:cartDetails});
 
 });
 
