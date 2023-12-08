@@ -650,7 +650,6 @@ router.post("/insert-message", getMessegeToBeInserted);
 router.get("/support", getsupport);
 router.get("/support/newrequest", getSupportnewrequest);
 //router.get("/support/oldrequests", getSupportoldrequests);
-router.get("/support/oldrequests", getSupportoldrequests);
 
 router.post("/support/newrequest", postSupportnewrequest);
 
