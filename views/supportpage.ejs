@@ -11,6 +11,8 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
+    <div class ="container">
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">ScarletElectronics Customer Support</h1>
@@ -20,19 +22,87 @@
 
         <!-- Button to create a customer representative -->
         <button class="btn btn-success" onclick="newrequest()">Raise a New Request</button>
-        <button class="btn btn-success" onclick="existingrequest()">View Existing Requests</button>
+        <form method="GET" action="#" id="viewAllRequestsForm" style="display: inline-block; margin-right: 10px;">
+            <button type="submit" class="btn btn-primary">View Existing Requests</button>
+        </form>
+        
     </div>
+
+    <div align="center" id="allRequestsTableDiv" style="display: none;">
+        <br>
+        <h2 class="text-primary text-left mx-auto">All Requests</h2>
+        <table class="table table-bordered" id="allRequestsTable" cellspacing="0" width="100%">
+            <thead>
+                <th width="5%">Request ID</th>
+                <th width="10%">User</th>
+                <th width="5%">Listing ID</th>
+                <th>Description</th>
+                <th width="10%">Created On</th>
+                <th width="2%">Status</th>
+                <th>CR</th>
+                <th>Updated On</th>
+                <th>Claim</th>
+            </thead>
+            <tbody>
+                <!-- Table rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <br>
+    </div>
+    </div>
+
     
     <script>
+        $(document).ready(function() {
+            function fetchFiledRequests() {
+                $.ajax({
+                    type: "POST",
+                    url: "/users/get-filed-requests",
+                    success: function(response) {
+                        var tableBody = $('#allRequestsTable tbody');
+                        tableBody.empty();
+                        response.serializedRequests.forEach(function(request) {
+                            var row = '<tr>' +
+                                        '<td>' + request.requestId + '</td>' +
+                                        '<td>' + request.userId + '</td>' +
+                                        '<td>' + request.listingId + '</td>' +
+                                        '<td><a href="/users/threads?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
+                                        '<td>' + request.createdOn + '</td>' +
+                                        '<td>' + request.currentStatus + '</td>' +
+                                        '<td>' + request.customerRep + '</td>' +
+                                        '<td>' + request.updatedOn + '</td>' +
+                                      '</tr>';
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching claimed requests:', error);
+                    }
+                });
+
+            }
+            $('#viewAllRequestsForm').on('click', 'button', function() {
+                $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
+                fetchFiledRequests(); // Fetch and populate all requests
+            });
+
+
+
+
+        });
+
+
+
+
         // JavaScript function to handle the button click
         function newrequest() {
             // Redirect to the "/admin/customer-rep" page
             window.location.href = '/users/support/newrequest';
         }
-        function existingrequest() {
-            // Redirect to the "/admin/customer-rep" page
-            window.location.href = '/users/support/oldrequests';
-        }
+        // function existingrequest() {
+        //     // Redirect to the "/admin/customer-rep" page
+        //     window.location.href = '/users/support/oldrequests';
+        // }
     </script>
 </body>
 

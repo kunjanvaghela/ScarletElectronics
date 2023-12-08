@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/cr_header.ejs') %>
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
@@ -38,12 +38,12 @@
                             <td><%=y.requestId%></td>
                             <td><%=y.userId%></td>
                             <td><%=y.listingId%></td>
-                            <td><%=y.updateDescription%></td>
+                            <td><a href=/customer_representative/thread><%=y.updateDescription%></a></td>
                             <td><%=y.createdOn%></td>
                             <td><%=y.currentStatus%></td>
                             <td><%=y.customerRep%></td>
                             <td><%=y.updatedOn%></td>
-                            
+                                                  
                         </th>
                     <%})%>
                     <%}%>
@@ -51,10 +51,21 @@
             </table>
         <br>
     </div>
-    <div>
+    <!-- <div>
         <br>
         <form method="GET" action="/customer_representative/show-all-request">
             <button type="submit" class="btn btn-primary align-self-center">View All Requests</button>
+        </form>
+        <form method="GET" action="/customer_representative/rep_listings">
+            <button type="submit" class="btn btn-primary align-self-center">View All Listngs</button>
+        </form>
+    </div> -->
+    <div style="display: flex; gap: 10px;">
+        <form method="GET" action="/customer_representative/show-all-request">
+            <button type="submit" class="btn btn-primary align-self-center">View All Requests</button>
+        </form>
+        <form method="GET" action="/customer_representative/rep_listings">
+            <button type="submit" class="btn btn-primary align-self-center">View All Listings</button>
         </form>
     </div>
     

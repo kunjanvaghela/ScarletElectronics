@@ -6,7 +6,9 @@ const axios = require("axios"); // Required for reCAPTCHA verification
 const db = require("../models");
 const UserUtil = require('../util/userUtil');
 const EndUser = db.EndUsers;
+const User = db.User;
 const EndUserRequest = db.EndUserRequest;
+const Messages = db.Messages;
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { encrypt, decrypt } = require("../util/encryptionUtil");
@@ -49,6 +51,20 @@ const logoutUser = (req, res) => {
     res.redirect("/users/login");
 };
 
+
+router.get("/logout-staff", (req, res) => {
+    console.log("Processing logout");
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.clearCookie("emailId");
+
+    const refreshToken = req.cookies.refreshToken;
+    refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+
+    // Redirect the user to the login page after logout
+    res.redirect("/staff-login/login");
+});
 
 router.get("/register", (req, res) => {
 	res.render("register");
@@ -185,7 +201,7 @@ const loginUser = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Welcome " + user.name + ", Login successful",
-            redirectUrl: "/item-listing"
+            redirectUrl: "/item-listing/listings"
         });
     } catch (error) {
         console.error("Error during login:", error);
@@ -325,30 +341,90 @@ const postModifyUser = async (req, res) => {
     }
 };
 
+//User support
 const getsupport = async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+ 
+
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
 	console.log("Successfully in Root :Inssss:sss:: /");
-	res.render("supportpage");
+	res.render("supportpage", {username});
 };
 
 const getSupportnewrequest =  async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
+    // console.log('username : ',  username);
+    res.render("newrequest" , {username});
+    
+};
+
+// const getSupportoldrequests = async (req, res) => {
+
+// 	userDetails = await UserUtil.check_email(req.cookies.emailId);
 	
-    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-    // const username = userDetails.name;
-    // console.log('username : ',  username);
-    res.render("newrequest");
-    
-};
-const getSupportoldrequests = async (req, res) => {
-    // const userDetails = await UserUtil.check_email(req.cookies.emailId);
-    // const username = userDetails.name;
-    // console.log('username : ',  username);
-    res.render("oldrequests");
-    
-};
+// 	const username = userDetails.name;
+  
+// 	EndUserRequest.findAll({
+	
+// 	}).then((requests) => {
+// 	  const serializedRequests = requests.map((request) => {
+// 		return {
+// 		  requestId: request.requestId,
+// 		  userId: request.userId,
+// 		  listingId: request.listingId,
+// 		  updateDescription: request.update_description,
+// 		  createdOn: request.created_on,
+// 		  currentStatus: request.current_status,
+// 		  customerRep: request.customer_rep,
+// 		  updatedOn: request.updated_on
+// 		};
+// 	  });
+// 	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+		
+// 		res.render('oldrequests', {serializedRequests, username});
+		
+		
+// 	  }).catch(function(err){
+// 		console.log('Oops! something went wrong, : ', err);
+// 	  });
+	
+       
+// };
 
 
 
 const postSupportnewrequest = async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).send('Authentication failed');
+    }
+
+    const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+
 	const { name, emailId } = req.body;
 	const User = db.User;
 	const userData = req.body
@@ -371,22 +447,211 @@ const postSupportnewrequest = async (req, res) => {
 		expires: expiresAt,
 		httpOnly: false,
 	});
-
+	if(userData.listingId === ''){
+		userData.listingId = null;
+	}
 
     userData.userId = user.userid;
 	userData.current_status = 'A'
+    userData.updated_on = new Date();
     console.log("User Inserted, now have to insert staffUser");
-    console.log(userData);
-    EndUserRequest.create(userData);
+    //console.log(userData);
+    const created = await EndUserRequest.create(userData);
+
+	//Adding into message table
+	const row = await EndUserRequest.findOne({where: {update_description: userData.update_description}});
+	// console.log("!!!!   Row printed is herere !!!!!",row);
+	// console.log(userData.update_description)
+	const Messages = db.Messages;
+	Messages.create({
+		requestId: row.requestId,
+		userId: user.userid,
+		customer_rep: null,
+		listingId: row.listingId,
+		update_description: userData.update_description,
+		created_on: new Date(),
+		created_by: "enduser"
+	   });
     
         
     res.redirect('/users/support'); 
 	
 };
 
+
+const postFiledrequests = async (req, res) => {
+	console.log('Working');
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        // If not authenticated, send a 401 Unauthorized response
+        return res.status(401).send('Authentication failed, working:)');
+      }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	// //console.log(userDetails);
+	// const username = userDetails.name;
+	const userid= userDetails.userid;
+	console.log("Username is " + username);
+  
+	EndUserRequest.findAll({
+		where: {
+			userId: userid
+		}
+	  }).then((requests) => {
+		const serializedRequests = requests.map((request) => {
+		  return {
+			requestId: request.requestId,
+			userId: request.userId,
+			listingId: request.listingId,
+			updateDescription: request.update_description,
+			createdOn: request.created_on,
+			currentStatus: request.current_status,
+			customerRep: request.customer_rep,
+			updatedOn: request.updated_on
+		  };
+		});
+	
+		// Send the serialized data as a response
+		//res.render('customer_rep_dasboard', {serializedRequests, username});
+		return res.status(200).json({
+		  success: true,
+		  message: "Requests fetched from database",
+		  serializedRequests: serializedRequests
+		  
+		});
+		// res.render('seller_listing', {serializedListings})
+	  }).catch((error) => {
+		console.error('Error retrieving data:', error);
+		res.status(500).send('Internal server error');
+	  });
+  
+  };
+router.post("/get-filed-requests", postFiledrequests);
+
+//Renders threads page
+const getThread1 = async (req, res) => {
+	console.log("!!!!!!!!!!!!!!!!  coming here  !!!!!!!!!!!!!!@@@@")
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	  //console.log(userDetails.userid);
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+
+	const username = userDetails.name;
+	const reqId = req.query.reqId;
+	//console.log(req);
+	console.log(reqId);
+  
+	res.render("threads_user",{ username, reqId });
+  };
+router.get("/threads", getThread1);
+
+
+//Getting messeges to display
+const getAllMessages = async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+  
+	const reqId = req.body.reqId;
+	console.log("RequestId received = ", reqId);
+  
+	Messages.findAll({
+	  where: {
+		requestId: reqId
+	}
+	
+	}).then((messages) => {
+	  const serializedMessages = messages.map((getMessage) => {
+		return {
+		  messageId: getMessage.messageId,
+		  requestId: getMessage.requestId,
+		  userId: getMessage.userId,
+		  customerRep: getMessage.customer_rep,
+		  listingId: getMessage.listingId,
+		  updateDescription: getMessage.update_description,
+		  createdOn: getMessage.created_on,
+		  createdBy: getMessage.created_by
+		};
+	  });
+	//const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
+		
+		//res.render('all_requests', {serializedRequests, username});
+		  return res.status(200).json({
+		  success: true,
+		  message: "Request filed by you",
+		  serializedMessages: serializedMessages
+		  
+		});
+		
+		
+	  }).catch(function(err){
+		console.log('Oops! something went wrong, : ', err);
+	  });
+	
+};
+router.post("/show-all-messages", getAllMessages);
+
+
+//Inserting messages in the table
+const getMessegeToBeInserted = async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		return res.status(401).send('Authentication failed, working:)');
+    }
+    const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+    console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    userDetails = await UserUtil.check_email(payload.emailId);
+    console.log(userDetails.userid);
+    const username = userDetails.name;
+	// userDetails = await UserUtil.check_email(req.cookies.emailId);
+	//const reqId = req.body.reqId;
+	console.log("!!!!!!!!!    Reqest received   !!!!!!!");
+	const Messages = db.Messages;
+	//console.log(req);
+	const reqId=req.body.reqId;
+	const row = await Messages.findOne({where: {requestId: reqId}});
+	//console.log("********   Row data *******", row.userId);
+	Messages.create({
+	  requestId: reqId,
+	  userId: row.userId,
+	  customer_rep: row.customer_rep,
+	  listingId: row.listingId,
+	  update_description: req.body.updateDescription,
+	  created_on: new Date(),
+	  created_by: "enduser"
+	 });
+  
+	 return res.status(200).json({
+	  success: true,
+	  message: "Message Inserted",
+	  reqId:reqId
+	});
+ 
+  };
+router.post("/insert-message", getMessegeToBeInserted);
+
+
+
 router.get("/support", getsupport);
 router.get("/support/newrequest", getSupportnewrequest);
+//router.get("/support/oldrequests", getSupportoldrequests);
 router.get("/support/oldrequests", getSupportoldrequests);
+
 router.post("/support/newrequest", postSupportnewrequest);
 
 
