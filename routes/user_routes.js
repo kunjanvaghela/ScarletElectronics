@@ -55,12 +55,10 @@ const logoutUser = (req, res) => {
 router.get("/logout-staff", (req, res) => {
     console.log("Processing logout");
 
-    // Clearing JWT-related cookies and emailId cookie
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     res.clearCookie("emailId");
 
-    // Optionally, handle the refresh token list if you store them server-side
     const refreshToken = req.cookies.refreshToken;
     refreshTokens = refreshTokens.filter(token => token !== refreshToken);
 
@@ -480,6 +478,7 @@ const postSupportnewrequest = async (req, res) => {
 	
 };
 
+
 const postFiledrequests = async (req, res) => {
 	console.log('Working');
 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
@@ -651,6 +650,8 @@ router.post("/insert-message", getMessegeToBeInserted);
 router.get("/support", getsupport);
 router.get("/support/newrequest", getSupportnewrequest);
 //router.get("/support/oldrequests", getSupportoldrequests);
+router.get("/support/oldrequests", getSupportoldrequests);
+
 router.post("/support/newrequest", postSupportnewrequest);
 
 
