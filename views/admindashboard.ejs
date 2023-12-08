@@ -65,12 +65,6 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- ... Existing HTML code ... -->
-
-<!-- ... Existing HTML code ... -->
-
-<!-- ... Existing HTML code ... -->
-
     <script>
         // JavaScript function to handle the button click for creating a customer representative
         function createCustomerRepresentative() {
@@ -133,7 +127,7 @@
                     success: function (response) {
                         //Callback function to refresh the table after successful deletion
                         fetchCustomerReps(function () {
-                            initializeDataTable();
+                            //initializeDataTable();
                             alert("Customer representative deleted successfully");
                         });
                         //fetchCustomerReps(initializeDataTable);
