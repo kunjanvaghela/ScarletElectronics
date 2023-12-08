@@ -13,6 +13,8 @@ const { encrypt, decrypt } = require("../util/encryptionUtil");
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const axios = require("axios"); // Required for reCAPTCHA verification
+const { Sequelize, Op } = require('sequelize');
+
 
 let refreshTokens = []
 
@@ -231,6 +233,67 @@ const postAdminlogin = async (req, res) => {
         });
         }
     };
+
+
+    const postAllCustomerReps = async (req, res) => {
+        console.log("token ", req.cookies.accessToken);
+    
+        // Check authentication
+        if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+            return res.status(401).send('Authentication failed');
+        }
+    
+        // Get user details from the token payload
+        const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+        console.log("ACCESSING USERID FROM TOKEN PAYLOAD:", payload.userId);
+        console.log("ACCESSING emailId FROM TOKEN PAYLOAD:", payload.emailId);
+        const userDetails = await UserUtil.check_email(payload.emailId);
+    
+        // Get user details from the token payload
+        const username = userDetails.name;
+        const custRepId = userDetails.userid;
+        console.log("Username is " + username);
+    
+        // Fetch all customer representatives who are staff members excluding 'admin'
+        User.findAll({
+            include: [{
+                model: Staff,
+                attributes: ['userId', 'designation', 'ssn'],
+                where: {
+                    designation: {
+                        [Sequelize.Op.ne]: 'admin'
+                    }
+                },
+                required: true, // This ensures we only get staff members
+                foreignKey: 'userId' // Specify the association key
+            }],
+            attributes: ['userid', 'name', 'emailId', 'created_on'], // Use 'userid' for the User model
+            raw: true // Ensure the result is a plain JSON object
+        }).then((reps) => {
+            const serializedReps = reps.map((rep) => {
+                return {
+                    userId: rep.userid,
+                    name: rep.name,
+                    emailId: rep.emailId,
+                    created_on: rep.created_on,
+                    designation: rep['Staff.designation'],
+                    ssn: rep['Staff.ssn']
+                };
+            });
+    
+            // Send the serialized data as a response
+            return res.status(200).json({
+                success: true,
+                message: "Customer Representatives fetched from database",
+                serializedReps: serializedReps
+            });
+        }).catch((error) => {
+            console.error('Error retrieving data:', error);
+            res.status(500).send('Internal server error');
+        });
+    };
+    
+    
   
   
 
@@ -239,6 +302,7 @@ router.get("/customer-rep", getCustomerrep);
 router.post('/insert-customer-rep', postinsertCustomerrep);
 router.get("/login", getAdminlogin);
 router.post("/login", postAdminlogin);
+router.post("/show-all-customer-reps", postAllCustomerReps);
 
 
 
