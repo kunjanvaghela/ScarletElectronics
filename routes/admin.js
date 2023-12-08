@@ -109,8 +109,10 @@ const postinsertCustomerrep =  async (req, res) => {
     console.log(userData);
 
     try {
+        userData.status = 'A';
         await User.create(userData).then((user) => {
             userData.userId = user.userid;
+            
             console.log("User Inserted, now have to insert staffUser");
             console.log(userData);
             Staff.create(userData);
@@ -256,13 +258,16 @@ const postAdminlogin = async (req, res) => {
     
         // Fetch all customer representatives who are staff members excluding 'admin'
         User.findAll({
+            where:{status: 'A'},
             include: [{
                 model: Staff,
                 attributes: ['userId', 'designation', 'ssn'],
                 where: {
                     designation: {
-                        [Sequelize.Op.ne]: 'admin'
+                        [Sequelize.Op.ne]: 'admin',
+                        
                     }
+                    
                 },
                 required: true, // This ensures we only get staff members
                 foreignKey: 'userId' // Specify the association key
@@ -292,6 +297,60 @@ const postAdminlogin = async (req, res) => {
             res.status(500).send('Internal server error');
         });
     };
+
+// ... Existing imports ...
+
+// Your existing routes...
+
+// New route to handle deletion of a customer representative
+const postdeleteRep =  async (req, res) => {
+    // Check authentication
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).json({ success: false, message: 'Authentication failed' });
+    }
+
+    // Get the userId to delete from the request body
+    const { userId } = req.body;
+
+    try {
+        // Find the user with the given userId
+        const user = await User.findByPk(userId, {
+            include: [{
+                model: Staff,
+                attributes: ['userId'],
+                where: { userId: userId },
+                required: true,
+                foreignKey: 'userId'
+            }]
+        });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Customer representative not found' });
+        }
+
+        // Check if the user has the designation "admin"
+        if (user.Staff.designation === 'admin') {
+            return res.status(401).json({ success: false, message: 'You are not authorized to delete an admin' });
+        }
+
+        // Delete the user
+        //await user.destroy();
+        User.update({status: 'I'},{where: {userid: userId}});
+
+        // Send a success response
+        return res.status(200).json({ success: true, message: 'Customer representative deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting customer representative:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// ... Other existing routes ...
+
+// Export the router
+module.exports = router;
+
     
     
 router.get("/header", async (req, res) => {
@@ -340,6 +399,7 @@ router.post('/insert-customer-rep', postinsertCustomerrep);
 router.get("/login", getAdminlogin);
 router.post("/login", postAdminlogin);
 router.post("/show-all-customer-reps", postAllCustomerReps);
+router.post("/delete-customer-rep", postdeleteRep)
 
 
 
