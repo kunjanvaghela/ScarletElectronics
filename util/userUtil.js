@@ -88,6 +88,6 @@ async function authent(req, res) {
 }
 
 function generateAccessToken(tokenPackage) {
-    return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '600s' });
+    return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3600s' });
 }
 module.exports = { check_email, authenticateToken, generateAccessToken, authent, retrieveTokenPayload };

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-
+    <%- include('Common/header.ejs') %>
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">Create New Request</h1>
@@ -32,7 +32,9 @@
 
             <div class="col-md-3 align-self-center mx-auto">
                 <label for="listingId" class="form-label text-left">ListingId/Order Number</label>
-                <input type="number" class="form-control text-left" id="listingId" name="listingId" required>
+                <input type="text" class="form-control text-left" id="listingId" name="listingId">
+
+
             </div>
             <br>
             
