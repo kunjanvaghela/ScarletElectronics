@@ -118,7 +118,7 @@
                     <div class="col-md-3 text-center mx-auto">
                         <!-- <a class="btn btn-outline-success align-self-center" href="/add-item/add" role="button">Add Item</a> -->
                         <form method="GET" action="/add-item/add">
-                            <button type="submit" class="btn btn-primary align-self-center">Add Item</button>
+                            <button type="submit" class="btn btn-primary align-self-center login-check-element">Add Item</button>
                         </form>
                     </div>
                     <!-- <div class="col-md-3 text-center mx-auto">
@@ -278,6 +278,30 @@
         event.preventDefault();
         if (validateForm()) {
             submitForm();
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // AJAX call to check if the user is logged in
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/users/", true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status !== 200) {
+                        console.log("Not logged in check for the button disabling");
+                        disableButtons();
+                    }
+                } else {
+                    console.error('Unable to check if the user is logged in. Error:', xhr.status, xhr.statusText);
+                }
+            }
+        xhr.send();
+        function disableButtons() {
+            var elementsToDisable = document.querySelectorAll('.login-check-element');
+            elementsToDisable.forEach(function(element) {
+                element.disabled = true;
+            });
         }
     });
 

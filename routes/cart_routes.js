@@ -266,23 +266,25 @@ router.post('/remove-itemlisting', async (req, res)=>
 router.get('/fetch-cart-display', async (req, res)=>
 {
     //get authentication status and user id
-    const [authentication, userId] = await authent(req,res);
+    // const [authentication, userId] = await authent(req,res);
     
-    if(!authentication)
-    {
-        return;
-    }
+    // if(!authentication)
+    // {
+    //     return;
+    // }
     
     console.log("fetch-cart inside ------------------------")
 
 
     //get cart details
-    const cartDetails = await get_cart(userId);
     if (!userUtil.authenticateToken(req.cookies.accessToken)) {
         // If not authenticated, send a 401 Unauthorized response
         return res.status(401).send('Authentication failed');
       }
-    userDetails = await userUtil.check_email(req.cookies.emailId);
+    const payload = userUtil.retrieveTokenPayload(req.cookies.accessToken);
+    userDetails = await userUtil.check_email(payload.emailId);
+    // userDetails = await userUtil.check_email(req.cookies.emailId);
+    const cartDetails = await get_cart(userDetails.userId);
     const username = userDetails.name;
 
     console.log("cartDetails: ", cartDetails);
