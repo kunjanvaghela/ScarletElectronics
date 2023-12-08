@@ -7,6 +7,7 @@ const UserUtil = require('../util/userUtil');
 const { encrypt, decrypt } = require("../util/encryptionUtil");
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
+const axios = require("axios"); // Required for reCAPTCHA verification
 
 let refreshTokens = []
 
@@ -22,7 +23,24 @@ const getstafflogin = async (req, res) => {
 const poststafflogin = async (req, res) => {
   const { emailId, password } = req.body;
 
+  const recaptchaResponse = req.body["g-recaptcha-response"];
+  if (!recaptchaResponse) {
+	  return res
+		  .status(400)
+		  .json({ success: false, message: "Please complete the CAPTCHA." });
+  }
+
   try {
+	const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=6Lffbu8oAAAAAHnr8NxZtRoP9-f7367MM9S_MjtN&response=${recaptchaResponse}`;
+	const verificationResponse = await axios.post(verificationURL);
+
+	if (!verificationResponse.data.success) {
+		return res.status(400).json({
+			success: false,
+			message: "CAPTCHA verification Failed/ Expired. Reload and Try again",
+		});
+	}
+
     // Check if the emailId exists in the users table
     const user = await User.findOne({ where: { emailId } });
 
