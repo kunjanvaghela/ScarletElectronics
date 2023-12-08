@@ -75,6 +75,7 @@ async function get_cart(userId)
             if(cartDetails[i].listingId == listingDetailsSQL[j].dataValues.listingId)
             {
                 cartDetails[i].price = listingDetailsSQL[j].dataValues.price;
+                cartDetails[i].max_quantity = listingDetailsSQL[j].dataValues.quantity;
                 itemIDs.push(listingDetailsSQL[j].dataValues.itemId);
             }
         }
