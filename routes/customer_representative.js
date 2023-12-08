@@ -113,12 +113,14 @@ const getshowallrequest = async (req, res) => {
   // const username = userDetails.name;
 
   EndUserRequest.findAll({
+    include: [User]
   
   }).then((requests) => {
     const serializedRequests = requests.map((request) => {
       return {
         requestId: request.requestId,
         userId: request.userId,
+        userEmail: request.User.emailId,
         listingId: request.listingId,
         updateDescription: request.update_description,
         createdOn: request.created_on,
@@ -127,13 +129,16 @@ const getshowallrequest = async (req, res) => {
         updatedOn: request.updated_on
       };
     });
+    //console.log("~!!!!!!!!!!!   print here    !!!!", requests);
   //const all_requests = EndUserRequest.findAll().then(function(serializedRequests){
-      
+      //const row = User.findOne()
       //res.render('all_requests', {serializedRequests, username});
         return res.status(200).json({
         success: true,
         message: "Request assigned to you",
-        serializedRequests: serializedRequests
+        serializedRequests: serializedRequests,
+        // username: username,
+        // cr_name: username,
         
       });
       
@@ -231,7 +236,8 @@ const updateStatus = async (req, res) => {
     const username = userDetails.name;
 
   EndUserRequest.findOne({where: {requestId: receivedRequestId}}).then((table) => {
-    table.current_status = req.body.status
+    table.current_status = req.body.status;
+    table.updated_on = new Date();
     
     return table.save();
   }).then(() => {
