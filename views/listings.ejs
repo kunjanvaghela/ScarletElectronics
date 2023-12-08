@@ -172,50 +172,63 @@
 
         document.getElementById('seller-filter').addEventListener('submit', function (event) {
             event.preventDefault();
+            console.log("in seller-filter submission")
 
-            console.log(document.getElementById("category").value);
-            console.log(document.getElementById("storage").value);
+            // console.log(document.getElementById("category").value);
+            // console.log(document.getElementById("storage").value);
 
-            fetch('/item-listing/apply-filter', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    category: document.getElementById("category").value,
-                    storage: document.getElementById("storage").value
-                })
-            })
-                .then(response => {  ///check the below code.
-                    // Check if the response is not ok (e.g., status code 400, 409, etc.)
-                    if (!response.ok) {
-                        // Convert the response to JSON and then throw an error with the backend's message
-                        return response.json().then(data => {
-                            throw new Error(data.message);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Redirect to the specified URL
-                        alert(data.message);
-                        window.location.href = data.redirectUrl || '/users/login';
-                    }
-                })
-                .catch(error => {
-                    // This will now catch errors with specific messages from the backend
-                    console.error('Error:', error);
-                    alert(error.message);
-                });
+            // fetch('/item-listing/apply-filter', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         category: document.getElementById("category").value,
+            //         storage: document.getElementById("storage").value
+            //     })
+            // })
+            //     .then(response => {  ///check the below code.
+            //         // Check if the response is not ok (e.g., status code 400, 409, etc.)
+            //         if (!response.ok) {
+            //             // Convert the response to JSON and then throw an error with the backend's message
+            //             return response.json().then(data => {
+            //                 throw new Error(data.message);
+            //             });
+            //         }
+            //         return response.json();
+            //     })
+            //     .then(data => {
+            //         if (data.success) {
+            //             // Redirect to the specified URL
+            //             alert(data.message);
+            //             // window.location.href = data.redirectUrl || '/users/login';
+            //         }
+            //     })
+            //     .catch(error => {
+            //         // This will now catch errors with specific messages from the backend
+            //         console.error('Error:', error);
+            //         alert(error.message);
+            //     });
+
+            fetchClaimedRequests();
         });
 
-        $(document).ready(function() {
+        function fetchClaimedRequests() {
+
+            let category = document.getElementById('category').value;
+            let storage = document.getElementById('storage').value;
+            let url;
+            if (category && storage) {
+                url = "/item-listing/?category=" + category + "&storage=" + storage;
+            } else {
+                url = "/item-listing/";
+            }
+            console.log(url);
             
-            function fetchClaimedRequests() {
         $.ajax({
             type: "GET",
-            url: "/item-listing",
+            url: url,
+            // data: $(this).serialize(), // Serialize form data
             success: function(response) {
                 var divParent = $('#listings-div');
                 divParent.empty(); // Clear existing content in the parent div
@@ -256,6 +269,9 @@
                 });
             }
 
+
+        $(document).ready(function() {
+            
             fetchClaimedRequests();
 
         });

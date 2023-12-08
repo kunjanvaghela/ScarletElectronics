@@ -8,9 +8,34 @@ const ItemListing = db.ItemListing;
 const UserUtil = require('../util/userUtil');
 const { Sequelize } = require('sequelize');
 const GoogleDriveUtil = require('../util/googleDriveUtil');
+const e = require("express");
 
 const getItemListings = async (req, res) => {
   console.log('in item_listing_routes.js route :/ ');
+  console.log("BODY " , req.query);
+  let listings;
+
+  if (Object.keys(req.query).length === 0 && req.query.constructor === Object) {
+    listings = await ItemListing.findAll({
+        where: {
+            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+        },
+        include: [Catalog],
+    });
+  } else {
+    listings = await ItemListing.findAll({
+        where: {
+            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+        },
+        include: [{
+          model: Catalog,
+          where: {
+            category: req.query.category,
+            storage: req.query.storage
+          }
+        }],
+    });
+  }
 
   // Check if the user is authenticated
   // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
@@ -30,12 +55,12 @@ const getItemListings = async (req, res) => {
     // const userDetails = await UserUtil.check_email(payload.emailId);
     // const username = userDetails.name;
 
-    const listings = await ItemListing.findAll({
-        where: {
-            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
-        },
-        include: [Catalog],
-    });
+    // const listings = await ItemListing.findAll({
+    //     where: {
+    //         price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+    //     },
+    //     include: [Catalog],
+    // });
 
     const serializedListings = await Promise.all(listings.map(async (listing) => {
         let imageFiles = [{"id" : "NoImage"}];
@@ -66,6 +91,13 @@ const getItemListings = async (req, res) => {
     }));
 
     console.log("serializedListings : " + serializedListings)
+    // return {
+		// 	success: true,
+		// 	message: "Item Listings retrieved.",
+    //   serializedListings: serializedListings,
+    //   redirectUrl: "/item-listing/listings"
+    // };
+
     return res.status(200).json({
 			success: true,
 			message: "Item Listings retrieved.",
@@ -302,7 +334,10 @@ router.get("/getUniqueValues", async (req, res) => {
     const getDistinctValues = async (column) => {
       const distinctValues = await db.Catalog.findAll({
         attributes: [[Sequelize.fn('DISTINCT', Sequelize.col(column)), column]],
-        where: { approval_Status },
+        where: {
+          approval_Status,
+          [column]: { [Sequelize.Op.ne]: null }
+        },
         order: [[column, 'ASC']]
       });
       return distinctValues.map(item => item[column]);
@@ -335,11 +370,16 @@ router.get("/getUniqueValues", async (req, res) => {
 
 router.post("/apply-filter", async (req, res) => {
   console.log("apply-filter-req ", req.body);
-  //apply the filters.
-  res.send(200).json({
-    success: true,
-    message: req.body
-  });
+
+  b = await getItemListings();
+  console.log(b);
+  return res.status(200).send(b);
+
+  // //apply the filters.
+  // res.status(200).json({
+  //   success: true,
+  //   message: req.body
+  // });
 
 });
 

@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
         EndUser.belongsTo(models.User, {
             foreignKey: 'userId'
         });
+        EndUser.hasMany(models.EndUserRequest, {
+            foreignKey: 'userId'
+        });
         
     };
 
