@@ -32,6 +32,16 @@ module.exports = (sequelize, DataTypes) => {
                 {
                     type: DataTypes.STRING(50),
                     allowNull: true
+                },
+            shipmentId:
+                {
+                    type: DataTypes.STRING(50),
+                    allowNull: false,
+                },
+            trackingId:
+                {
+                    type: DataTypes.STRING(50),
+                    allowNull: false,
                 }
         },
         {
