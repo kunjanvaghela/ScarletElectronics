@@ -72,7 +72,7 @@ const postinsert = async (req, res) => {
         catalogData.created_by = userid;
         const catalog = await Catalog.create(catalogData);
         // Handle the response after success
-        res.redirect('/item-listing');  // Redirect to the item listing or any other page
+        res.redirect('/item-listing/listings');  // Redirect to the item listing or any other page
     } catch (error) {
         // Handle the error response
         console.error('Error occurred:', error);

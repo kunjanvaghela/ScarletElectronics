@@ -343,6 +343,7 @@ const postModifyUser = async (req, res) => {
     }
 };
 
+//User support
 const getsupport = async (req, res) => {
 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
         // If not authenticated, send a 401 Unauthorized response
@@ -454,6 +455,7 @@ const postSupportnewrequest = async (req, res) => {
 
     userData.userId = user.userid;
 	userData.current_status = 'A'
+    userData.updated_on = new Date();
     console.log("User Inserted, now have to insert staffUser");
     //console.log(userData);
     const created = await EndUserRequest.create(userData);
