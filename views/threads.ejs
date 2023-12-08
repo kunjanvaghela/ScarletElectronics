@@ -46,6 +46,11 @@
     <div align="center">
         <br>
         <h2 class="text-primary text-left mx-auto">Thread Messages</h2>
+
+        <div id="messageDetails" class="message-details">
+            <!-- Request ID, User ID, etc., will be appended here -->
+        </div>
+
         <div id="messagesContainer" class="messages-container">
             <!-- Dynamic message divs will be appended here -->
         </div>
@@ -73,16 +78,26 @@
                 data: { reqId: receivedReqId },
                 success: function(response) {
                     var messagesContainer = $('#messagesContainer');
+                    var messageDetails = $('#messageDetails');
+
                     messagesContainer.empty();
+                    messageDetails.empty();
+                    if(response.serializedMessages && response.serializedMessages.length > 0) {
+                        var firstMessage = response.serializedMessages[0];
+                        var detailsDiv = '<div>Request ID: ' + firstMessage.requestId + '&nbsp' +
+                                         'User ID: ' + firstMessage.userId + '&nbsp' +
+                                         'Customer Rep: ' + firstMessage.customerRep + '&nbsp' +
+                                         'Listing ID: ' + firstMessage.listingId + '</div>';
+                        messageDetails.append(detailsDiv);
+                    }
+
                     response.serializedMessages.forEach(function(message) {
                         var messageDiv = '<div class="message">' +
-                            '<div>Request ID: ' + message.requestId + '</div>' +
-                            '<div>User ID: ' + message.userId + '</div>' +
-                            '<div>Customer Rep: ' + message.customerRep + '</div>' +
-                            '<div>Listing ID: ' + message.listingId + '</div>' +
+                            
+                            
                             '<div>Description: ' + message.updateDescription + '</div>' +
                             '<div>Created On: ' + message.createdOn + '</div>' +
-                            '<div>Updated By: ' + message.createdBy + '</div>' +
+                            
                             '</div>';
                         messagesContainer.append(messageDiv);
                     });

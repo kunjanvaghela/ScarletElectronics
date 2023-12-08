@@ -17,7 +17,8 @@
         <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
         <br>
     </div>
-
+    
+    <div class="container">
     <div align="center" id="claimedRequestsTableDiv">
         <br>
         <h2 class="text-primary text-left mx-auto">Requests Claimed by Me</h2>
@@ -25,11 +26,12 @@
             <thead>
                 <th width="5%">Request ID</th>
                 <th width="10%">User</th>
-                <th width="5%">Listing ID</th>
+                <th width="10%">Email</th>
+                <th width="5%">Reference Listing ID</th>
                 <th>Description</th>
                 <th width="10%">Created On</th>
                 <th width="2%">Status</th>
-                <th>CR</th>
+                
                 <th>Updated On</th>
             </thead>
             <tbody>
@@ -37,6 +39,7 @@
             </tbody>
         </table>
         <br>
+    </div>
     </div>
 
     <br>
@@ -52,7 +55,7 @@
 
 
      
-
+    <div class="container">
     <div align="center" id="allRequestsTableDiv" style="display: none;">
         <br>
         <h2 class="text-primary text-left mx-auto">View and Claim Requests</h2>
@@ -60,6 +63,7 @@
             <thead>
                 <th width="5%">Request ID</th>
                 <th width="10%">User</th>
+                <th width="10%">Email</th>
                 <th width="5%">Listing ID</th>
                 <th>Description</th>
                 <th width="10%">Created On</th>
@@ -73,6 +77,7 @@
             </tbody>
         </table>
         <br>
+    </div>
     </div>
 
     <script>
@@ -88,18 +93,19 @@
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
                             var dropdown = '<select class="status-dropdown" data-reqid="'+ request.requestId +'">' +
-                                            '<option value="A" ' + (request.currentStatus === 'A' ? 'selected' : '') + '>A</option>' +
-                                            '<option value="I" ' + (request.currentStatus === 'I' ? 'selected' : '') + '>I</option>' +
-                                            '<option value="C" ' + (request.currentStatus === 'C' ? 'selected' : '') + '>C</option>' +
+                                            '<option value="A" ' + (request.currentStatus === 'A' ? 'selected' : '') + '>Active</option>' +
+                                            '<option value="I" ' + (request.currentStatus === 'I' ? 'selected' : '') + '>Inactive</option>' +
+                                            '<option value="C" ' + (request.currentStatus === 'C' ? 'selected' : '') + '>Completed</option>' +
                                            '</select>';
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
-                                        '<td>' + request.userId + '</td>' +
+                                        '<td>' + request.userName + '</td>' +
+                                        '<td>' + request.userEmail + '</td>' +
                                         '<td>' + request.listingId + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + dropdown + '</td>' +
-                                        '<td>' + request.customerRep + '</td>' +
+                                        
                                         '<td>' + request.updatedOn + '</td>' +
                                       '</tr>';
                             tableBody.append(row);
@@ -121,6 +127,7 @@
                         response.serializedRequests.forEach(function(request) {
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
+                                        '<td>' + request.userName + '</td>' +
                                         '<td>' + request.userEmail + '</td>' +
                                         '<td>' + request.listingId + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId="'+ request.requestId +'"">' + request.updateDescription + '</a></td>' +

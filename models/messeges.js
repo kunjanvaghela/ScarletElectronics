@@ -9,8 +9,13 @@ module.exports = (sequelize, DataTypes) => {
         requestId: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
-            
+            references: {
+                model: 'EndUserRequest', // This should match your Sequelize model name for end_user
+                key: 'requestId',
+            },
             onDelete: 'CASCADE'
+            
+            
         },
         userId: {
             type: DataTypes.INTEGER.UNSIGNED,
@@ -53,9 +58,13 @@ module.exports = (sequelize, DataTypes) => {
       // Define associations if needed
       Messages.associate = (models) => {
         Messages.belongsTo(models.User, { foreignKey: 'userId', onDelete: 'CASCADE' });
-        Messages.belongsTo(models.EndUserRequest, { foreignKey: 'requestId', onDelete: 'CASCADE' });
+        Messages.belongsTo(models.EndUserRequest, { foreignKey: 'requestId', onDelete: 'CASCADE'  });
+        
         //EndUserRequest.belongsTo(models.Staff, { foreignKey: 'customer_rep', onDelete: 'CASCADE' });
     };
+
+
+    
 
     return Messages;
         

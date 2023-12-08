@@ -57,11 +57,15 @@ const postClaimedrequests = async (req, res) => {
   EndUserRequest.findAll({
       where: {
           customer_rep: custRepId
-      }
+          
+      },
+      include: [User],
     }).then((requests) => {
       const serializedRequests = requests.map((request) => {
         return {
           requestId: request.requestId,
+          userName: request.User.name,
+          userEmail: request.User.emailId,
           userId: request.userId,
           listingId: request.listingId,
           updateDescription: request.update_description,
@@ -120,6 +124,7 @@ const getshowallrequest = async (req, res) => {
       return {
         requestId: request.requestId,
         userId: request.userId,
+        userName: request.User.name,
         userEmail: request.User.emailId,
         listingId: request.listingId,
         updateDescription: request.update_description,
@@ -176,9 +181,13 @@ const postClaimrequest = async (req, res) => {
     // userDetails = await UserUtil.check_email(req.cookies.emailId);
     // //console.log(userDetails.userid);
     // const username = userDetails.name;
+    Messages.update({customer_rep : userDetails.userid},{where: {requestId: receivedRequestId}});
 
-    EndUserRequest.findOne({where: {requestId: receivedRequestId}}).then((table) => {
-      table.customer_rep = userDetails.userid
+    EndUserRequest.findOne({where: {requestId: receivedRequestId},
+      
+      
+    }).then((table) => {
+      table.customer_rep = userDetails.userid;
       
       return table.save();
     }).then(() => {

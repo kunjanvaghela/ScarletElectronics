@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       // Define associations if needed
       EndUserRequest.associate = (models) => {
         EndUserRequest.belongsTo(models.User, { foreignKey: 'userId', onDelete: 'CASCADE' });
+        
         // EndUserRequest.belongsTo(models.ItemListing, { foreignKey: 'listingId', onDelete: 'CASCADE' });
         //EndUserRequest.belongsTo(models.Staff, { foreignKey: 'customer_rep', onDelete: 'CASCADE' });
     };
