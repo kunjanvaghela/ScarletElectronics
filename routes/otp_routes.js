@@ -6,8 +6,9 @@ const { where } = require('sequelize');
 const User = db.User;
 const OTP = db.OTP;
 
-router.post('/', async (req, res)=>{
-    
+
+const opt_mail = async (req, res)=>{
+    console.log(req.body);
     try{
         const { emailId } = req.body;
         const user_email = await  User.findOne({where: {emailId: emailId}});
@@ -21,27 +22,50 @@ router.post('/', async (req, res)=>{
             res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.header('Pragma', 'no-cache');
             res.header('Expires', 0);
-            res.status(200).render('otp_validation', {emailId});
+            const content  = {
+                success : true,
+                status : 200,
+                body: {emailId : user_email.encrypted_emailId},
+                redirectUrl : "/users/recover-password?emailId=" + user_email.encrypted_emailId
+            };
+            //res.status(200).render('otp_validation', {emailId});
+            res.status(200).json(content);
             return;
         }
         else
-        {   
-
-            res.status(400).render('forgot-password', {message : "User not found. Please sign up first!!"});
+        {
+            const content  = {
+                success : false,
+                status : 400,
+                message : "User not found. Please sign up first!!"
+            };   
+            //res.status(400).render('forgot-password', );
+            res.status(400).json(content);
         }
         
     }
     catch(err)
     {
         console.log("Error Caught" + err);
-        res.status(400).redirect('/users/login');
+        const content  = {
+            success : false,
+            status : 400,
+            message : "Unexpected Error"
+        };   
+        //res.status(400).render('forgot-password', );
+        //res.status(400).redirect('/users/login');
+
+        res.status(400).json(content);
     }
-});
+}
 
-
-router.get('/', async (req, res)=>{
+const get_opt_page = async (req, res)=>{
     console.log("Get/ Reset-Password");
     res.send(req.body);
-});
+}
+router.post('/', opt_mail);
+
+
+router.get('/', get_opt_page);
 
 module.exports = router;

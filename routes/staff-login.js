@@ -86,6 +86,7 @@ const poststafflogin = async (req, res) => {
     // Send a JSON response indicating success and possibly a redirect URL.
     return res.status(200).json({
       success: true,
+      body: user,
       message: "Welcome " + user.name + ", Login successful",
     });
 

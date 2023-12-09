@@ -7,6 +7,7 @@
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
     
 <body align="center">
@@ -175,12 +176,14 @@
                         dynamicTable.style.display = 'none';
                         btn.style.display = 'none';
                         var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
-                        hiddenElement.innerHTML = dynamicContent;
-                        hiddenElement.style.color = "red";
-                        hiddenElement.style.fontSize = "20px";
-                        hiddenElement.style.display = "flex";
-                        hiddenElement.style.alignItems = "center";
-                        hiddenElement.style.justifyContent = "center";
+                        // hiddenElement.innerHTML = dynamicContent;
+                        // hiddenElement.style.color = "red";
+                        // hiddenElement.style.fontSize = "20px";
+                        // hiddenElement.style.display = "flex";
+                        // hiddenElement.style.alignItems = "center";
+                        // hiddenElement.style.justifyContent = "center";
+                        alert(dynamicContent);
+                        window.location.href = "/item-listing";
                         // window.alert(dynamicContent);
                     }
 
@@ -245,12 +248,14 @@
             btn.innerHTML = '';
             var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
             
-            hiddenElement.innerHTML = dynamicContent;
-            hiddenElement.style.color = "red";
-            hiddenElement.style.fontSize = "20px";
-            hiddenElement.style.display = "flex";
-            hiddenElement.style.alignItems = "center";
-            hiddenElement.style.justifyContent = "center";
+            // hiddenElement.innerHTML = dynamicContent;
+            // hiddenElement.style.color = "red";
+            // hiddenElement.style.fontSize = "20px";
+            // hiddenElement.style.display = "flex";
+            // hiddenElement.style.alignItems = "center";
+            // hiddenElement.style.justifyContent = "center";
+            alert(dynamicContent);
+            window.location.href = "/item-listing";
 
             //send ajax post request to flush
             var xhttp = new XMLHttpRequest();
@@ -270,6 +275,8 @@
             
             xhttp.onreadystatechange = function () {
                 var hiddenElement = document.getElementById("hiddenElement");
+                var response = this.responseText;
+                console.log(response);
                 
                 if (xhttp.readyState == 4) {
                 // Check if the request was successful (status code 200)
@@ -279,11 +286,13 @@
                         var dynamicContent = "PROMOCODE found, Hurray!!!!";
                         hiddenElement.innerHTML = dynamicContent;
                         hiddenElement.style.display = "block";
+                        alert(response);
                     } else {
                         // Handle the error or non-200 status code here
                         var dynamicContent = "PROMOCODE not found, Sorry!!!";
                         hiddenElement.innerHTML = dynamicContent;
                         hiddenElement.style.display = "block";
+                        alert(response);
                     }
                 }
             };
@@ -379,12 +388,14 @@
                 dynamicTable.style.display = 'none';
                 btn.style.display = 'none';
                 var dynamicContent = "Empty Cart! Please make sure to add items to proceed further!!!";
-                hiddenElement.innerHTML = dynamicContent;
-                hiddenElement.style.color = "red";
-                hiddenElement.style.fontSize = "20px";
-                hiddenElement.style.display = "flex";
-                hiddenElement.style.alignItems = "center";
-                hiddenElement.style.justifyContent = "center";
+                // hiddenElement.innerHTML = dynamicContent;
+                // hiddenElement.style.color = "red";
+                // hiddenElement.style.fontSize = "20px";
+                // hiddenElement.style.display = "flex";
+                // hiddenElement.style.alignItems = "center";
+                // hiddenElement.style.justifyContent = "center";
+                alert(dynamicContent);
+                window.location.href = "/item-listing";
                 // window.alert(dynamicContent);
             }
             

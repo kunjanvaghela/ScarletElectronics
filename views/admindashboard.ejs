@@ -29,7 +29,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/admin_header.ejs') %>
     <div class="container" align="center">
         <h1 class="text-primary">Admin Dashboard</h1>
 
@@ -64,12 +64,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- ... Existing HTML code ... -->
-
-<!-- ... Existing HTML code ... -->
-
-<!-- ... Existing HTML code ... -->
 
     <script>
         // JavaScript function to handle the button click for creating a customer representative
@@ -133,7 +127,7 @@
                     success: function (response) {
                         //Callback function to refresh the table after successful deletion
                         fetchCustomerReps(function () {
-                            initializeDataTable();
+                            //initializeDataTable();
                             alert("Customer representative deleted successfully");
                         });
                         //fetchCustomerReps(initializeDataTable);

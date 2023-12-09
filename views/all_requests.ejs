@@ -6,18 +6,19 @@
     <title>Customer Representative Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
 </head>
 
 <body>
-    <%- include('Common/cr_header.ejs') %>
+    <%- include('Common/cr_header2.ejs') %>
 
     <div align="center">
         <br> <br>
         <h1 class="text-primary text-center mx-auto">Customer Representative Dashboard</h1>
         <br>
     </div>
-    
+
     <div class="container">
     <div align="center" id="claimedRequestsTableDiv">
         <br>
@@ -79,12 +80,39 @@
         <br>
     </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
+        
+        function initializeDataTable() {
+            //Destroy the existing DataTable instance, if any
+            if ($.fn.DataTable.isDataTable('#claimedRequestsTable')) {
+                $('#claimedRequestsTable').DataTable().destroy();
+            }
 
-        $(document).ready(function() {
-            
-            function fetchClaimedRequests() {
+            //Initialize DataTable with searching option
+            $('#claimedRequestsTable').DataTable({
+                paging: true,
+                searching: true,
+            });
+        }
+
+        function initializeAllRequestTable() {
+            //Destroy the existing DataTable instance, if any
+            if ($.fn.DataTable.isDataTable('#allRequestsTable')) {
+                $('#allRequestsTable').DataTable().destroy();
+            }
+
+            //Initialize DataTable with searching option
+            $('#allRequestsTable').DataTable({
+                paging: true,
+                searching: true,
+            });
+        }
+        
+        function fetchClaimedRequests() {
                 $.ajax({
                     type: "POST",
                     url: "/customer_representative/get-claimed-requests",
@@ -92,6 +120,7 @@
                         var tableBody = $('#claimedRequestsTable tbody');
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
+                            var listingIdDisplay = request.listingId ? request.listingId : "N/A";
                             var dropdown = '<select class="status-dropdown" data-reqid="'+ request.requestId +'">' +
                                             '<option value="A" ' + (request.currentStatus === 'A' ? 'selected' : '') + '>Active</option>' +
                                             '<option value="I" ' + (request.currentStatus === 'I' ? 'selected' : '') + '>Inactive</option>' +
@@ -101,7 +130,7 @@
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userName + '</td>' +
                                         '<td>' + request.userEmail + '</td>' +
-                                        '<td>' + request.listingId + '</td>' +
+                                        '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + dropdown + '</td>' +
@@ -109,7 +138,10 @@
                                         '<td>' + request.updatedOn + '</td>' +
                                       '</tr>';
                             tableBody.append(row);
+                            
                         });
+                        
+                                           
                     },
                     error: function(error) {
                         console.error('Error fetching claimed requests:', error);
@@ -125,15 +157,17 @@
                         var tableBody = $('#allRequestsTable tbody');
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
+                            var listingIdDisplay = request.listingId ? request.listingId : "N/A";
+                            var customerRepDisplay = request.customerRep ? request.customerRep : "Unclaimed";
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userName + '</td>' +
                                         '<td>' + request.userEmail + '</td>' +
-                                        '<td>' + request.listingId + '</td>' +
+                                        '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId="'+ request.requestId +'"">' + request.updateDescription + '</a></td>' +
                                         '<td>' + request.createdOn + '</td>' +
                                         '<td>' + request.currentStatus + '</td>' +
-                                        '<td>' + request.customerRep + '</td>' +
+                                        '<td>' + customerRepDisplay + '</td>' +
                                         '<td>' + request.updatedOn + '</td>' +
                                         '<td><button class="claim-button" data-reqid="'+ request.requestId +'">Claim</button></td>' +
                                       '</tr>';
@@ -161,14 +195,6 @@
                     }
                 });
             }
-
-            // Event handler for status dropdown change
-            $('body').on('change', '.status-dropdown', function() {
-                var requestId = $(this).data('reqid');
-                var newStatus = $(this).val();
-                updateRequestStatus(requestId, newStatus);
-            });
-
             function updateRequestStatus(requestId, newStatus) {
                 $.ajax({
                     type: "POST",
@@ -185,20 +211,40 @@
                 });
             }
 
+        $(document).ready(function() {
+           
+
+
+
+            // Event handler for status dropdown change
+            $('body').on('change', '.status-dropdown', function() {
+                var requestId = $(this).data('reqid');
+                var newStatus = $(this).val();
+                updateRequestStatus(requestId, newStatus);
+            });
+
+           
+
             // Initial fetch for tables on page load
+            
             fetchClaimedRequests();
+            initializeDataTable();
             //fetchAllRequests();
 
 
-            $('#viewAllRequestsForm').on('click', 'button', function() {
+            $('#viewAllRequestsForm').on('click', 'button', function(e) {
+                e.preventDefault();
                 $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
                 fetchAllRequests(); // Fetch and populate all requests
+                initializeAllRequestTable();
             });
         
             // Event handler for claim buttons
-            $('body').on('click', '.claim-button', function() {
+            $('body').on('click', '.claim-button', function(e) {
+                e.preventDefault();
                 var requestId = $(this).data('reqid');
                 claimRequest(requestId); // Call the function to handle the claim
+                
             });
         
         });
