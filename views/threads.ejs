@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    <%- include('Common/cr_header.ejs') %>
+    <%- include('Common/cr_header2.ejs') %>
     <div align="center">
         <br>
         <h2 class="text-primary text-left mx-auto">Thread Messages</h2>
@@ -61,10 +61,12 @@
     <div align="center">
         
 
-        <form id="replyForm" >
-            <label for="inputField">Reply:</label>
-            <input type="text" id="inputField" name="inputField">
-            <button type="submit">Submit</button>
+        <form id="replyForm">
+            <div><label for="inputField">Reply:</label>
+            <textarea type="text" id="inputField" name="inputField"></textarea></div>
+            <div>
+                <button type="submit" style="margin-bottom: 8px;">Submit</button>
+            </div>
         </form>
 
     </div>

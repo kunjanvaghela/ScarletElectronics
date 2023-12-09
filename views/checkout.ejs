@@ -41,19 +41,19 @@
     <table class="table table-bordered" style="float: right; width: 50%;">
         <tr>
             <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost</td>
-            <td class="text-center" style="font-weight: bold;"><%- TotalPrice %></td>
+            <td class="text-center" style="font-weight: bold;" id="totalprice"></td>
         </tr>
         <tr>
-            <td colspan="3" class="text-center" style="font-weight: bold;">promo code</td>
-            <td class="text-center" style="font-weight: bold;"><%- Promocode %></td>
+            <td colspan="3" class="text-center" style="font-weight: bold;">Promo Code</td>
+            <td class="text-center" style="font-weight: bold;" id="promocode"></td>
         </tr>
         <tr>
             <td colspan="3" class="text-center" style="font-weight: bold;">Sales Tax</td>
-            <td class="text-center" style="font-weight: bold;"><%- Sales %></td>
+            <td class="text-center" style="font-weight: bold;" id="salestax"></td>
         </tr>
         <tr class="table-active">
-            <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost</td>
-            <td class="text-center" style="font-weight: bold;"><%- FinalPrice %></td>
+            <td colspan="3" class="text-center" style="font-weight: bold;">Final Cost</td>
+            <td class="text-center" style="font-weight: bold;" id="finalcost"></td>
         </tr>
         </tbody>
     </table>
@@ -74,59 +74,58 @@
         {
             window.history.back();
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const dynamicTable = document.getElementById('dynamicTable');
-            let rowCounter = 0;
-    
-            var cartDetails = <%- JSON.stringify(cartDetails) %>;
-            cart_row_reference = [];
-            for (const itemData of cartDetails) {
-                rowCounter++;
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <tr>
-                        <td class="w-25 text-center">
-                            <label for="item${rowCounter}">${itemData.name}</label>
-                        </td>
-                        <td class="w-25 text-center">
-                            <label for="item${rowCounter}">${itemData.quantity}</label>
-                        </td>
-                        <td class="w-25 text-center">
-                            <label for="item${rowCounter}">${itemData.price}</label>
-                        </td>
-                        <td class="w-25 text-center">
-                            <label for="item${rowCounter}">${itemData.totalPrice}</label>
-                        </td>
-                    <tr>
-                `;
-                dynamicTable.appendChild(newRow);
-            }
-    
-            // const checkoutButton = document.getElementById('checkout');
-            // checkoutButton.addEventListener('click', function () {
 
+        document.addEventListener('DOMContentLoaded', function() {
+            event.preventDefault();
+			fetch('/cart/fetch-cart')
+			.then(response => response.json())
+			.then(data => {
+				if (data) {
+					// console.log(".....",data);
+                    cartDetails = data['cartDetails'];
+                    TotalPrice = data['TotalPrice'];
+                    console.log(TotalPrice);
+                    Promocode = data['Promocode'];
+                    Sales = data['Sales'];
+                    FinalPrice = data['FinalPrice'];
+                    // console.log(typeof data['cartDetails']);
+                    const dynamicTable = document.getElementById('dynamicTable');
+                    const totalprice = document.getElementById('totalprice');
+                    const promocode = document.getElementById('promocode');
+                    const salestax = document.getElementById('salestax');
+                    const finalcost = document.getElementById('finalcost');
+                    let rowCounter = 0;
 
-            //     // get card details
-            //     const cardNumber = document.getElementById('cardNumber').value;
-            //     const cardName = document.getElementById('cardName').value;
-            //     const cardExpiry = document.getElementById('cardExpiry').value;
-            //     const cardCVV = document.getElementById('cardCVV').value;
+                    totalprice.textContent = TotalPrice;
+                    promocode.textContent = Promocode;
+                    salestax.textContent = Sales;
+                    finalcost.textContent = FinalPrice;
 
-            //     //AJAX call to send data to server
-            //     const xhr = new XMLHttpRequest();
-            //     xhr.open('POST', '/cart/checkout');
-            //     xhr.setRequestHeader('Content-Type', 'application/json');
-                
-
-            //     xhr.send(JSON.stringify({
-            //         cardNumber: cardNumber,
-            //         cardName: cardName,
-            //         cardExpiry: cardExpiry,
-            //         cardCVV: cardCVV,
-            //     }));
-            // });
-        });
+                    cart_row_reference = [];
+                    for (const itemData of cartDetails) {
+                        rowCounter++;
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                        <tr>
+                            <td class="w-25 text-center">
+                                <label for="item${rowCounter}">${itemData.name}</label>
+                            </td>
+                            <td class="w-25 text-center">
+                                <label for="item${rowCounter}">${itemData.quantity}</label>
+                            </td>
+                            <td class="w-25 text-center">
+                                <label for="item${rowCounter}">${itemData.price}</label>
+                            </td>
+                            <td class="w-25 text-center">
+                                <label for="item${rowCounter}">${itemData.totalPrice}</label>
+                            </td>
+                        <tr>
+                        `;
+                        dynamicTable.appendChild(newRow);
+                    }
+				}
+			})
+		});
     </script>
         
 </body>

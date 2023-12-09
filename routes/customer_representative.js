@@ -10,6 +10,44 @@ const User = db.User;
 
 const UserUtil = require('../util/userUtil');
 
+// router.get("/", async (req, res) => {
+// 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+// 		// If not authenticated, send a 401 Unauthorized response
+// 		return res.status(401).send('Authentication failed');
+// 	}
+// 	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+// 	console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+// 	console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+// 	if (payload.emailId) {
+// 		const emailId = payload.emailId;
+// 		const userDetails = await db.User.findOne({ where: { emailId } });
+// 		const userId = userDetails.dataValues.userid;
+// 		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+// 		const user = {
+// 			name: userDetails.name,
+// 			emailId: userDetails.emailId,
+// 		};
+
+// 		return res.status(200).json({
+// 			success: true,
+// 			status: 200,
+// 			body: user
+// 		});
+
+// 		// res.render("userProfile", { user: user });
+// 	} else {
+
+// 		return res.status(401).json({
+// 			success: false,
+// 			status: 401,
+// 			message: "Invalid cookie",
+// 			redirectUrl: "/users/login"
+// 		});
+
+// 		// res.redirect("login");
+// 	}
+// });
+
 const getAllrequests = async (req, res) => {
   console.log("token ", req.cookies.accessToken);
   if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
@@ -28,7 +66,9 @@ const getAllrequests = async (req, res) => {
   // const username = userDetails.name;
   const custRepId = userDetails.userid;
   console.log("Username is " + username);
+  
   res.render('all_requests', {username});
+  
 };
 
 const postClaimedrequests = async (req, res) => {
@@ -516,6 +556,45 @@ const postmodifyreplisting = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+router.get("/header", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+	console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+	console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+	if (payload.emailId) {
+		const emailId = payload.emailId;
+		const userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+		
+		const user = {
+			name: userDetails.name,
+			emailId: userDetails.emailId,
+
+		};
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			body: user
+		});
+
+		// res.render("userProfile", { user: user });
+	} else {
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
+	}
+});
 
 router.get("/", getAllrequests);
 router.post("/get-claimed-requests", postClaimedrequests);

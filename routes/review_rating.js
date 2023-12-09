@@ -52,20 +52,33 @@ const getReview = async (req, res) => {
 	try {
 		if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
 			// If not authenticated, send a 401 Unauthorized response
-			return res.status(401).send("Authentication failed");
+			const content = {
+				success: false,
+				status : 401,
+				message:"Authentication failed"
+			  }
+			return res.status(401).send(content);
 		}
 		userDetails = await UserUtil.check_email(req.cookies.emailId);
 		const item_id = req.body.itemId; //item id of specific item coming from Request
 
 		const comments = await comment_fetcher(item_id, userDetails.userid);
 		console.log(comments);
-		res.status(200).render("getreview", {
-			comments: comments.comments,
-			ind_comment: comments.ind_comment,
-		});
+		const content = {
+			success : true,
+			status : 201,
+			body : {comments : comments.comments , ind_comment : comments.ind_comment}
+		  }
+	  
+		res.status(200).render("getreview", content);
 	} catch (err) {
 		console.log("Error caught in Get method of Review : " + err);
-		res.status(500).send("Internal Server Error!!");
+		const content = {
+			success: false,
+			status : 500,
+			message:"Internal Server Error!!"
+		  }
+		res.status(500).send(content);
 	}
 };
 
@@ -75,7 +88,12 @@ const addReview = async (req, res) => {
 	try {
 		if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
 			// If not authenticated, send a 401 Unauthorized response
-			return res.status(401).send("Authentication failed");
+			const content = {
+				success: false,
+				status : 401,
+				message:"Authentication failed"
+			  }
+			return res.status(401).send(content);
 		}
 		userDetails = await UserUtil.check_email(req.cookies.emailId);
 		const item_id = req.body.itemId; //item id of specific item coming from Request
@@ -100,13 +118,21 @@ const addReview = async (req, res) => {
 
 		//res.send("Data added Successfully in REVIEW");
 		const comments = await comment_fetcher(item_id, userDetails.userid);
-		res.status(201).render("getreview", {
-			comments: comments.comments,
-			ind_comment: comments.ind_comment,
-		});
+		const content = {
+			success : true,
+			status : 201,
+			body : {comments : comments.comments , ind_comment : comments.ind_comment}
+		  }
+	  
+		res.status(201).render("getreview", content);
 	} catch (err) {
 		console.log("Error caught in post method of Review : " + err);
-		res.status(500).send("Internal Server Error!!");
+		const content = {
+			success: false,
+			status : 500,
+			message:"Internal Server Error!!"
+		  }
+		res.status(500).send(content);
 	}
 };
 
@@ -115,7 +141,12 @@ const deleteReview = async (req, res) => {
 	try {
 		if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
 			// If not authenticated, send a 401 Unauthorized response
-			return res.status(401).send("Authentication failed");
+			const content = {
+				success: false,
+				status : 401,
+				message:"Authentication failed"
+			  }
+			return res.status(401).send(content);
 		}
 		userDetails = await UserUtil.check_email(req.cookies.emailId);
 		const review_id = req.params.reviewid; //item id of specific item coming from Request
@@ -136,12 +167,25 @@ const deleteReview = async (req, res) => {
 			res.status(204).send(); //.render("getreview", {comments : comments.comments , ind_comment : comments.ind_comment});
 			return;
 		}
-		res.status(404).send(
-			"No review found for this item for the given user"
-		);
+		else
+		{
+			const content = {
+				success: false,
+				status : 404,
+				message:"No reviews found"
+			  }
+			res.status(404).send(content);
+		}
+		
+		
 	} catch (err) {
 		console.log("Error caught in delete  method of Review : " + err);
-		res.status(500).send("Internal Server Error!!");
+		const content = {
+			success: false,
+			status : 500,
+			message:"Internal Server Error!!"
+		  }
+		res.status(500).send(content);
 	}
 };
 
