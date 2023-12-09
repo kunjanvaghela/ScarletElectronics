@@ -43,7 +43,7 @@ async function handleSubmit(e) {
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
-      return_url: "http://localhost:3000/item-listing",
+      return_url: "http://localhost:3000/item-listing/listings",
     },
     redirect: 'if_required',
   });
@@ -55,16 +55,34 @@ async function handleSubmit(e) {
       showMessage("An unexpected error occurred.");
     }
   }
-  else {
-    //Call API to flush cart and store order details. (Victor's/Kush's part).
-    console.log(paymentId); //This Id can be used by Victor for storing in payments table.
-    data = {"paymentID" : paymentId};
-    await fetch("/cart/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      // headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: JSON.stringify(data)
-    });
+  else 
+  {
+      //Call API to flush cart and store order details. (Victor's/Kush's part).
+      console.log(paymentId); //This Id can be used by Victor for storing in payments table.
+      await fetch("/cart/checkout", 
+      {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ "paymentID": paymentId })
+
+      }).then(response => 
+        {
+            return response.json().then(data => {
+                if (response.ok) {
+                    // If the response is successful, alert the message and then redirect
+                    alert(data.message);
+                    window.location.href = data.redirectUrl || '/cart/orderplace';
+                } else {
+                    // If the response is not successful, throw an error with the message from the server
+                    throw new Error(data.message);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('errorMsg').innerText = error.message || 'An unexpected error occurred.';
+        });
+  
   }
   setLoading(false);
   

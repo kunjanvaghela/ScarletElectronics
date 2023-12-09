@@ -98,7 +98,7 @@ button, .button {
   }
 }
 
-.container {
+.container2 {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
@@ -329,3 +329,19 @@ button, .button {
 .footer__disclaimer #rights {
   font-size: x-small;
 }/*# sourceMappingURL=style.css.map */
+
+.img_contain {
+  max-height:100%;
+  max-width:100%;
+  height:auto;
+  width:auto;
+  object-fit: contain;
+}
+.image-container {
+  height: 300px; /* Set the maximum height of the container */
+  width: 300px;  /* Set the maximum width of the container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;  /* Ensure the image doesn't overflow the container */
+}
