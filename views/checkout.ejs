@@ -14,49 +14,55 @@
 </head>
 
 <body align="center">
-    <div class="row" style="margin-top: 0.5%;margin-left: 0.1%;">
-        <div class="col-md-2 text-center mx-auto">
-            <button onclick="moveToCart()" class="btn btn-primary">Cart</button>
+    <%- include('Common/header2.ejs') %>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="text-center text-primary">Checkout Summary</h2>
+            </div>
         </div>
-        <div class="col-md-10 text-center mx-auto">
+    
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <thead class="table-primary">
+                        <tr>
+                            <th class="text-center">Item Name</th>
+                            <th class="text-center">Quantity (Qty)</th>
+                            <th class="text-center">Per Item Cost</th>
+                            <th class="text-center">Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dynamicTable">
+                        <!-- Table rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+        <div class="row mt-3">
+            <div class="col-md-6 offset-md-6">
+                <table class="table table-bordered">
+                    <tr>
+                        <td colspan="3" class="text-center font-weight-bold">Total Cost</td>
+                        <td class="text-center font-weight-bold" id="totalprice"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-center font-weight-bold">Promo Code</td>
+                        <td class="text-center font-weight-bold" id="promocode"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-center font-weight-bold">Sales Tax</td>
+                        <td class="text-center font-weight-bold" id="salestax"></td>
+                    </tr>
+                    <tr class="table-active">
+                        <td colspan="3" class="text-center font-weight-bold">Final Cost</td>
+                        <td class="text-center font-weight-bold" id="finalcost"></td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-    <br> <br>
-    <h1 class="text-primary text-center mx-auto">CheckOut Items</h1>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr class="table-primary">
-                <th class="text-center">Item Name</th>
-                <th class="text-center">Quantity (qty)</th>
-                <th class="text-center">Per Item cost</th>
-                <th class="text-center">Total Cost</th>
-            </tr>
-        </thead>
-        <tbody id="dynamicTable">
-            <!-- Table rows will be added here -->
-        </tbody>
-    </table>
-    <!-- align table left -->
-    <table class="table table-bordered" style="float: right; width: 50%;">
-        <tr>
-            <td colspan="3" class="text-center" style="font-weight: bold;">Total Cost</td>
-            <td class="text-center" style="font-weight: bold;" id="totalprice"></td>
-        </tr>
-        <tr>
-            <td colspan="3" class="text-center" style="font-weight: bold;">Promo Code</td>
-            <td class="text-center" style="font-weight: bold;" id="promocode"></td>
-        </tr>
-        <tr>
-            <td colspan="3" class="text-center" style="font-weight: bold;">Sales Tax</td>
-            <td class="text-center" style="font-weight: bold;" id="salestax"></td>
-        </tr>
-        <tr class="table-active">
-            <td colspan="3" class="text-center" style="font-weight: bold;">Final Cost</td>
-            <td class="text-center" style="font-weight: bold;" id="finalcost"></td>
-        </tr>
-        </tbody>
-    </table>
     
     <form id="payment-form" class="col-md-3 text-center mx-auto">
         <div id="payment-element">
@@ -96,10 +102,10 @@
                     const finalcost = document.getElementById('finalcost');
                     let rowCounter = 0;
 
-                    totalprice.textContent = TotalPrice;
-                    promocode.textContent = Promocode;
-                    salestax.textContent = Sales;
-                    finalcost.textContent = FinalPrice;
+                    totalprice.textContent = TotalPrice + ' $';
+                    promocode.textContent = Promocode+ ' $';
+                    salestax.textContent = Sales+ ' $';
+                    finalcost.textContent = FinalPrice+ ' $';
 
                     cart_row_reference = [];
                     for (const itemData of cartDetails) {
@@ -114,10 +120,10 @@
                                 <label for="item${rowCounter}">${itemData.quantity}</label>
                             </td>
                             <td class="w-25 text-center">
-                                <label for="item${rowCounter}">${itemData.price}</label>
+                                <label for="item${rowCounter}">${itemData.price} $</label>
                             </td>
                             <td class="w-25 text-center">
-                                <label for="item${rowCounter}">${itemData.totalPrice}</label>
+                                <label for="item${rowCounter}">${itemData.totalPrice} $</label>
                             </td>
                         <tr>
                         `;

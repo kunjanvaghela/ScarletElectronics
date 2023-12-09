@@ -32,8 +32,8 @@ module.exports = (sequelize, DataTypes) => {
         EndUser.hasMany(models.EndUserRequest, {
             foreignKey: 'userId'
         });
-        
-    };
+        
+    };
 
     return EndUser;
 }

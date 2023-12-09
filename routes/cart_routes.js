@@ -14,6 +14,7 @@ Calculate Final Cost	        cart/get-final-cost	            GET	token, promoCod
 Checkout	                    cart/checkout	                POST	token, selectedAddress, promoCode
 */
 
+const { Sequelize } = require('sequelize');
 const express = require("express");
 const EasyPostClient = require('@easypost/api');
 const sendOTP  = require("../services/controller");
@@ -37,7 +38,7 @@ const Promocode = db.Promocode;
 
 router.use(express.urlencoded({ extended: true }));
 
-async function get_cart(userId)
+async function get_cart(userId,filter=true)
 {
     let cartDetails = [];
     let listingIds = [];
@@ -97,6 +98,19 @@ async function get_cart(userId)
         }
     }
 
+    if(filter)
+    {
+        //remove listingId from cartDetails if max_quantity is 0
+        for (var i = 0; i < cartDetails.length; i++) 
+        {
+            if(cartDetails[i].max_quantity == 0)
+            {
+                cartDetails.splice(i, 1);
+            }
+        }
+
+    }
+
     return cartDetails;
 }
 
@@ -104,20 +118,15 @@ router.post('/add-itemlisting', async (req, res)=>
 {
     console.log("add-itemlisting inside ------------------------")
 
-    //get authentication status and user id
-    // const [authentication, userid] = await authent(req,res);
-    if (!userUtil.authenticateToken(req.cookies.accessToken)) {
-        // If not authenticated, send a 401 Unauthorized response
-        return res.status(401).send('Authentication failed');
-      }
-    const userDetails = await userUtil.check_email(req.cookies.emailId);
 
-    if(!userDetails.userid)
+    //get authentication status and user id
+    const [authentication, userId] = await authent(req,res);
+
+    if(!authentication)
     {
         return;
     }
-
-    const userId = userDetails.userid;
+    
 
     //parse listingId from request
     //parse query parameters
@@ -200,6 +209,8 @@ router.post('/update-itemlisting', async (req, res)=>
         return;
     }
 
+
+    
     //check if listingId exists in db
     const listingIdExists = await ItemListing.findOne({where:{listingId:listingId}});
 
@@ -290,31 +301,14 @@ router.get('/fetch-cart-display', async (req, res)=>
 {
     //get authentication status and user id
     const [authentication, userId] = await authent(req,res);
-    
+
     if(!authentication)
     {
         return;
     }
-    
-    console.log("fetch-cart dis getinside ------------------------")
-
-
-    //get cart details
-    const cartDetails = await get_cart(userId);
-    if (!userUtil.authenticateToken(req.cookies.accessToken)) {
-        // If not authenticated, send a 401 Unauthorized response
-        return res.status(401).send('Authentication failed');
-      }
-    userDetails = await userUtil.check_email(req.cookies.emailId);
-    const username = userDetails.name;
-
-    console.log("cartDetails: ", cartDetails);
-    // res.status(200).json({"cartDetails" : cartDetails});
 
     //return cart details
     res.render('cart');
-    // res.status(200).send(cartDetails);
-
 });
 
 router.post('/fetch-cart-display', async (req, res)=>
@@ -338,8 +332,10 @@ router.get('/fetch-cart', async (req, res)=>
         return;
     }
 
+    
+
     //get cart details
-    const cartDetails = await get_cart(userId);
+    const cartDetails = await get_cart(userId,false);
     
     console.log("cartDetails: ", cartDetails);
     
@@ -370,13 +366,7 @@ router.get('/fetch-cart', async (req, res)=>
         //check if the quantity of listingId is greater than updateCount
 
         const listingIdQuantity = await ItemListing.findOne({where:{listingId:listingId}});
-        if(listingIdQuantity.dataValues.quantity < cartDetails[i].quantity)
-        {
-            //return 400 error - quantity of listingId is less than updateCount
-            res.status(400).send("quantity of listingId is less than updateCount");
-            console.log("quantity of listingId is less than updateCount");
-            return;
-        }
+        
 
         //calculate total price of each listing
         cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
@@ -426,7 +416,7 @@ router.get('/fetch-cart', async (req, res)=>
     total_price = total_price.toString();
     promocode_discount_string = promocode_discount.toString();
 
-
+    console.log("debug");
 
     //return cart details
     res.status(200).json({
@@ -477,7 +467,7 @@ router.get('/display-shipping-charges', async (req, res)=>
     console.log("display-shipping-charges inside ------------------------")
 });
 
-router.post('/check-promo-code', async (req, res)=>
+router.post('/check-promo-code', async (req, res)=> 
 {
     console.log("check-promo-code inside ------------------------")
 
@@ -536,9 +526,11 @@ router.post('/check-promo-code', async (req, res)=>
 
     console.log("promoCode: ", promoCode1);
 
-    //check if promoCode exists in db
-    var promocode_discount;
-    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode1}});
+        //check if promoCode exists in db
+        const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+        console.log("promoCodeData: ", promoCodeData);
+
+
 
     if(!promoCodeData || promoCodeData.dataValues.is_active == false)
     {
@@ -585,11 +577,7 @@ router.get('/get-final-cost', async (req, res)=>
     }
    
     
-    if(!userId)
-    {
-        return;
-    }
-
+    
     res.render('checkout');
 //    res.render()
 
@@ -643,8 +631,11 @@ router.post('/checkout', async (req, res)=>
     const promoCode = req.body.promoCode;
 
 
-    //clear cart
-    const deleteCartDetails = await Cart.destroy({where:{userId:userId}});
+    //clear cart where quantity in not zero for a particular userId
+    const deleteCartDetails = await Cart.destroy({where:{userId:userId, quantity:{[Sequelize.Op.ne]:0}}});
+
+
+    console.log("deletecartDetails: ", deleteCartDetails);
 
 
     //update qunaity of each listing in db
@@ -656,7 +647,6 @@ router.post('/checkout', async (req, res)=>
         const updateListingId = await ItemListing.decrement({quantity:quantity},{where:{listingId:listingId}});
     }
 
-    // Victor's Code
 
     const paymentId = req.body["paymentID"];
     const purchase = await db.Purchase.create({paymentId: paymentId, total_price: total_price, userId: userid});
