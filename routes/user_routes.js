@@ -660,4 +660,22 @@ router.get("/modify-user", modifyUser);
 router.post("/modify-user", postModifyUser);
 router.get("/logout", logoutUser);
 
+router.get("/get-purchase-history", async (req, res) => {
+	if (req.cookies.emailId) {
+		const emailId = req.cookies.emailId;
+		var userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+
+		var [orderDetails, metadata] = await db.sequelize.query("Select `ref_catalog`.`name`, `purchase`.`purchase_date`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item` from `order_detail` " +
+																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
+																				"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
+																				"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
+																				"where `purchase`.`userId` = " + userId + ";");
+		res.render("purchase_history", { user: userDetails, order: orderDetails });
+	} else {
+		res.redirect("login");
+	}
+});
+
+
 module.exports = router;

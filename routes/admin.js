@@ -13,6 +13,8 @@ const { encrypt, decrypt } = require("../util/encryptionUtil");
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const axios = require("axios"); // Required for reCAPTCHA verification
+const { Sequelize, Op } = require('sequelize');
+
 
 let refreshTokens = []
 
@@ -107,8 +109,10 @@ const postinsertCustomerrep =  async (req, res) => {
     console.log(userData);
 
     try {
+        userData.status = 'A';
         await User.create(userData).then((user) => {
             userData.userId = user.userid;
+            
             console.log("User Inserted, now have to insert staffUser");
             console.log(userData);
             Staff.create(userData);
@@ -231,6 +235,124 @@ const postAdminlogin = async (req, res) => {
         });
         }
     };
+
+
+    const postAllCustomerReps = async (req, res) => {
+        console.log("token ", req.cookies.accessToken);
+    
+        // Check authentication
+        if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+            return res.status(401).send('Authentication failed');
+        }
+    
+        // Get user details from the token payload
+        const payload = await UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+        console.log("ACCESSING USERID FROM TOKEN PAYLOAD:", payload.userId);
+        console.log("ACCESSING emailId FROM TOKEN PAYLOAD:", payload.emailId);
+        const userDetails = await UserUtil.check_email(payload.emailId);
+    
+        // Get user details from the token payload
+        const username = userDetails.name;
+        const custRepId = userDetails.userid;
+        console.log("Username is " + username);
+    
+        // Fetch all customer representatives who are staff members excluding 'admin'
+        User.findAll({
+            where:{status: 'A'},
+            include: [{
+                model: Staff,
+                attributes: ['userId', 'designation', 'ssn'],
+                where: {
+                    designation: {
+                        [Sequelize.Op.ne]: 'admin',
+                        
+                    }
+                    
+                },
+                required: true, // This ensures we only get staff members
+                foreignKey: 'userId' // Specify the association key
+            }],
+            attributes: ['userid', 'name', 'emailId', 'created_on'], // Use 'userid' for the User model
+            raw: true // Ensure the result is a plain JSON object
+        }).then((reps) => {
+            const serializedReps = reps.map((rep) => {
+                return {
+                    userId: rep.userid,
+                    name: rep.name,
+                    emailId: rep.emailId,
+                    created_on: rep.created_on,
+                    designation: rep['Staff.designation'],
+                    ssn: rep['Staff.ssn']
+                };
+            });
+    
+            // Send the serialized data as a response
+            return res.status(200).json({
+                success: true,
+                message: "Customer Representatives fetched from database",
+                serializedReps: serializedReps
+            });
+        }).catch((error) => {
+            console.error('Error retrieving data:', error);
+            res.status(500).send('Internal server error');
+        });
+    };
+
+// ... Existing imports ...
+
+// Your existing routes...
+
+// New route to handle deletion of a customer representative
+const postdeleteRep =  async (req, res) => {
+    // Check authentication
+    if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+        return res.status(401).json({ success: false, message: 'Authentication failed' });
+    }
+
+    // Get the userId to delete from the request body
+    const { userId } = req.body;
+
+    try {
+        // Find the user with the given userId
+        const user = await User.findByPk(userId, {
+            include: [{
+                model: Staff,
+                attributes: ['userId'],
+                where: { userId: userId },
+                required: true,
+                foreignKey: 'userId'
+            }]
+        });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Customer representative not found' });
+        }
+
+        // Check if the user has the designation "admin"
+        if (user.Staff.designation === 'admin') {
+            return res.status(401).json({ success: false, message: 'You are not authorized to delete an admin' });
+        }
+
+        // Delete the user
+        //await user.destroy();
+        User.update({status: 'I'},{where: {userid: userId}});
+
+        // Send a success response
+        return res.status(200).json({ success: true, message: 'Customer representative deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting customer representative:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// ... Other existing routes ...
+
+// Export the router
+module.exports = router;
+
+    
+    
   
   
 
@@ -239,6 +361,8 @@ router.get("/customer-rep", getCustomerrep);
 router.post('/insert-customer-rep', postinsertCustomerrep);
 router.get("/login", getAdminlogin);
 router.post("/login", postAdminlogin);
+router.post("/show-all-customer-reps", postAllCustomerReps);
+router.post("/delete-customer-rep", postdeleteRep)
 
 
 
