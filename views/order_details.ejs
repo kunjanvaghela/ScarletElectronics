@@ -36,9 +36,11 @@
         <li class="nav-item">
             <form action="/users/return-order" name="returnForm" method="get">
                 <input type="hidden" name="orderId" value="<%= order.orderId %>">
-                <button type="button" class="btn btn-primary" onclick="returnOrder()">
-                    Return Order
-                </button>
+                <% if (order.order_status === 'in transit') { %>
+                    <button type="button" class="btn btn-primary" onclick="returnOrder()">
+                        Return Order
+                    </button>
+                <% } %>
             </form>
         </li>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -56,11 +58,19 @@
             <th class="w-15 text-center">Purchase Date</th>
             <th class="w-15 text-center">Total Price</th>
             <th class="w-15 text-center">Payment ID</th>
-            <th class="w-15 text-center">Shipment ID</th>
-            <th class="w-15 text-center">Tracking ID</th>
+            <th class="w-15 text-center">
+                <% if (order.order_status === 'in transit') { %>
+                    Shipment ID
+                <% } else if (order.order_status === 'return requested') { %>
+                     Return Shipment ID
+                <% } %>
+            </th>
+            <% if (order.order_status === 'in transit') { %>
+                <th class="w-15 text-center">Tracking ID</th>
+            <% }  %>
             <th class="w-15 text-center">Quantity</th>
             <th class="w-15 text-center">Total Cost of Item</th>
-            <th class="w-15 text-center">Return Status</th>
+            <th class="w-15 text-center">Order Status</th>
         </tr>
         </thead>
         <tr>
@@ -71,8 +81,22 @@
             <td class="w-15 text-center"><%= order.purchase_date %></td>
             <td class="w-15 text-center"><%= order.total_price %></td>
             <td class="w-15 text-center"><%= order.paymentId %></td>
-            <td class="w-15 text-center"><%= order.shipmentId %></td>
-            <td class="w-15 text-center"><a href="<%= order.trackerUrl %>" ><%= order.trackingId %></a></td>
+            <td class="w-15 text-center">
+                <% if (order.order_status === 'in transit') { %>
+                    <%= order.shipmentId %>
+                <% } else if (order.order_status === 'return requested') { %>
+                    <%= order.returnShipmentId %>
+                <% } %>
+            </td>
+            <% if (order.order_status === 'in transit') { %>
+            <td class="w-15 text-center">
+                <% if (order.order_status === 'in transit') { %>
+                    <a href="<%= order.trackerUrl %>" ><%= order.trackingId %></a>
+                <% } else if (order.order_status === 'return requested') { %>
+                    -------------
+                <% } %>
+            </td>
+            <% } %>
             <td class="w-15 text-center"><%= order.quantity %></td>
             <td class="w-15 text-center"><%= order.total_cost_of_item %></td>
             <td class="w-15 text-center"><%= order.order_status %></td>

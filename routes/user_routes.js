@@ -13,6 +13,8 @@ const { encrypt, decrypt } = require("../util/encryptionUtil");
 
 const multer = require("multer");
 const EasyPostClient = require("@easypost/api");
+const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
+const client = new EasyPostClient(EASYPOST_API_KEY);
 const upload = multer();
 
 //###############################
@@ -375,8 +377,7 @@ router.get("/get-purchase-history", async (req, res) => {
 router.get("/view-order", async (req, res) => {
 	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
 	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
-	const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
-	const client = new EasyPostClient(EASYPOST_API_KEY);
+
 
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
@@ -385,7 +386,7 @@ router.get("/view-order", async (req, res) => {
 
 		let orderId = req.query["orderId"];
 
-		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`,  `order_detail`.`trackingId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
+		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`return_shipment`, `order_detail`.`trackingId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
 																"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
 																"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
 																"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
@@ -415,6 +416,7 @@ router.get("/view-order", async (req, res) => {
 				total_price: firstOrder.total_price,
 				paymentId: firstOrder.paymentId,
 				shipmentId: firstOrder.shipmentId,
+				returnShipmentId: firstOrder.return_shipment,
 				trackingId: firstOrder.trackingId,
 				trackerUrl: trackerDetails.public_url,
 				quantity: firstOrder.quantity,
@@ -440,11 +442,34 @@ router.get("/return-order", async (req, res) => {
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 		let orderId = req.query["orderId"];
+		var orderDetails = await Order.findOne({ where: { orderId } });
 
+
+		const prevShipment = await (async () => {
+			const shipment = await client.Shipment.retrieve(orderDetails.shipmentId);
+
+			console.log(shipment);
+			return shipment;
+		})();
+
+		const returnShipment = await (async () => {
+			const shipment = await client.Shipment.create({
+				parcel: {id: prevShipment.parcel.id},
+				to_address: {id: prevShipment.to_address.id},
+				from_address: {id: prevShipment.from_address.id},
+				is_return: true,
+			});
+
+			console.log(shipment);
+			return shipment;
+		})();
 
 		Order.update(
 			{
-				order_status: "return requested"
+				order_status: "return requested",
+				return_shipment: returnShipment.id,
+				shipmentId: null,
+				trackingId: null
 			},
 			{
 				where: { orderId: orderId }
