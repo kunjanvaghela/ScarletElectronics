@@ -882,4 +882,8 @@ router.post("/cancel-return", async (req, res) => {
 });
 
 
+router.get("/profile", (req,res) => {
+	res.render("userprofile.ejs");
+});
+
 module.exports = router;
