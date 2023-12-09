@@ -434,7 +434,7 @@ router.get("/view-order", async (req, res) => {
 	}
 });
 
-router.post("/return-order", async (req, res) => {
+router.get("/return-order", async (req, res) => {
 	if (req.cookies.emailId) {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
@@ -444,10 +444,10 @@ router.post("/return-order", async (req, res) => {
 
 		Order.update(
 			{
-				order_status: "Return Requested"
+				order_status: "return requested"
 			},
 			{
-				where: { orderId: req.body.orderId }
+				where: { orderId: orderId }
 			}
 		)
 		res.redirect("get-purchase-history");
@@ -465,7 +465,7 @@ router.post("/cancel-return", async (req, res) => {
 
 		Order.update(
 			{
-				order_status: "not requested"
+				order_status: "return requested"
 			},
 			{
 				where: { listingId: req.body.listingId }

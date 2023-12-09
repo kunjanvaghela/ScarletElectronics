@@ -599,7 +599,7 @@ router.post('/checkout', async (req, res)=>
                 console.log(tracker);
             })();
 
-            const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, shipmentId:shipmentId, trackingId: trackingId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, order_status: "not requested"});
+            const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, shipmentId:shipmentId, trackingId: trackingId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, order_status: "in transit"});
             console.log("Auto-generated Order ID: ", order.orderId);
         }
 

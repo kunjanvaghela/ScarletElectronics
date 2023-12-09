@@ -32,6 +32,17 @@
                 </button>
             </form>
         </li>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <li class="nav-item">
+            <form action="/users/return-order" name="returnForm" method="get">
+                <input type="hidden" name="orderId" value="<%= order.orderId %>">
+                <button type="button" class="btn btn-primary" onclick="returnOrder()">
+                    Return Order
+                </button>
+            </form>
+        </li>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
     </ul>
 </div>
 <% if (order) { %>
@@ -65,11 +76,23 @@
             <td class="w-15 text-center"><%= order.quantity %></td>
             <td class="w-15 text-center"><%= order.total_cost_of_item %></td>
             <td class="w-15 text-center"><%= order.order_status %></td>
+            <td class="w-15 text-center">
+
+            </td>
         </tr>
     </table>
 <% } else { %>
     <p>No order details available.</p>
 <% } %>
-
+<script>
+    function returnOrder() {
+        var txt;
+        if (confirm("Are you sure you want to return ?")) {
+            document.forms['returnForm'].submit();
+        } else {
+            // do nothing
+        }
+    }
+</script>
 </body>
 </html>
