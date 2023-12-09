@@ -682,7 +682,7 @@ router.get("/get-purchase-history", async (req, res) => {
 	if (payload.emailId) {
 		const emailId = payload.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = payload.userid;
+		const userId = payload.userId;
 
 		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
 																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
