@@ -23,14 +23,6 @@
         </li>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <li class="nav-item">
-            <form action="/users/modify-user" method="get">
-                <button type="submit" class="btn btn-primary">
-                    Edit
-                </button>
-            </form>
-        </li>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <li class="nav-item">
             <form action="/users" method="get">
                 <button type="submit" class="btn btn-primary">
                     Go Back to Profile Page
@@ -39,122 +31,113 @@
         </li>
     </ul>
 </div>
-<form action="#" method="post" name="login">
-
-    <table class="table table-bordered">
-        <thead>
-        <tr class="table-primary">
-            <th class="w-15 text-center">Item Id</th>
-            <th class="w-15 text-center">Item Name</th>
-            <th class="w-15 text-center">Purchase Date</th>
-            <th class="w-15 text-center">Shipment ID</th>
-            <th class="w-15 text-center">Quantity (qty)</th>
-            <th class="w-15 text-center">Cost</th>
-            <th class="w-15 text-center">Actions</th>
-        </tr>
-        </thead>
-        <tbody id="dynamicTable">
-        <!-- Table rows will be added here -->
-        </tbody>
-    </table>
-
-
+<form action="/users/view-order" method="get" name="orderDetailsForm" style="display: none;">
+    <input type="hidden" id="orderIdInput" name="orderId">
 </form>
+
+<table class="table table-bordered">
+    <thead>
+    <tr class="table-primary">
+        <th class="w-15 text-center">Item Name</th>
+        <th class="w-15 text-center">Purchase Date</th>
+        <th class="w-15 text-center">Shipment ID</th>
+        <th class="w-15 text-center">Payment ID</th>
+        <th class="w-15 text-center">Quantity (qty)</th>
+        <th class="w-15 text-center">Cost</th>
+        <th class="w-15 text-center">Actions</th>
+    </tr>
+    </thead>
+    <tbody id="dynamicTable">
+    <!-- Table rows will be added here -->
+    </tbody>
+</table>
+
 <br> <br>
 <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const dynamicTable = document.getElementById('dynamicTable');
+    document.addEventListener('DOMContentLoaded', () => {
+        const dynamicTable = document.getElementById('dynamicTable');
+        let rowCounter = 0;
+        var order_details = <%- JSON.stringify(order)  %>;
 
-                let rowCounter = 0;
+        for (const itemData of order_details) {
+            rowCounter++;
+            let content;
+            const newRow = document.createElement('tr');
 
-                // Populate table rows from an array
-                var order_details = <%- JSON.stringify(order)  %>;
-                for (const itemData of order_details) {
-                rowCounter++;
-                const newRow = document.createElement('tr');
-                    if (itemData.return_status === 'not requested') {
-                        content = `<button type="button" class="btn btn-danger btn-block" onclick="returnOrder(this)">Return Item</button>`;
-                    } else if (itemData.return_status === 'Return Requested') {
-                        content = `<div class="text-success">Return requested and in process</div><button type="button" class="btn btn-danger btn-block" onclick="cancelReturn(this)">Cancel Item Return</button>`;
-                    }
-                newRow.innerHTML = `
-                    <td id="w-15 text-center">
-                        <input type="hidden" for="item${rowCounter}" id="${itemData.listingId}" value="${itemData.listingId}">
-                    </td>
-                    <td class="w-15 text-center">
-                        <label for="item${rowCounter}">${itemData.name}</label>
-                    </td>
-                    <td class="w-15 text-center">
-                        <label for="item${rowCounter}">${itemData.purchase_date}</label>
-                    </td>
-                    <td class="w-15 text-center">
-                        <label for="item${rowCounter}">${itemData.shipmentId}</label>
-                    </td>
-                    <td class="w-15 text-center" >
-                        <label for="item${rowCounter}">${itemData.quantity}</label>
-                    </td>
-                    <td class="w-15 text-center">
-                        <label for="item${rowCounter}">${itemData.total_cost_of_item}</label>
-                    </td>
-                    <td class="w-15 text-center">
-                        ${content}
-                    </td>
-                `;
-                dynamicTable.appendChild(newRow);
-            }
-            });
+            // if (itemData.return_status === 'not requested') {
+            //     content = `<button type="button" class="btn btn-danger btn-block" onclick="returnOrder(this)">Return Item</button>`;
+            // } else if (itemData.return_status === 'Return Requested') {
+            //     content = `<div class="text-success">Return requested and in process</div><button type="button" class="btn btn-danger btn-block" onclick="cancelReturn(this)">Cancel Item Return</button>`;
+            // }
 
-            function returnOrder(button) {
-                const listingId = button.parentElement.parentElement.children[0].children[0].value;
+            newRow.innerHTML = `
+                <input type="hidden" id="orderIdInput${rowCounter}" value="${itemData.orderId}">
+                <td class="w-15 text-center">
+                    <label>${itemData.name}</label>
+                </td>
+                <td class="w-15 text-center">
+                    <label>${itemData.purchase_date}</label>
+                </td>
+                <td class="w-15 text-center">
+                    <label>${itemData.shipmentId}</label>
+                </td>
+                <td class="w-15 text-center">
+                    <label>${itemData.paymentId}</label>
+                </td>
+                <td class="w-15 text-center" >
+                    <label>${itemData.quantity}</label>
+                </td>
+                <td class="w-15 text-center">
+                    <label>${itemData.total_cost_of_item}</label>
+                </td>
+                <td class="w-15 text-center">
+                    <button type="button" class="btn btn-primary btn-block" onclick="viewOrderDetails(${rowCounter})">View Order Details</button>
+                </td>
+            `;
 
-                // Use AJAX to send the POST request
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/users/return-order', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
+            dynamicTable.appendChild(newRow);
+        }
+    });
 
-                // Define the data to be sent in the request body
-                const data = JSON.stringify({ listingId: listingId });
+    function viewOrderDetails(rowCounter) {
+        const orderId = document.getElementById(`orderIdInput${rowCounter}`).value;
+        document.getElementById('orderIdInput').value = orderId;
+        document.forms['orderDetailsForm'].submit();
+    }
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        // Handle the response if needed
-                        console.log(xhr.responseText);
-
-                        // Refresh the page after a successful response
-                        window.location.reload();
-                    }
-                };
-
-                // Send the request
-                xhr.send(data);
-
-            }
-
-            function cancelReturn(button) {
-                const listingId = button.parentElement.parentElement.children[0].children[0].value;
-
-                // Use AJAX to send the POST request
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/users/cancel-return', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-
-                // Define the data to be sent in the request body
-                const data = JSON.stringify({ listingId: listingId });
-
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        // Handle the response if needed
-                        console.log(xhr.responseText);
-
-                        // Refresh the page after a successful response
-                        window.location.reload();
-                    }
-                };
-
-                // Send the request
-                xhr.send(data);
-
-            }
+    // function returnOrder(button) {
+    //     const listingId = button.parentElement.parentElement.children[0].value;
+    //     const xhr = new XMLHttpRequest();
+    //     xhr.open('POST', '/users/return-order', true);
+    //     xhr.setRequestHeader('Content-Type', 'application/json');
+    //     const data = JSON.stringify({ listingId: listingId });
+    //
+    //     xhr.onreadystatechange = function () {
+    //         if (xhr.readyState == 4 && xhr.status == 200) {
+    //             console.log(xhr.responseText);
+    //             window.location.reload();
+    //         }
+    //     };
+    //
+    //     xhr.send(data);
+    // }
+    //
+    // function cancelReturn(button) {
+    //     const listingId = button.parentElement.parentElement.children[0].value;
+    //     const xhr = new XMLHttpRequest();
+    //     xhr.open('POST', '/users/cancel-return', true);
+    //     xhr.setRequestHeader('Content-Type', 'application/json');
+    //     const data = JSON.stringify({ listingId: listingId });
+    //
+    //     xhr.onreadystatechange = function () {
+    //         if (xhr.readyState == 4 && xhr.status == 200) {
+    //             console.log(xhr.responseText);
+    //             window.location.reload();
+    //         }
+    //     };
+    //
+    //     xhr.send(data);
+    // }
 </script>
 
 </body>

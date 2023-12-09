@@ -14,7 +14,6 @@ create table purchase(
 	purchaseId int NOT NULL auto_increment Primary key,
     purchase_date timestamp NOT NULL,
     paymentId varchar(50) NOT NULL,
-    shipmentId varchar(50) NOT NULL,
     total_price float NOT NULL,
     userId  int unsigned NOT NULL,
     FOREIGN KEY (`userId`) REFERENCES `end_user` (`userId`)
@@ -39,6 +38,8 @@ create table order_detail(
 	orderId int NOT NULL auto_increment PRIMARY KEY,
     listingId int NOT NULL,
     purchaseId int NOT NULL,
+    shipmentId varchar(50) NOT NULL,
+    trackingId varchar(50),
     quantity int NOT NULL,
     total_cost_of_item float NOT NULL,
     return_status varchar(50) DEFAULT NULL,

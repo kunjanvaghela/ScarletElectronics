@@ -18,6 +18,16 @@ module.exports = (sequelize, DataTypes) => {
                     type: DataTypes.INTEGER,
                     allowNull: false,
                 },
+            shipmentId:
+                {
+                    type: DataTypes.STRING(50),
+                    allowNull: false,
+                },
+            trackingId:
+                {
+                    type: DataTypes.STRING(50),
+                    allowNull: true,
+                },
             quantity:
                 {
                     type: DataTypes.INTEGER,
@@ -28,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
                     type: DataTypes.FLOAT,
                     allowNull: false,
                 },
-            return_status:
+            order_status:
                 {
                     type: DataTypes.STRING(50),
                     allowNull: true

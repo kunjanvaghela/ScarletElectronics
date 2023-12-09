@@ -13,11 +13,6 @@ module.exports = (sequelize, DataTypes) => {
                     type: DataTypes.STRING(50),
                     allowNull: false,
                 },
-            shipmentId:
-                {
-                    type: DataTypes.STRING(50),
-                    allowNull: false,
-                },
             purchase_date:
                 {
                     type: 'TIMESTAMP',
