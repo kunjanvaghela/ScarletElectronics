@@ -135,7 +135,7 @@
                         // hiddenElement.style.alignItems = "center";
                         // hiddenElement.style.justifyContent = "center";
                         alert(dynamicContent);
-                        window.location.href = "/item-listing";
+                        window.location.href = "/item-listing/listings";
                         // window.alert(dynamicContent);
                     }
 
@@ -205,7 +205,7 @@
             // hiddenElement.style.alignItems = "center";
             // hiddenElement.style.justifyContent = "center";
             alert(dynamicContent);
-            window.location.href = "/item-listing";
+            window.location.href = "/item-listing/listings";
 
             //send ajax post request to flush
             var xhttp = new XMLHttpRequest();
@@ -298,7 +298,7 @@
         function removeRow(button) {
             // Get the parent row and remove it
             const cartItemsTable = document.getElementById('cartItemsTable');
-            const promocode = document.getElementById('promocode');
+            const promocode = document.getElementById('promocodeInput');
             const address = document.getElementById('address');
             const dynamicTable = document.getElementById('dynamicTable');
             const btn = document.getElementById('btn');
@@ -345,7 +345,7 @@
                 // hiddenElement.style.alignItems = "center";
                 // hiddenElement.style.justifyContent = "center";
                 alert(dynamicContent);
-                window.location.href = "/item-listing";
+                window.location.href = "/item-listing/listings";
                 // window.alert(dynamicContent);
             }
             
