@@ -11,9 +11,10 @@
     <!-- Make sure to include this at the end of your body tag -->
     <script type="text/javascript">
         // Wait for the DOM to be ready
-        $(document).ready(function () {
+        // $(document).ready(function () {
             // Event listener for 'Add to Cart' button clicks
-            $('.add-to-cart-btn').click(function (event) {
+            // $('.add-to-cart-btn').click(function (event) {
+                $(document).on('click', '.add-to-cart-btn', function(event) {
                 // Prevent the default form submit action
                 event.preventDefault();
 
@@ -48,7 +49,7 @@
                     }
                 });
             });
-        });
+        // });
     </script>
     
     <!-- <link rel="preconnect" href="https://fonts.googleapis.com">

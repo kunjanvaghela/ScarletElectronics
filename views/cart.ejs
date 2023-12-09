@@ -15,44 +15,125 @@
 
     <form action="/cart/get-final-cost" name="login">
 
-        <table class="table table-bordered" id="cartItemsTable">
-            <thead>
-                <tr class="table-primary">
-                    <th class="w-25 text-center">Item Name</th>
-                    <th class="w-25 text-center">Quantity (qty)</th>
-                    <th class="w-25 text-center">Cost per item</th>
-                    <th class="w-25 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="dynamicTable">
-                <!-- Table rows will be added here -->
-            </tbody>
-        </table>
-
-        <div class="form-group" id = "promocode">
-            <input type="text" class="form-control" name="promocode" id="promocode" placeholder="Enter Promo code if any?" onchange="checkpromocode(this.value)"><br>
-        </div>
-
-        <div id="hiddenElement" style="display: none;"></div>
-
-        <br>
-
-        <div class="form-group" id = "address">
-
-            <input type="text" class="form-control" name="address1" id="address1" placeholder="Address line 1" required><br>
-
-            <input type="text" class="form-control" name="address2" id="address2" placeholder="Address line 2"><br>
-
-            <input type="text" class="form-control" name="address3" id="address3" placeholder="city" required><br>
-
-            <input type="text" class="form-control" name="address4" id="address4" placeholder="state" required><br>
-
-            <input type="text" class="form-control" name="address5" id="address5" placeholder="pincode" required><br>
-        </div>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-8">
+                    <table class="table table-bordered" id="cartItemsTable">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="w-25 text-center">Item Name</th>
+                                <th class="w-25 text-center">Quantity (qty)</th>
+                                <th class="w-25 text-center">Cost per item</th>
+                                <th class="w-25 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamicTable">
+                            <!-- Table rows will be added here -->
+                        </tbody>
+                    </table>
         
-        <div class="col-md-3 text-center mx-auto"  id="btn">
-            <button type="button" class="btn btn-danger align-self-center" id="removeAll">Flush Cart</button>
-            <button type="submit" class="btn btn-primary align-self-center" id="getFinalCost">Get Final Cost</button>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="promocode" id="promocodeInput" placeholder="Enter Promo code if any?" onchange="checkpromocode(this.value)">
+                    </div>
+        
+                    <div id="hiddenElement" style="display: none;"></div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="form-group" id="address">
+                        <div class="form-group">
+                            <label for="address1">Address Line 1<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="address1" id="address1" placeholder="Enter Address Line 1" required>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="address2">Address Line 2</label>
+                            <input type="text" class="form-control" name="address2" id="address2" placeholder="Enter Address Line 2">
+                        </div>
+        
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="city">City<span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="address3" id="address3" placeholder="Enter City" required>
+                            </div>
+        
+                            <div class="form-group col-md-6">
+                                <label for="state">State<span class="text-danger">*</span></label>
+                                <select class="form-control" name="address4" id="address4" required>
+                                    <option value="" selected disabled>Select State</option>
+                                    <option value="AL">Alabama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawaii</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                    <option value="IA">Iowa</option>
+                                    <option value="KS">Kansas</option>
+                                    <option value="KY">Kentucky</option>
+                                    <option value="LA">Louisiana</option>
+                                    <option value="ME">Maine</option>
+                                    <option value="MD">Maryland</option>
+                                    <option value="MA">Massachusetts</option>
+                                    <option value="MI">Michigan</option>
+                                    <option value="MN">Minnesota</option>
+                                    <option value="MS">Mississippi</option>
+                                    <option value="MO">Missouri</option>
+                                    <option value="MT">Montana</option>
+                                    <option value="NE">Nebraska</option>
+                                    <option value="NV">Nevada</option>
+                                    <option value="NH">New Hampshire</option>
+                                    <option value="NJ">New Jersey</option>
+                                    <option value="NM">New Mexico</option>
+                                    <option value="NY">New York</option>
+                                    <option value="NC">North Carolina</option>
+                                    <option value="ND">North Dakota</option>
+                                    <option value="OH">Ohio</option>
+                                    <option value="OK">Oklahoma</option>
+                                    <option value="OR">Oregon</option>
+                                    <option value="PA">Pennsylvania</option>
+                                    <option value="RI">Rhode Island</option>
+                                    <option value="SC">South Carolina</option>
+                                    <option value="SD">South Dakota</option>
+                                    <option value="TN">Tennessee</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="UT">Utah</option>
+                                    <option value="VT">Vermont</option>
+                                    <option value="VA">Virginia</option>
+                                    <option value="WA">Washington</option>
+                                    <option value="WV">West Virginia</option>
+                                    <option value="WI">Wisconsin</option>
+                                    <option value="WY">Wyoming</option>
+                                </select>
+                            </div>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="pincode">Pincode<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="address5" id="address5" placeholder="Enter Pincode" pattern="\d{5}" title="Enter a valid 5-digit pin code" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Add some spacing between the sections -->
+            <div class="my-4"></div>
+        
+            <div class="row">
+                <div class="col-md-4 offset-md-8">
+                    <div class="text-center">
+                        <button type="button" class="btn btn-danger btn-block mt-3" id="removeAll">Flush Cart</button>
+                        <button type="submit" class="btn btn-primary btn-block mt-3" id="getFinalCost">Get Final Cost</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
     <br> <br>
@@ -60,7 +141,8 @@
         var cartDetails;
         var cartDetailsLength;
         
-        document.addEventListener('DOMContentLoaded', function() {
+        function cartSync() 
+        {
             event.preventDefault();
 			fetch('/cart/fetch-cart')
 			.then(response => response.json())
@@ -81,6 +163,9 @@
                     cartDetailsLength = cartDetails.reduce((count, value) => {
                         return count + (value === null ? 0 : 1);
                     }, 0);
+
+                    //clear dynamic table
+                    dynamicTable.innerHTML = '';
 
                     if (cartDetails.length == 0)
                     {
@@ -108,10 +193,26 @@
                             newRow.innerHTML = `
                                 <td class="w-25">
                                     <label for="item${rowCounter}">${itemData.name}</label>
-                                </td>
+                                </td>`
+
+                            console.log(itemData.quantity);
+
+                            if(itemData.max_quantity != 0)
+                            {
+                                newRow.innerHTML +=`
                                 <td class="w-25">
-                                    <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1" onchange="updateqty(${rowCounter}, this.value)">
-                                </td>
+                                    <input type="number" class="form-control" name="qty${rowCounter}" value="${itemData.quantity}" min="1"  onchange="updateqty(${rowCounter}, this.value)">
+                                </td>`
+                            }
+                            else if(itemData.max_quantity == 0)
+                            {
+                                newRow.innerHTML +=`<td class="w-25 text-center">
+                                    <label for="item${rowCounter}">Unavailable</label>
+                                </td>`
+                            }
+
+
+                            newRow.innerHTML += `
                                 <td class="w-25 text-center">
                                     <label for="item${rowCounter}">${itemData.price}</label>
                                 </td>
@@ -124,7 +225,11 @@
                     }
 				}
 			})
-		});
+		}
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cartSync();
+        });
 
         document.getElementById('removeAll').addEventListener('click', () => {
             // Remove all rows from the table
@@ -187,31 +292,48 @@
         }
         
         
-        function updateqty(row, qty) {
-            //send ajax post request to remove item
 
-            //get item number from row from substring after 4th character of for attribute of label
+        function updateqty(row, qty) 
+        {
+            // send ajax post request to update item quantity
+
+            // get item number from row from substring after the 4th character of the "for" attribute of the label
             var itemNumber = row;
-            //convert item number to integer
+            // convert item number to an integer
             itemNumber = parseInt(itemNumber);
-            // console.log(itemNumber);
-            // console.log(qty);
 
-            //get listing id cartdetails[itemNumber-1].listing_id
-            var listingId = cartDetails[itemNumber-1].listingId;
+            // get listing id cartDetails[itemNumber-1].listing_id
+            var listingId = cartDetails[itemNumber - 1].listingId;
 
-            console.log(listingId);
-
-            // send ajax post request to remove item with listing_id
+            // send ajax post request to update item with listing_id
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "/cart/update-itemlisting", true);
             xhttp.setRequestHeader("Content-type", "application/json");
 
-            var data = JSON.stringify({ "listingId": listingId , "updateCount": qty });
-            
-            xhttp.send(data);
+            var data = JSON.stringify({ "listingId": listingId, "updateCount": qty });
 
-            //remove item from cartDetails
+            //alert for response 400 and string response = "quantity of listingId is less than updateCount"
+            xhttp.onreadystatechange = function () 
+            {
+                //for status 400 with payload = "quantity of listingId is less than updateCount"
+                if (xhttp.readyState == 4) 
+                {
+                    if (xhttp.status == 400) 
+                    {
+                        // Parse the response JSON if applicable
+                        var Response = xhttp.responseText;
+                        if (Response == "quantity of listingId is less than updateCount") {
+                            alert("quantity of listingId is less than updateCount")
+                            cartSync();
+                        }
+                        
+                            
+                        
+                    }
+                
+                };
+            }
+            xhttp.send(data);
         }
 
         function removeRow(button) {
