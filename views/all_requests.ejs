@@ -98,6 +98,19 @@
                 searching: true,
             });
         }
+
+        function initializeAllRequestTable() {
+            //Destroy the existing DataTable instance, if any
+            if ($.fn.DataTable.isDataTable('#allRequestsTable')) {
+                $('#allRequestsTable').DataTable().destroy();
+            }
+
+            //Initialize DataTable with searching option
+            $('#allRequestsTable').DataTable({
+                paging: true,
+                searching: true,
+            });
+        }
         
         function fetchClaimedRequests() {
                 $.ajax({
@@ -223,6 +236,7 @@
                 e.preventDefault();
                 $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
                 fetchAllRequests(); // Fetch and populate all requests
+                initializeAllRequestTable();
             });
         
             // Event handler for claim buttons
