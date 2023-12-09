@@ -399,6 +399,54 @@ router.post('/check-promo-code', async (req, res)=>
 {
     console.log("check-promo-code inside ------------------------")
 
+    const [authentication, userId] = await authent(req,res);
+    
+    if(!authentication)
+    {
+        return;
+    }
+   
+    
+    if(!userId)
+    {
+        return;
+    }
+
+    let cartDetails = await get_cart(userId)
+
+    total_price = 0;
+
+    // check quantity of each listing
+    for (var i = 0; i < cartDetails.length; i++)
+    {
+        const listingId = cartDetails[i].listingId;
+
+        //check if listingId exists in db  
+        const listingIdExists = await ItemListing.findOne({where:{listingId:listingId}});
+        if(!listingIdExists)
+        {
+            //return 404 error - listingId does not exist in db
+            res.status(404).send("listingId does not exist in db");
+            console.log("listingId does not exist in db");
+            return;
+        }
+
+        //check if the quantity of listingId is greater than updateCount
+
+        const listingIdQuantity = await ItemListing.findOne({where:{listingId:listingId}});
+        if(listingIdQuantity.dataValues.quantity < cartDetails[i].quantity)
+        {
+            //return 400 error - quantity of listingId is less than updateCount
+            res.status(400).send("quantity of listingId is less than updateCount");
+            console.log("quantity of listingId is less than updateCount");
+            return;
+        }
+
+        //calculate total price of each listing
+        cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
+        total_price += cartDetails[i].totalPrice;
+    }
+
     //parse promoCode from request
     //parse query parameters
     console.log("req.query: ", req.body);
@@ -407,31 +455,33 @@ router.post('/check-promo-code', async (req, res)=>
     console.log("promoCode: ", promoCode1);
 
     //check if promoCode exists in db
+    var promocode_discount;
     const promoCodeData = await Promocode.findOne({where:{promocode:promoCode1}});
 
-    console.log(promoCodeData.dataValues);
-
-    if(!promoCodeData)
-    {
-        //return 404 error - promoCode does not exist in db
-        res.status(404).send("promoCode does not exist in db");
-        console.log("promoCode does not exist in db");
-        return;
-    }
-
-    // check if promoCode is active
-    if(promoCodeData.dataValues.is_active == false)
+    if(!promoCodeData || promoCodeData.dataValues.is_active == false)
     {
         //return 400 error - promoCode is not active
-        res.status(400).send("promoCode is not active");
-        console.log("promoCode is not active");
+        promocode_discount = 0;
+        res.status(400).send(`Promocode Discount Applied is : ${promocode_discount}`);
         return;
     }
+    else
+    {
+        const discount_percent = promoCodeData.dataValues.discount_percent;
+        promocode_discount = total_price*discount_percent/100;
+        const max_discount = promoCodeData.dataValues.max_discount;
 
-    //return success message
-    res.status(200).send("promoCode is active");
-    
-
+        if(promocode_discount > max_discount)
+        {
+            promocode_discount = max_discount;
+        }
+        else
+        {
+            promocode_discount = promocode_discount;
+        }
+        res.status(200).send(`Promocode Discount Applied is : ${promocode_discount}`);
+        return;
+    }
 });
 
 router.get('/orderplace', async (req, res) => { 
