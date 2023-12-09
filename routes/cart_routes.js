@@ -527,7 +527,7 @@ router.post('/check-promo-code', async (req, res)=>
     console.log("promoCode: ", promoCode1);
 
         //check if promoCode exists in db
-        const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+        const promoCodeData = await Promocode.findOne({where:{promocode:promoCode1}});
         console.log("promoCodeData: ", promoCodeData);
 
 
@@ -575,6 +575,27 @@ router.get('/get-final-cost', async (req, res)=>
     {
         return;
     }
+
+    res.cookie("promocode", req.query.promocode, {
+        httpOnly: false,
+    });
+
+    res.cookie("address1", req.query.address1, {
+        httpOnly: false,
+    });
+
+    res.cookie("address2", req.query.address2, {
+        httpOnly: false,
+    });
+    res.cookie("address3", req.query.address3, {
+        httpOnly: false,
+    });
+    res.cookie("address4", req.query.address4, {
+        httpOnly: false,
+    });
+    res.cookie("address5", req.query.address5, {
+        httpOnly: false,
+    });
    
     
     
