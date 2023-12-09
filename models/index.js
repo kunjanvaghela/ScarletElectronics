@@ -70,7 +70,10 @@ const ItemListing = require('./itemListing.js')(sequelize, Sequelize.DataTypes);
 const Catalog = require('./catalog.js')(sequelize, Sequelize.DataTypes);
 // Catalog.hasMany(ItemListing, { foreignKey: 'itemId' });
 // ItemListing.belongsTo(Catalog, { foreignKey: 'itemId' });
+
 console.log("Associations created!!");
+
+const Review = require('./review.js')(sequelize, Sequelize.DataTypes);
 
 // console.log("Db object : ", db);
 
