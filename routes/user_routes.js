@@ -16,6 +16,7 @@ const { encrypt, decrypt } = require("../util/encryptionUtil");
 
 const multer = require("multer");
 const EasyPostClient = require("@easypost/api");
+const {cookies} = require("express/lib/request");
 const upload = multer();
 
 //###############################
@@ -663,13 +664,25 @@ router.post("/modify-user", postModifyUser);
 router.get("/logout", logoutUser);
 
 router.get("/get-purchase-history", async (req, res) => {
-	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
 
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+	console.log("ACCESSING USERID FROM TOKEN PAYLOAD:", payload.userId);
+	console.log("ACCESSING emailId FROM TOKEN PAYLOAD:", payload.emailId);
+
+	userDetails = await UserUtil.check_email(payload.emailId);
+
+	console.log(userDetails.userid);
+	// const username = userDetails.name;
+
+
+	if (payload.emailId) {
+		const emailId = payload.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
+		const userId = payload.userid;
 
 		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
 																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
@@ -744,13 +757,20 @@ router.get("/get-purchase-history", async (req, res) => {
 });
 
 router.get("/view-order", async (req, res) => {
-	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+
+
+
 	const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
 	const client = new EasyPostClient(EASYPOST_API_KEY);
 
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
+	if (payload.emailId) {
+		const emailId = payload.emailId;
 		var userDetails = await db.User.findOne({where: {emailId}});
 		const userId = userDetails.dataValues.userid;
 
@@ -806,8 +826,15 @@ router.get("/view-order", async (req, res) => {
 });
 
 router.post("/return-order", async (req, res) => {
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+
+	if (payload.emailId) {
+		const emailId = payload.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 
@@ -827,8 +854,15 @@ router.post("/return-order", async (req, res) => {
 });
 
 router.post("/cancel-return", async (req, res) => {
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+
+	if (payload.emailId) {
+		const emailId = payload.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 
