@@ -219,13 +219,15 @@
             //fetchAllRequests();
 
 
-            $('#viewAllRequestsForm').on('click', 'button', function() {
+            $('#viewAllRequestsForm').on('click', 'button', function(e) {
+                e.preventDefault();
                 $('#allRequestsTableDiv').toggle(); // Toggle visibility of the allRequestsTableDiv
                 fetchAllRequests(); // Fetch and populate all requests
             });
         
             // Event handler for claim buttons
-            $('body').on('click', '.claim-button', function() {
+            $('body').on('click', '.claim-button', function(e) {
+                e.preventDefault();
                 var requestId = $(this).data('reqid');
                 claimRequest(requestId); // Call the function to handle the claim
                 

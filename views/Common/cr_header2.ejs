@@ -75,7 +75,7 @@
                   <div class="header__links hide-for-mobile">
                     <a>Welcome ${user.name}</a>
                     
-                    <a href="/users/logout">Logout</a>
+                    <a href="/staff-login/login">Logout</a>
                   </div>
               `);
           }
@@ -83,7 +83,7 @@
           function updateLoggedOutUI() {
               // Update the UI for a logged-out user
               $('#user-login-container').html(`
-                  <form action="/users/login" method="get">
+                  <form action="/staff-login/login" method="get">
                     <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
                   </form>
               `);
