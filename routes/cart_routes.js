@@ -14,6 +14,7 @@ Calculate Final Cost	        cart/get-final-cost	            GET	token, promoCod
 Checkout	                    cart/checkout	                POST	token, selectedAddress, promoCode
 */
 
+const { Sequelize } = require('sequelize');
 const express = require("express");
 const EasyPostClient = require('@easypost/api');
 const sendOTP  = require("../services/controller");
@@ -331,6 +332,8 @@ router.get('/fetch-cart', async (req, res)=>
         return;
     }
 
+    
+
     //get cart details
     const cartDetails = await get_cart(userId,false);
     
@@ -363,13 +366,7 @@ router.get('/fetch-cart', async (req, res)=>
         //check if the quantity of listingId is greater than updateCount
 
         const listingIdQuantity = await ItemListing.findOne({where:{listingId:listingId}});
-        if(listingIdQuantity.dataValues.quantity < cartDetails[i].quantity)
-        {
-            //return 400 error - quantity of listingId is less than updateCount
-            res.status(400).send("quantity of listingId is less than updateCount");
-            console.log("quantity of listingId is less than updateCount");
-            return;
-        }
+        
 
         //calculate total price of each listing
         cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
@@ -419,7 +416,7 @@ router.get('/fetch-cart', async (req, res)=>
     total_price = total_price.toString();
     promocode_discount_string = promocode_discount.toString();
 
-
+    console.log("debug");
 
     //return cart details
     res.status(200).json({
@@ -580,11 +577,7 @@ router.get('/get-final-cost', async (req, res)=>
     }
    
     
-    if(!userId)
-    {
-        return;
-    }
-
+    
     res.render('checkout');
 //    res.render()
 
@@ -628,8 +621,11 @@ router.post('/checkout', async (req, res)=>
     const promoCode = req.body.promoCode;
 
 
-    //clear cart
-    const deleteCartDetails = await Cart.destroy({where:{userId:userId}});
+    //clear cart where quantity in not zero for a particular userId
+    const deleteCartDetails = await Cart.destroy({where:{userId:userId, quantity:{[Sequelize.Op.ne]:0}}});
+
+
+    console.log("deletecartDetails: ", deleteCartDetails);
 
 
     //update qunaity of each listing in db
@@ -641,7 +637,6 @@ router.post('/checkout', async (req, res)=>
         const updateListingId = await ItemListing.decrement({quantity:quantity},{where:{listingId:listingId}});
     }
 
-    // Victor's Code
 
     // Victor's Code
     const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';

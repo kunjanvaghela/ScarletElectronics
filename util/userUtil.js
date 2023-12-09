@@ -73,7 +73,7 @@ async function authent(req, res) {
     const payload = retrieveTokenPayload(req.cookies.accessToken);
     // //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
     // console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
-     console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
     const authentication = await check_email(payload.emailId);
 
     console.log("authentication: ", authentication);
