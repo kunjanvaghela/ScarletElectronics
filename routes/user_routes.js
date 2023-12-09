@@ -468,8 +468,7 @@ router.get("/return-order", async (req, res) => {
 			{
 				order_status: "return requested",
 				return_shipment: returnShipment.id,
-				shipmentId: null,
-				trackingId: null
+				shipmentId: "Order Requested for return"
 			},
 			{
 				where: { orderId: orderId }
