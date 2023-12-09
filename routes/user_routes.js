@@ -439,6 +439,7 @@ router.post("/return-order", async (req, res) => {
 		const emailId = req.cookies.emailId;
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
+		let orderId = req.query["orderId"];
 
 
 		Order.update(
@@ -446,7 +447,7 @@ router.post("/return-order", async (req, res) => {
 				order_status: "Return Requested"
 			},
 			{
-				where: { listingId: req.body.listingId }
+				where: { orderId: req.body.orderId }
 			}
 		)
 		res.redirect("get-purchase-history");
