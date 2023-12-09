@@ -197,22 +197,52 @@ const getAllProducts = async (req, res) => {
   // userDetails = await UserUtil.check_email(req.cookies.emailId);
   // console.log(userDetails.userid);
   // const username = userDetails.name;
-  const item_listing = Catalog.findAll().then(function(Catalog){
-      
-      return res.status(200).json({
-        success: true,
-        message: "Item Information retrieved.",
-        catalog: Catalog,
+  console.log("BODY " , req.query);
+
+  try {
+    let item_listing;
+    if (Object.keys(req.query).length === 0 && req.query.constructor === Object) {
+      item_listing = await Catalog.findAll();
+    } else {
+      item_listing = await Catalog.findAll({
+        where: {
+          category: req.query.category
+        }
       });
-      // res.render('seller_listing', {Catalog, username});
-      //console.log(Catalog);
-      
-    }).catch(function(err){
-      console.log('Oops! something went wrong, : ', err);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Item Information retrieved.",
+      body: item_listing
     });
-  //console.log(item_listing);
-  //console.log(typeof(item_listing));
+
+    // const item_listing = Catalog.findAll().then(function(Catalog){
+        
+    //     return res.status(200).json({
+    //       success: true,
+    //       message: "Item Information retrieved.",
+    //       catalog: Catalog,
+    //     });
+    //     // res.render('seller_listing', {Catalog, username});
+    //     //console.log(Catalog);
+        
+    //   }).catch(function(err){
+    //     console.log('Oops! something went wrong, : ', err);
+    //   });
+    //console.log(item_listing);
+    //console.log(typeof(item_listing));
+    
   
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      redirectUrl: "/item-listing/listings"
+    });
+  }
+
 }
 
 const createItemListing = async (req, res) => {

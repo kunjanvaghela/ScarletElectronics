@@ -94,6 +94,51 @@
                             </select>
                         </div>
                         <!-- Add more filter criteria dropdowns as needed -->
+                        <div class="form-group col-md-10">
+                            <label for="cpu">CPU:</label>
+                            <select class="form-control" id="cpu">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="gpu">GPU:</label>
+                            <select class="form-control" id="gpu">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="ram">RAM:</label>
+                            <select class="form-control" id="ram">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="operating_system">Operating System:</label>
+                            <select class="form-control" id="operating_system">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_size">Screen Size:</label>
+                            <select class="form-control" id="screen_size">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_type">Screen Type:</label>
+                            <select class="form-control" id="screen_type">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_resolution">Screen Resolution:</label>
+                            <select class="form-control" id="screen_resolution">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="front_camera">Front Camera:</label>
+                            <select class="form-control" id="front_camera">
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="rear_camera">Rear Camera:</label>
+                            <select class="form-control" id="rear_camera">
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -155,9 +200,19 @@
             .then(response => response.json())
 			.then(data => {
 				if (data.success) {
-                    const columns = ['CATEGORY', 'STORAGE']
+                    const columns = ['CATEGORY', 'STORAGE', 'CPU', 'GPU', 'RAM', 'OS', 'ScreenSize', 
+                    'ScreenType', 'ScreenResolution', 'FrontCamera', 'RearCamera']
                     populateSelect('category', data.body.CATEGORY);
                     populateSelect('storage', data.body.STORAGE);
+                    populateSelect('cpu', data.body.CPU);
+                    populateSelect('gpu', data.body.GPU);
+                    populateSelect('ram', data.body.RAM);
+                    populateSelect('os', data.body.OPERATING_SYSTEM);
+                    populateSelect('screen_size', data.body.SCREEN_SIZE);
+                    populateSelect('screen_type', data.body.SCREEN_TYPE);
+                    populateSelect('screen_resolution', data.body.SCREEN_RESOLUTION);
+                    populateSelect('front_camera', data.body.FRONT_CAMERA);
+                    populateSelect('rear_camera', data.body.REAR_CAMERA);
                     //others
 				} else {
 					window.location.href = data.redirectUrl;
