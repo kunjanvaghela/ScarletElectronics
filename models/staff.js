@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         
         ssn: DataTypes.INTEGER,
         designation: DataTypes.STRING,
-        status: DataTypes.STRING,
+        // status: DataTypes.STRING,
         created_on: DataTypes.DATE,
         created_by: DataTypes.STRING,
         remarks: DataTypes.STRING,

@@ -156,10 +156,7 @@ const addReview = async (req, res) => {
 
 		//res.send("Data added Successfully in REVIEW");
 		const comments = await comment_fetcher(item_id, userDetails.userid);
-		// res.status(201).json({}).render("getreview", {
-		// 	comments: comments.comments,
-		// 	ind_comment: comments.ind_comment,
-		// });
+
 		return res.status(201).json({
 			success: true,
 			status: 201,

@@ -70,7 +70,13 @@ async function authent(req, res) {
         res.status(401).send('Authentication failed');
         return [false, null];
     }
-    const authentication = await check_email(req.cookies.emailId);
+    const payload = retrieveTokenPayload(req.cookies.accessToken);
+    // //THIS IS HOW YOU CAN ACCESS THE PAYLOAD OBJECT
+    // console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+    console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+    const authentication = await check_email(payload.emailId);
+
+    console.log("authentication: ", authentication);
 
     if (!authentication) {
         //return invalid authorization token
@@ -88,6 +94,6 @@ async function authent(req, res) {
 }
 
 function generateAccessToken(tokenPackage) {
-    return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '600s' });
+    return jwt.sign(tokenPackage, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3600s' });
 }
 module.exports = { check_email, authenticateToken, generateAccessToken, authent, retrieveTokenPayload };
