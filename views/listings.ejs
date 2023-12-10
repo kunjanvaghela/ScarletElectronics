@@ -77,67 +77,78 @@
                             <label for="price">Price:</label>
                             <select class="form-control" id="price">
                                 <option value="">Any</option>
-                                <option value="under-100">Under $100</option>
+                                <option value="0-100">Under $100</option>
                                 <option value="100-500">$100 - $500</option>
                                 <option value="500-1000">$500 - $1000</option>
                                 <option value="1000-2000">$1000 - $2000</option>
-                                <option value="above-2000">$2000 Above</option>
+                                <option value="2000-100000">$2000 Above</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="category">Category:</label>
                             <select class="form-control" id="category">
+                                <option value="">Select Category</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="storage">Storage:</label>
                             <select class="form-control" id="storage">
+                                <option value="">Select Storage</option>
                             </select>
                         </div>
                         <!-- Add more filter criteria dropdowns as needed -->
                         <div class="form-group col-md-10">
                             <label for="cpu">CPU:</label>
                             <select class="form-control" id="cpu">
+                                <option value="">Select CPU</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="gpu">GPU:</label>
                             <select class="form-control" id="gpu">
+                                <option value="">Select GPU</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="ram">RAM:</label>
                             <select class="form-control" id="ram">
+                                <option value="">Select RAM</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="operating_system">Operating System:</label>
                             <select class="form-control" id="operating_system">
+                                <option value="">Select Operating System</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="screen_size">Screen Size:</label>
                             <select class="form-control" id="screen_size">
+                                <option value="">Select Screen Size</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="screen_type">Screen Type:</label>
                             <select class="form-control" id="screen_type">
+                                <option value="">Select Screen Type</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="screen_resolution">Screen Resolution:</label>
                             <select class="form-control" id="screen_resolution">
+                                <option value="">Select Screen Resolution</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="front_camera">Front Camera:</label>
                             <select class="form-control" id="front_camera">
+                                <option value="">Select Front Camera</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="rear_camera">Rear Camera:</label>
                             <select class="form-control" id="rear_camera">
+                                <option value="">Select Rear Camera</option>
                             </select>
                         </div>
                     </div>
@@ -182,7 +193,7 @@
             var selectElement = document.getElementById(selectId);
             
             // Clear existing options except the first one
-            selectElement.length = 0;
+            selectElement.length = 1;
 
             // Add new options from the data
             options.forEach(function(option, index) {
@@ -208,7 +219,7 @@
                     populateSelect('cpu', data.body.CPU);
                     populateSelect('gpu', data.body.GPU);
                     populateSelect('ram', data.body.RAM);
-                    populateSelect('os', data.body.OPERATING_SYSTEM);
+                    populateSelect('operating_system', data.body.OPERATING_SYSTEM);
                     populateSelect('screen_size', data.body.SCREEN_SIZE);
                     populateSelect('screen_type', data.body.SCREEN_TYPE);
                     populateSelect('screen_resolution', data.body.SCREEN_RESOLUTION);
@@ -265,20 +276,81 @@
             //         console.error('Error:', error);
             //         alert(error.message);
             //     });
-
+            
             fetchClaimedRequests();
         });
 
         function fetchClaimedRequests() {
 
+            let price = document.getElementById('price').value;
             let category = document.getElementById('category').value;
             let storage = document.getElementById('storage').value;
-            let url;
-            if (category && storage) {
-                url = "/item-listing/?category=" + category + "&storage=" + storage;
-            } else {
-                url = "/item-listing/";
+            let cpu = document.getElementById('cpu').value;
+            let gpu = document.getElementById('gpu').value;
+            let ram = document.getElementById('ram').value;
+            let operating_system = document.getElementById('operating_system').value;
+            let screen_size = document.getElementById('screen_size').value;
+            let screen_type = document.getElementById('screen_type').value;
+            let screen_resolution = document.getElementById('screen_resolution').value;
+            let front_camera = document.getElementById('front_camera').value;
+            let rear_camera = document.getElementById('rear_camera').value;
+
+            let url = "/item-listing/";
+            if (price || category || storage || cpu || gpu || ram || operating_system || screen_size || screen_type || screen_resolution || front_camera || rear_camera) {
+                let queryParams = [];
+
+                if (price) {
+                    queryParams.push("price=" + encodeURIComponent(price));
+                }
+
+                if (category) {
+                    queryParams.push("category=" + encodeURIComponent(category));
+                }
+
+                if (storage) {
+                    queryParams.push("storage=" + encodeURIComponent(storage));
+                }
+
+                if (cpu) {
+                    queryParams.push("cpu=" + encodeURIComponent(cpu));
+                }
+
+                if (gpu) {
+                    queryParams.push("gpu=" + encodeURIComponent(gpu));
+                }
+
+                if (ram) {
+                    queryParams.push("ram=" + encodeURIComponent(ram));
+                }
+
+                if (operating_system) {
+                    queryParams.push("operating_system=" + encodeURIComponent(operating_system));
+                }
+
+                if (screen_size) {
+                    queryParams.push("screen_size=" + encodeURIComponent(screen_size));
+                }
+
+                if (screen_type) {
+                    queryParams.push("screen_type=" + encodeURIComponent(screen_type));
+                }
+
+                if (screen_resolution) {
+                    queryParams.push("screen_resolution=" + encodeURIComponent(screen_resolution));
+                }
+
+                if (front_camera) {
+                    queryParams.push("front_camera=" + encodeURIComponent(front_camera));
+                }
+
+                if (rear_camera) {
+                    queryParams.push("rear_camera=" + encodeURIComponent(rear_camera));
+                }
+
+                url += "?" + queryParams.join("&");
+
             }
+
             console.log(url);
             
         $.ajax({

@@ -9,6 +9,7 @@ const UserUtil = require('../util/userUtil');
 const { Sequelize } = require('sequelize');
 const GoogleDriveUtil = require('../util/googleDriveUtil');
 const e = require("express");
+const { Op } = require('sequelize');
 
 const getItemListings = async (req, res) => {
   console.log('in item_listing_routes.js route :/ ');
@@ -23,18 +24,104 @@ const getItemListings = async (req, res) => {
         include: [Catalog],
     });
   } else {
+
+    let catalogWhere = {};
+
+    // Add category condition if it exists and is not empty
+    if (req.query.category && req.query.category.trim() !== '') {
+      catalogWhere.category = req.query.category;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.storage && req.query.storage.trim() !== '') {
+      catalogWhere.storage = req.query.storage;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.cpu && req.query.cpu.trim() !== '') {
+      catalogWhere.cpu = req.query.cpu;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.gpu && req.query.gpu.trim() !== '') {
+      catalogWhere.gpu = req.query.gpu;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.ram && req.query.ram.trim() !== '') {
+      catalogWhere.ram = req.query.ram;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.operating_system && req.query.operating_system.trim() !== '') {
+      catalogWhere.operating_system = req.query.operating_system;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.screen_size && req.query.screen_size.trim() !== '') {
+      catalogWhere.screen_size = req.query.screen_size;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.screen_type && req.query.screen_type.trim() !== '') {
+      catalogWhere.screen_type = req.query.screen_type;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.screen_resolution && req.query.screen_resolution.trim() !== '') {
+      catalogWhere.screen_resolution = req.query.screen_resolution;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.front_camera && req.query.front_camera.trim() !== '') {
+      catalogWhere.front_camera = req.query.front_camera;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.rear_camera && req.query.rear_camera.trim() !== '') {
+      catalogWhere.rear_camera = req.query.rear_camera;
+    }
+    
+    // let priceCondition = db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)');
+
+    // let itemListingWhere = {
+    //     [Op.and]: [
+    //         { price: priceCondition }
+    //     ]
+    // };
+
+    // // Add 'between' condition for price if small and big values are present
+    // if (req.query.price && req.query.price.trim() != '') {
+    //   let small = Number(req.query.price.split("-")[0])
+    //   let big = Number(req.query.price.split("-")[1])
+    //   itemListingWhere[Op.and].push({
+    //       price: { [Op.between]: [small, big] }
+    //   });
+    // }
+
+
+    // Initialize the where condition for the ItemListing
+    let itemListingWhere = {
+      price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+    };
+
+    // Assuming small and big are your query parameters for price range
+    if (req.query.price && req.query.price.trim() != '') {
+      let small = Number(req.query.price.split("-")[0])
+      let big = Number(req.query.price.split("-")[1])
+      itemListingWhere.price = {
+          [db.Sequelize.Op.between]: [small, big]
+      };
+    }
+
     listings = await ItemListing.findAll({
-        where: {
-            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
-        },
+        where: itemListingWhere,
         include: [{
           model: Catalog,
-          where: {
-            category: req.query.category,
-            storage: req.query.storage
-          }
+          where: catalogWhere
         }],
     });
+
   }
 
   // Check if the user is authenticated
@@ -204,11 +291,93 @@ const getAllProducts = async (req, res) => {
     if (Object.keys(req.query).length === 0 && req.query.constructor === Object) {
       item_listing = await Catalog.findAll();
     } else {
+
+      let catalogWhere = {};
+
+      // Add category condition if it exists and is not empty
+      if (req.query.category && req.query.category.trim() !== '') {
+        catalogWhere.category = req.query.category;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.storage && req.query.storage.trim() !== '') {
+        catalogWhere.storage = req.query.storage;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.cpu && req.query.cpu.trim() !== '') {
+        catalogWhere.cpu = req.query.cpu;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.gpu && req.query.gpu.trim() !== '') {
+        catalogWhere.gpu = req.query.gpu;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.ram && req.query.ram.trim() !== '') {
+        catalogWhere.ram = req.query.ram;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.operating_system && req.query.operating_system.trim() !== '') {
+        catalogWhere.operating_system = req.query.operating_system;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.screen_size && req.query.screen_size.trim() !== '') {
+        catalogWhere.screen_size = req.query.screen_size;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.screen_type && req.query.screen_type.trim() !== '') {
+        catalogWhere.screen_type = req.query.screen_type;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.screen_resolution && req.query.screen_resolution.trim() !== '') {
+        catalogWhere.screen_resolution = req.query.screen_resolution;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.front_camera && req.query.front_camera.trim() !== '') {
+        catalogWhere.front_camera = req.query.front_camera;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.rear_camera && req.query.rear_camera.trim() !== '') {
+        catalogWhere.rear_camera = req.query.rear_camera;
+      }
+      
+      // let priceCondition = db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)');
+  
+      // let itemListingWhere = {
+      //     [Op.and]: [
+      //         { price: priceCondition }
+      //     ]
+      // };
+  
+      // // Add 'between' condition for price if small and big values are present
+      // if (req.query.price && req.query.price.trim() != '') {
+      //   let small = Number(req.query.price.split("-")[0])
+      //   let big = Number(req.query.price.split("-")[1])
+      //   itemListingWhere[Op.and].push({
+      //       price: { [Op.between]: [small, big] }
+      //   });
+      // }
+    
+      // listings = await ItemListing.findAll({
+      //     where: itemListingWhere,
+      //     include: [{
+      //       model: Catalog,
+      //       where: catalogWhere
+      //     }],
+      // });
+  
       item_listing = await Catalog.findAll({
-        where: {
-          category: req.query.category
-        }
+        where: catalogWhere
       });
+      
     }
 
     return res.status(200).json({
