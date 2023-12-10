@@ -479,5 +479,11 @@ p {
 }
 
 strong {
-  color: #b14130; /* Red color for strong tags */
+  color: #b14130;
+}
+
+.star {
+  display: inline-block;
+  font-size: 24px;
+  color: #ffd700;
 }
