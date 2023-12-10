@@ -336,10 +336,10 @@ button, .button {
   height: 100%;
   display: flex;
   flex-direction: column;
-  border: 1px solid #ddd; /* Add a border for better separation */
-  border-radius: 8px; /* Rounded corners for a more modern look */
+  border: 1px solid #ddd;
+  border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.3s ease; /* Add smooth transition on hover */
+  transition: transform 0.3s ease;
 }
 
 /* Image styling */
@@ -371,7 +371,7 @@ button, .button {
 /* Price styling */
 .card-text {
   font-size: 1rem;
-  color: #007bff; /* Change to your preferred primary color */
+  /* color: #007bff; */
 }
 
 /* Subtitle styling */
@@ -388,8 +388,8 @@ button, .button {
 
 /* Hover effect */
 .card-listings-page:hover {
-  transform: translateY(-5px); /* Move the card up slightly on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Add space between cards */
@@ -406,7 +406,7 @@ button, .button {
 
 /* Ensure proper spacing on all sides of the card */
 .card-listings-page2 {
-  margin: 10px; /* Adjust as needed */
+  margin: 10px;
 }
 
 #product-div-2 > .row > .col-md-6 {
@@ -422,4 +422,72 @@ button, .button {
 #product-div-2 > .row > .col-md-6 > p {
   font-size: 1rem;
   margin-top: 5px;
+}
+
+/* For hover effect */
+.card-listings-page .card-text-description {
+  opacity: 0;
+  /* height: 0; */
+  max-height: 0;
+  overflow: hidden;
+  /* transition: opacity 0.3s ease, height 0.3s ease; */
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.card-listings-page:hover .card-text-description {
+  opacity: 1;
+  /* height: auto; */
+  max-height: 150px;
+}
+
+.btn-primary {
+  background-color: #CD4631;
+  border-color: darkred;
+}
+
+.btn-primary:hover {
+  background-color: #a8301d;
+  border-color: darkred;
+}
+
+
+.btn-primary {
+  background-color: #CD4631;
+  border-color: darkred;
+}
+
+.btn-primary:hover {
+  background-color: #a8301d;
+  border-color: darkred;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  background-color: #e6e6e6;
+  border-color: #cccccc;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #af7a4c;
+  border-color: #86582d;
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: #39833d;
+  border-color: #2d862d;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #CD4631;
+}
+
+p {
+  color: #18191a;
+}
+
+strong {
+  color: #b14130; /* Red color for strong tags */
 }

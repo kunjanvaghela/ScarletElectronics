@@ -87,6 +87,9 @@ module.exports = (sequelize, DataTypes) => {
       Catalog.hasMany(models.ItemListing, {
           foreignKey: 'itemId',
       });
+      Catalog.hasMany(models.Review, {
+        foreignKey: 'itemId',
+    });
   };
 
     Catalog.sync({ force: false })

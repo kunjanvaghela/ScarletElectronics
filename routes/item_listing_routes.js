@@ -5,6 +5,9 @@ const db = require('../models');
 const { where } = require('sequelize');
 const Catalog = db.Catalog;
 const ItemListing = db.ItemListing;
+const Review = db.Review;
+const EndUsers = db.EndUsers;
+const User = db.User;
 const UserUtil = require('../util/userUtil');
 const GoogleDriveUtil = require('../util/googleDriveUtil');
 
@@ -83,6 +86,18 @@ const getItemListings = async (req, res) => {
 
 }
 
+async function calculateAverageRating(reviews) {
+  if (!reviews || reviews.length === 0) {
+      return 0;
+  }
+
+  const sumOfRatings = reviews.reduce((sum, review) => sum + parseInt(review.rating, 10), 0);
+  const averageRating = sumOfRatings / reviews.length;
+  const res = Math.round(averageRating * 100) / 100;
+  console.log("Calculated average : "+ res);
+  return res;
+}
+
 const getProductInformation = async (req, res) => {
   console.log('Working');
   try {
@@ -117,8 +132,24 @@ const getProductInformation = async (req, res) => {
           include: [{
             model: ItemListing,
             attributes: ['listingId', 'price', 'quantity'],
-          }],
+            include: [{
+                model: EndUsers,
+                attributes: ['userId', 'address_line1', 'address_line2', 'address_city', 'address_state_code', 'address_zipcode', 'phone_nr'], // Add the attributes you want to retrieve
+                include: [{
+                    model: User,
+                    attributes: ['name', 'emailId'], // Add the attributes you want to retrieve
+                }],
+            }],
+          },
+          {
+            model: Review,
+            attributes: ['reviewId', 'userId', 'rating', 'comments'],
+          },
+        ],
       });
+
+      console.log('product : '+product);
+      console.log('product : '+JSON.stringify(product));
 
       if (!product) {
         console.log('Product not found');
@@ -136,11 +167,14 @@ const getProductInformation = async (req, res) => {
         console.log("Got imageFiles value in if : " + imageFiles);
       }
       console.log("Got imageFiles value after if : "+ imageFiles);
+
+      const averageRating = await calculateAverageRating(product.Reviews);
       
       return res.status(200).json({
         success: true,
         message: "Item Information retrieved.",
         product: product,
+        averageRating: averageRating,
         imageFiles: imageFiles,
       });
       // res.render('product', {product, username, imageFiles});

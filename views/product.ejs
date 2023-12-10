@@ -31,9 +31,13 @@
 
             <div class="col-md-7" id="product-div-2">
                 <div class="row mb-3" id="product-div-rating">
-                    <span class="star-rating">
-                            &#9733; <!-- Unicode star character -->
-                    </span>
+                    <div class="star-rating">
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                        <span class="star">&#9733;</span>
+                    </div>
                 </div>
                 <div class="row mb-3" id="product-div-description">
                     <p><!--= product.description %>--></p>
@@ -47,8 +51,8 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <th scope="col">Seller</th>
                                 <th scope="col">Price</th>
-                                <th scope="col">Quantity</th>
                                 <th scope="col">Add to Cart</th>
                             </tr>
                         </thead>
@@ -58,9 +62,13 @@
                     </table>
                 </div>
 
-                <div class="col-md-2">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" min="1" max="1" class="form-control">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="quantity">Quantity:</label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="quantity-input" name="quantity" min="0" max="0" class="form-control">
+                    </div>
                 </div>
                 <button class="btn btn-primary add-to-cart-btn login-check-element">Add Selected Item to Cart</button>
             </div>
@@ -106,7 +114,7 @@
                 type: 'GET',
                 success: function (response) {
                     if (response.success) {
-                        updateProductDetails(response.product, response.imageFiles);
+                        updateProductDetails(response.product, response.imageFiles, response.averageRating);
                     } else {
                         console.error('Failed to retrieve item information.');
                     }
@@ -118,7 +126,7 @@
         }
     
         // Function to update HTML content with received data
-        function updateProductDetails(product, imageFiles) {
+        function updateProductDetails(product, imageFiles, averageRating) {
             // Update product name
             var productNameHeader = document.querySelector('#product-name-header');
             productNameHeader.innerHTML = product.name;
@@ -129,16 +137,36 @@
     
             // Update other product details
             var productDiv2 = document.querySelector('#product-div-2');
-            productDiv2.querySelector('#product-div-rating .star-rating').innerHTML = '&#9733;&#9733;&#9733;&#9733;&#9733;';
+            // productDiv2.querySelector('#product-div-rating .star-rating').innerHTML = '&#9733;&#9733;&#9733;&#9733;&#9733;';
+            const productRatingElement = document.querySelector('.star-rating');
+            productRatingElement.dataset.rating = roundToNearestHalf(averageRating);
+            console.log('productRatingElement : '+productRatingElement.dataset.rating);
+            console.log('productRatingElement : '+averageRating);
+
             productDiv2.querySelector('#product-div-description p').innerHTML = product.description;
     
             var productDetailsDiv = document.querySelector('#product-div-specifications');
             productDetailsDiv.innerHTML = '';
-            var excludeKeys = ['itemId', 'name', 'description', 'itemImage', 'listing_Status', 'created_on', 'remarks', 'updated_on', 'ItemListings', 'approval_Status', 'created_by', 'updated_by'];
+            var excludeKeys = ['itemId', 'name', 'description', 'itemImage', 'listing_Status', 'created_on', 'remarks', 'updated_on', 'ItemListings', 'approval_Status', 'created_by', 'updated_by', 'Reviews'];
+            var keyDictionary = {
+                "category": "Category",
+                "storage": "Storage",
+                "cpu": "CPU",
+                "gpu": "GPU",
+                "ram": "RAM",
+                "operating_system": "Operating System",
+                "screen_size": "Screen Size",
+                "screen_type": "Screen Type",
+                "screen_resolution": "Screen Resolution",
+                "front_camera": "Front Camera",
+                "rear_camera": "Rear Camera",
+            };
 
             // Iterate through product attributes and create HTML elements dynamically for non-null values
             for (var key in product) {
                 if (product.hasOwnProperty(key) && !excludeKeys.includes(key) && product[key] !== null) {
+                    console.log("Key : "+key);
+                    var displayName = keyDictionary[key] || key;
                     var detailDiv = document.createElement('div');
                     detailDiv.classList.add('row', 'mb-3');
 
@@ -152,7 +180,7 @@
                     valueDiv.classList.add('col-md-6');
 
                     var strong = document.createElement('strong');
-                    strong.innerHTML = key.charAt(0).toUpperCase() + key.slice(1);
+                    strong.innerHTML = displayName;
 
                     var p = document.createElement('p');
                     p.innerHTML = product[key];
@@ -170,7 +198,7 @@
 
             // Update table with item listings
             var tableBody = productDiv2.querySelector('#product-div-listings-list');
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
     
             product.ItemListings.forEach(function (item) {
                 var row = tableBody.insertRow();
@@ -180,8 +208,8 @@
     
                 console.log("Attaching : "+ item.listingId + ", " + item.price + ", " + item.quantity);
 
-                cell1.innerHTML = item.price;
-                cell2.innerHTML = item.quantity;
+                cell1.innerHTML = item.EndUser.User.name;
+                cell2.innerHTML = item.price;
     
                 // Create radio button and attach data attributes
                 var radioBtn = document.createElement('input');
@@ -191,8 +219,18 @@
                 radioBtn.dataset.itemName = product.name;
                 radioBtn.dataset.itemPrice = item.price;
                 radioBtn.dataset.itemCategory = product.category;
+
+                radioBtn.classList.add('listing-radio-button');
+                // radioBtn.classList.add('login-check-element');
     
                 cell3.appendChild(radioBtn);
+
+                radioBtn.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.getElementById('quantity-input').max = item.quantity;
+                        quantityInputValidation();
+                    }
+                });
             });
     
         }
@@ -214,11 +252,36 @@
             xhr.send();
             function disableButtons() {
                 var elementsToDisable = document.querySelectorAll('.login-check-element');
+                console.log("Checking for buttons : " + JSON.stringify(elementsToDisable));
                 elementsToDisable.forEach(function(element) {
+                    console.log("Disabling : " + element);
                     element.disabled = true;
                 });
             }
         }
+
+        // Round to the nearest 0.50
+        function roundToNearestHalf(value) {
+            const roundedValue = Math.round(value * 100) / 100;
+            const remainder = roundedValue % 0.50;
+            const roundedToHalf = remainder < 0.25
+                ? roundedValue - remainder
+                : roundedValue + (0.50 - remainder);
+
+            return roundedToHalf;
+        }
+
+        var quantityInput = document.getElementById('quantity-input');
+        const quantityInputValidation = function () {
+            console.log("Calledd");
+            var maxQuantity = parseInt(quantityInput.max, 10);
+            var enteredQuantity = parseInt(quantityInput.value, 10);
+            if (enteredQuantity > maxQuantity) {
+                quantityInput.value = maxQuantity;
+            }
+        }
+
+        quantityInput.addEventListener('change', quantityInputValidation);
 
         $(document).ready(function () {
             // Call the function to fetch item details on page load
@@ -238,7 +301,7 @@
                     var itemPrice = selectedRadio.data("item-price");
                     var itemCategory = selectedRadio.data("item-category");
 
-                    var quantity = parseInt($('#quantity').val(), 10);
+                    var quantity = parseInt($('#quantity-input').val(), 10);
                     if (isNaN(quantity) || quantity <= 0) {
                         alert("Please enter a valid quantity.");
                         return;
