@@ -10,9 +10,10 @@
 </head>
 
 <body align="center">
+    <%- include('Common/header2.ejs') %>
 <br> <br>
 <h1 class="text-center mx-auto">Purchase History</h1>
-<div>
+<!-- <div>
     <ul class="nav">
         <li class="nav-item">
             <form action="/item-listing/listings" method="get">
@@ -30,7 +31,7 @@
             </form>
         </li>
     </ul>
-</div>
+</div> -->
 <form action="/users/view-order" method="get" name="orderDetailsForm" style="display: none;">
     <input type="hidden" id="orderIdInput" name="orderId">
 </form>
