@@ -547,6 +547,7 @@ router.post('/check-promo-code', async (req, res)=>
 
     console.log("promoCode: ", promoCode1);
 
+
     //check promo code
     [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode1);
 
@@ -572,6 +573,27 @@ router.get('/get-final-cost', async (req, res)=>
     {
         return;
     }
+
+    res.cookie("promocode", req.query.promocode, {
+        httpOnly: false,
+    });
+
+    res.cookie("address1", req.query.address1, {
+        httpOnly: false,
+    });
+
+    res.cookie("address2", req.query.address2, {
+        httpOnly: false,
+    });
+    res.cookie("address3", req.query.address3, {
+        httpOnly: false,
+    });
+    res.cookie("address4", req.query.address4, {
+        httpOnly: false,
+    });
+    res.cookie("address5", req.query.address5, {
+        httpOnly: false,
+    });
    
     
     
