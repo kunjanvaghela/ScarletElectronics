@@ -262,6 +262,44 @@ router.get("/", async (req, res) => {
 	}
 });
 
+router.get("/header", async (req, res) => {
+	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
+		// If not authenticated, send a 401 Unauthorized response
+		return res.status(401).send('Authentication failed');
+	}
+	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+	console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+	console.log("ACCESSING emailId FROM TOKENPAAYLOAD:", payload.emailId);
+	if (payload.emailId) {
+		const emailId = payload.emailId;
+		const userDetails = await db.User.findOne({ where: { emailId } });
+		const userId = userDetails.dataValues.userid;
+		const endUserDetails = await db.EndUsers.findOne({ where: { userId } });
+		const user = {
+			name: userDetails.name,
+			emailId: userDetails.emailId,
+		};
+
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			body: user
+		});
+
+		// res.render("userProfile", { user: user });
+	} else {
+
+		return res.status(401).json({
+			success: false,
+			status: 401,
+			message: "Invalid cookie",
+			redirectUrl: "/users/login"
+		});
+
+		// res.redirect("login");
+	}
+});
+
 const modifyUser = async (req, res) => {
     if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
         return res.status(401).send('Authentication failed');

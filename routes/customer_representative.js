@@ -7,6 +7,8 @@ const EndUserRequest = db.EndUserRequest;
 const ItemListing = db.ItemListing; //newcode
 const Messages = db.Messages;
 const User = db.User;
+const EndUser = db.EndUsers;
+const Catalog = db.Catalog;
 
 const UserUtil = require('../util/userUtil');
 
@@ -467,8 +469,40 @@ const getReplistings =  async (req, res) => {
     // userDetails = await UserUtil.check_email(req.cookies.emailId);
     // console.log(userDetails.userid);
     const username = userDetails.name;
-    const rep_listings = await ItemListing.findAll();
-    res.render('rep_listings', { rep_listings, username });
+    const rep_listings1 = await ItemListing.findAll(
+      {
+        include: [{
+          model: EndUser,
+          include: [{
+            model: User,
+            attributes: ['name'], // Only fetch the username
+          }]
+        },{
+          model: Catalog
+        }]
+
+      }
+      ).then((messages) => {
+      const rep_listings = messages.map((getListings) => {
+        return {
+          listingId: getListings.listingId,
+          itemId: getListings.itemId,
+          itemName: getListings.Catalog.name,
+          sellerId: getListings.sellerId,
+          username: getListings.EndUser.User.name,
+          price: getListings.price,
+          created_on: getListings.created_on,
+          created_by: getListings.created_by,
+          remarks: getListings.remarks,
+          updated_by: getListings.updated_by,
+          updated_on: getListings.updated_on,
+          quantity: getListings.quantity
+        };
+      });
+    res.render('rep_listings', { rep_listings, username })
+    });
+
+
   } catch (error) {
     console.error('Error fetching listings:', error);
     res.status(500).send('Internal Server Error');
