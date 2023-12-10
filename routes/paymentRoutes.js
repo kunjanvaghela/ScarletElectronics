@@ -44,6 +44,11 @@ const createPaymentIntent = async (req, res) => {
 
     console.log("cartDetails: ", cartDetails);
 
+    if (cartDetails == 0) {
+        console.log("cartDetails is 0");
+        return res.status(400).send('Cart is empty');
+    }
+
     const [total_price, sales_tax, promocode_discount] = await caluculateCost(req, cartDetails, req.cookies.promocode);
 
     let finalPrice = total_price + sales_tax - promocode_discount;
