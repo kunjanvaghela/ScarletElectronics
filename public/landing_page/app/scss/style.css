@@ -451,7 +451,7 @@ button, .button {
 }
 
 
-.btn-primary {
+.btn-primary, .btn-primary:focus  {
   background-color: #CD4631;
   border-color: darkred;
 }

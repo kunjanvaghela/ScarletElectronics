@@ -31,7 +31,7 @@
 <body>
     <%- include('Common/admin_header.ejs') %>
     <div class="container" align="center">
-        <h1 class="text-primary">Admin Dashboard</h1>
+        <h1 class="mx-auto">Admin Dashboard</h1>
 
         <!-- Button to create a customer representative -->
         <button class="btn btn-success" onclick="createCustomerRepresentative()">Create Customer Representative</button>
@@ -42,7 +42,7 @@
         <br>
         <!-- Section to display all customer representatives -->
         <div id="customerRepsTableDiv" style="display: none;">
-            <h2 class="text-primary">View All Customer Representatives</h2>
+            <h2 class="mx-auto">View All Customer Representatives</h2>
             <br>
             <table class="table table-bordered" id="customerRepsTable" cellspacing="0">
                 <thead>
@@ -146,7 +146,8 @@
             fetchCustomerReps(initializeDataTable);
 
             // Toggle visibility of the allRequestsTableDiv
-            $('#viewAllRepsForm').on('click', 'button', function () {
+            $('#viewAllRepsForm').on('click', 'button', function (e) {
+                e.preventDefault();
                 $('#customerRepsTableDiv').toggle();
                 // Re-initialize DataTable after toggling visibility
                 initializeDataTable();
