@@ -7,3 +7,4 @@ package-lock.json/
 node_modules/.package-lock.json
 uploads/
 .env
+node_modules/googleapis-common/node_modules/.bin/uuid
