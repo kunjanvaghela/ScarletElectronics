@@ -86,10 +86,11 @@
                     messageDetails.empty();
                     if(response.serializedMessages && response.serializedMessages.length > 0) {
                         var firstMessage = response.serializedMessages[0];
+                        var listingIdDisplay = firstMessage.listingId ? firstMessage.listingId : "N/A";
                         var detailsDiv = '<div>Request ID: ' + firstMessage.requestId + '&nbsp' +
                                          'User ID: ' + firstMessage.userId + '&nbsp' +
                                          'Customer Rep: ' + firstMessage.customerRep + '&nbsp' +
-                                         'Listing ID: ' + firstMessage.listingId + '</div>';
+                                         'Listing ID: ' + listingIdDisplay + '</div>';
                         messageDetails.append(detailsDiv);
                     }
 

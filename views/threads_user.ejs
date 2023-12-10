@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    <%- include('Common/header.ejs') %>
+    <%- include('Common/header2.ejs') %>
     <div align="center">
         <br>
         <h2 class="text-primary text-left mx-auto">Thread Messages</h2>
@@ -85,10 +85,12 @@
 
                     if(response.serializedMessages && response.serializedMessages.length > 0) {
                         var firstMessage = response.serializedMessages[0];
+                        var listingIdDisplay = firstMessage.listingId ? firstMessage.listingId : "N/A";
+                        var crIdDisplay = firstMessage.customerRep ? firstMessage.customerRep : "Unclaimed";
                         var detailsDiv = '<div>Request ID: ' + firstMessage.requestId + '&nbsp' +
                                          'User ID: ' + firstMessage.userId + '&nbsp' +
-                                         'Customer Rep: ' + firstMessage.customerRep + '&nbsp' +
-                                         'Listing ID: ' + firstMessage.listingId + '</div>';
+                                         'Customer Rep: ' + crIdDisplay + '&nbsp' +
+                                         'Listing ID: ' + listingIdDisplay + '</div>';
                         messageDetails.append(detailsDiv);
                     }
                     

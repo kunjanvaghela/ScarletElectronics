@@ -132,10 +132,10 @@
                                         '<td>' + request.userEmail + '</td>' +
                                         '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId='+request.requestId+'">'+request.updateDescription+'</a></td>' +
-                                        '<td>' + request.createdOn + '</td>' +
+                                        '<td>' + request.createdOn.split(".")[0] + '</td>' +
                                         '<td>' + dropdown + '</td>' +
                                         
-                                        '<td>' + request.updatedOn + '</td>' +
+                                        '<td>' + request.updatedOn.split(".")[0] + '</td>' +
                                       '</tr>';
                             tableBody.append(row);
                             
@@ -158,17 +158,17 @@
                         tableBody.empty();
                         response.serializedRequests.forEach(function(request) {
                             var listingIdDisplay = request.listingId ? request.listingId : "N/A";
-                            var customerRepDisplay = request.customerRep ? request.customerRep : "Unclaimed";
+                            var customerRepDisplay = request.customerRep ? "Claimed" : "Unclaimed";
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userName + '</td>' +
                                         '<td>' + request.userEmail + '</td>' +
                                         '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId="'+ request.requestId +'"">' + request.updateDescription + '</a></td>' +
-                                        '<td>' + request.createdOn + '</td>' +
+                                        '<td>' + request.createdOn.split(".")[0] + '</td>' +
                                         '<td>' + request.currentStatus + '</td>' +
                                         '<td>' + customerRepDisplay + '</td>' +
-                                        '<td>' + request.updatedOn + '</td>' +
+                                        '<td>' + request.updatedOn.split(".")[0] + '</td>' +
                                         '<td><button class="claim-button" data-reqid="'+ request.requestId +'">Claim</button></td>' +
                                       '</tr>';
                             tableBody.append(row);

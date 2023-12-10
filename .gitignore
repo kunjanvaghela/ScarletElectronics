@@ -7,3 +7,9 @@ node_modules/
 package-lock.json/
 node_modules/.package-lock.json
 uploads/
+routes/try copy.js
+.env
+views/tryy.ejs
+
+.env
+node_modules/googleapis-common/node_modules/.bin/uuid
