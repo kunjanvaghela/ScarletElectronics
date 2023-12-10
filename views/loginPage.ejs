@@ -18,6 +18,7 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
 
     <!-- NOTE: The server-side conditionals were removed. You might want to include the relevant headers based on which one would typically be displayed. -->
     <!-- Example: Including the header for 'EndUser' -->
@@ -26,7 +27,7 @@
 
     <div align="center">
         <br> <br>
-        <h1 class="text-primary text-center mx-auto">Welcome to ScarletElectronics</h1>
+        <h1 class="text-center mx-auto">Welcome to ScarletElectronics</h1>
         <br> <br><br>
         <% if (locals.message) { %>
             <h2 style="font-size: larger; color: red;" class="error">
