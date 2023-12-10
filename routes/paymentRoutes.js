@@ -5,7 +5,7 @@ const db = require('../models');
 const { where } = require('sequelize');
 const cart = require("../models/cart");
 const userUtil = require("../util/userUtil");
-const { get_cart: get_cart } = require('../routes/cart_routes');
+const { get_cart: get_cart, caluculateCost: caluculateCost } = require('../routes/cart_routes');
 const paymentService = require('../services/paymentService');
 const authent = userUtil.authent;
 const StripeUser = db.StripeUser;
@@ -28,33 +28,31 @@ const createPaymentIntent = async (req, res) => {
     //USING THE EMAIL ID FROM PAYLOAD OBJECT
     const userDetails = await userUtil.check_email(payload.emailId);
     const customerId = paymentService.fetchCustomerFromStripe(userDetails);
-    const total = Math.ceil(await paymentService.calculateTotal(userDetails) * 100);
+    // const total = Math.ceil(await paymentService.calculateTotal(userDetails) * 100);
     // Create a PaymentIntent with the order amount and currency
+    let cartDetails = 0;
 
-    const calculation = await stripe.tax.calculations.create({
-        currency: 'usd',
-        line_items: [
-            {
-                amount: total,
-                reference: 'L1',
-            },
-        ],
-        customer_details: {
-            address: {
-                line1: 'Geroge Street',
-                city: 'New Brunswick',
-                state: 'NJ',
-                postal_code: '08901',
-                country: 'US',
-            },
-            address_source: 'shipping',
-        },
-    });
-    console.log("Total (with Tax): "+ calculation.amount_total + ", Total: " + total);
+    if (req.query.filter == "false") {
+        console.log("filter is false");
+        cartDetails = await get_cart(payload.userId, false);
+
+    }
+    else {
+        console.log("filter is true");
+        cartDetails = await get_cart(payload.userId);
+    }
+
+    console.log("cartDetails: ", cartDetails);
+
+    const [total_price, sales_tax, promocode_discount] = await caluculateCost(req, cartDetails, req.cookies.promocode);
+
+    let finalPrice = total_price + sales_tax - promocode_discount;
+    finalPrice = Math.ceil(finalPrice * 100);
+    console.log("finalPrice: ", finalPrice);
     const paymentIntent = await stripe.paymentIntents.create({
         customer: customerId,
         // setup_future_usage: "off_session",
-        amount: calculation.amount_total,
+        amount: finalPrice,
         currency: "usd",
         // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
         automatic_payment_methods: {

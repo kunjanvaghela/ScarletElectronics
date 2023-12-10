@@ -35,7 +35,7 @@ const Order = db.Order;
 
 const Catalog = db.Catalog;
 const Promocode = db.Promocode;
-
+const stripe = require("stripe")('sk_test_51O49dTDB1UugWx3SlwFKiiQc8JDwiBU5QX343MsHyZKRmgXN16V4vYSn46NOjm1pSHXgF6kXiDL9FZ2MkuYe17xH00Vx06mKID');
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -159,8 +159,31 @@ async function caluculateCost(req,cartDetails,promoCode_string)
         total_price += cartDetails[i].price * cartDetails[i].quantity;
     }
 
-    sales_tax = 0.07 * total_price;
-
+    // sales_tax = 0.07 * total_price;
+    //Using a new "total" in "tax" only, as stripe takes values in cents, Ex : $10 => 1000.
+    const total = Math.ceil(total_price * 100);
+    const tax = await stripe.tax.calculations.create({
+        currency: 'usd',
+        line_items: [
+            {
+                amount: total,
+                reference: 'L1',
+            },
+        ],
+        customer_details: {
+            address: {
+                line1: req.cookies.address1,
+                line2: req.cookies.address2,
+                city: req.cookies.address3,
+                state: req.cookies.address4,
+                postal_code: req.cookies.address5,
+                country: 'US',
+            },
+            address_source: 'shipping',
+        },
+    });
+    sales_tax = (tax.amount_total - total)/100;
+    console.log("Sales Tax: ", sales_tax);
     console.log("promoCode string: ", promoCode_string);
 
     let promocode_discount = 0;
@@ -766,4 +789,4 @@ router.post('/checkout', async (req, res)=>
 
 
 //export router
-module.exports = { router, get_cart};
+module.exports = { router, get_cart, caluculateCost};
