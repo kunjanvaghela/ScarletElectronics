@@ -81,13 +81,18 @@
             window.history.back();
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() 
+        {
             event.preventDefault();
-			fetch('/cart/fetch-cart')
-			.then(response => response.json())
-			.then(data => {
-				if (data) {
-					// console.log(".....",data);
+			
+            
+            fetch(`/cart/fetch-cart`)
+            .then(response => response.json())
+			.then(data => 
+            {
+                if (data) 
+                {
+                    // console.log(".....",data);
                     cartDetails = data['cartDetails'];
                     TotalPrice = data['TotalPrice'];
                     console.log(TotalPrice);
@@ -129,9 +134,10 @@
                         `;
                         dynamicTable.appendChild(newRow);
                     }
-				}
-			})
-		});
+                }
+			});
+        });
+
     </script>
         
 </body>

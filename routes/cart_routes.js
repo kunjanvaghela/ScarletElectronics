@@ -38,7 +38,7 @@ const Promocode = db.Promocode;
 
 router.use(express.urlencoded({ extended: true }));
 
-async function get_cart(userId,filter=true)
+async function get_cart(userId,filter=true, include_cart_id = true)
 {
     let cartDetails = [];
     let listingIds = [];
@@ -51,12 +51,18 @@ async function get_cart(userId,filter=true)
         // listing id and quantity for each listing in cart
         var listingId = cartDetailsSQL[i].dataValues.listingId;
         var quantity = cartDetailsSQL[i].dataValues.quantity;
+        var cartId = cartDetailsSQL[i].dataValues.cartId;
 
         //append listing id and quantity to cartDetails
-        cartDetails.push({
-                            listingId:listingId, 
-                            quantity:quantity
-                        });
+
+        if(include_cart_id)
+        {
+            cartDetails.push({listingId:listingId, quantity:quantity, cartId:cartId});
+        }
+        else
+        {
+            cartDetails.push({listingId:listingId, quantity:quantity});
+        }
         
         //append listing id to listingIds
         listingIds.push(listingId);
@@ -100,18 +106,70 @@ async function get_cart(userId,filter=true)
 
     if(filter)
     {
-        //remove listingId from cartDetails if max_quantity is 0
-        for (var i = 0; i < cartDetails.length; i++) 
-        {
-            if(cartDetails[i].max_quantity == 0)
-            {
-                cartDetails.splice(i, 1);
-            }
-        }
-
+        cartDetails = cartDetails.filter(item => item.max_quantity !== 0);
+        console.log("cartDetails inide filter: ", cartDetails);
     }
 
     return cartDetails;
+}
+
+async function checkPromoCode(promoCode)
+{
+    //check if promoCode exists in db
+    const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
+
+    console.log("promoCodeData: ", promoCodeData);
+
+    if(!promoCodeData || promoCodeData.dataValues.is_active == false)
+    {
+        statusCode = 400;
+        promocode_discount = 0;
+        promocode_discount_string = "Promocode is not active";
+        return [promocode_discount, promocode_discount_string,statusCode];
+    }
+    else
+    {
+        statusCode = 200;
+        const discount_percent = promoCodeData.dataValues.discount_percent;
+        promocode_discount = total_price*discount_percent/100;
+        const max_discount = promoCodeData.dataValues.max_discount;
+
+        if(promocode_discount > max_discount)
+        {
+            promocode_discount = max_discount;
+        }
+        else
+        {
+            promocode_discount = promocode_discount;
+        }
+        promocode_discount_string = "Promocode Discount Applied is : "+promocode_discount;
+        return [promocode_discount, promocode_discount_string,statusCode];
+    }
+
+}
+
+async function caluculateCost(req,cartDetails,promoCode_string)
+{
+    total_price = 0;
+
+
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        total_price += cartDetails[i].price * cartDetails[i].quantity;
+    }
+
+    sales_tax = 0.07 * total_price;
+
+    console.log("promoCode string: ", promoCode_string);
+
+    let promocode_discount = 0;
+    if(promoCode_string !== undefined)
+    {
+        //check promo code
+        [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode_string);
+    }
+    return [total_price, sales_tax, promocode_discount];
+
 }
 
 router.post('/add-itemlisting', async (req, res)=>
@@ -147,6 +205,14 @@ router.post('/add-itemlisting', async (req, res)=>
         //return 404 error - listingId does not exist in db
         res.status(404).send("listingId does not exist in db");
         console.log("listingId does not exist in db");
+        return;
+    }
+
+    if(listingIdExists.dataValues.quantity == 0)
+    {
+        //return 400 error - quantity of listingId is 0
+        res.status(400).send("quantity of listingId is 0");
+        console.log("quantity of listingId is 0");
         return;
     }
 
@@ -322,7 +388,6 @@ router.get('/fetch-cart', async (req, res)=>
 {
     console.log("fetch-cart inside ------------------------")
 
-    console.log(req.cookies)
 
     //get authentication status and user id
     const [authentication, userId] = await authent(req,res);
@@ -332,98 +397,54 @@ router.get('/fetch-cart', async (req, res)=>
         return;
     }
 
-    
+    //get query parameters
+    console.log("req.query: ", req.query.filter);
+    let cartDetails = 0;
 
-    //get cart details
-    const cartDetails = await get_cart(userId,false);
+    if(req.query.filter == "false")
+    {
+        console.log("filter is false");
+        cartDetails = await get_cart(userId,false);
+
+    }
+    else
+    {
+        console.log("filter is true");
+        cartDetails = await get_cart(userId);
+    }
     
     console.log("cartDetails: ", cartDetails);
-    
+
+
+
+
     //add total price to cartDetails
     for (var i = 0; i < cartDetails.length; i++) 
     {
         cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
     }
 
-    total_price = 0;
+    //get promocode string
+    const promocode_string = req.query.promoCode;
 
-    // check quantity of each listing
-    for (var i = 0; i < cartDetails.length; i++)
-    {
-        const listingId = cartDetails[i].listingId;
+    //calculate cost
+    [total_price, sales_tax, promocode_discount] = await caluculateCost(req,cartDetails,promocode_string);
 
-        //check if listingId exists in db  
-        const listingIdExists = await ItemListing.findOne({where:{listingId:listingId}});
-        if(!listingIdExists)
-        {
-            //return 404 error - listingId does not exist in db
-            res.status(404).send("listingId does not exist in db");
-            console.log("listingId does not exist in db");
-            return;
+    let finalPrice = total_price + sales_tax - promocode_discount;
 
-        }
+    //convert to 2 decimal places
+    total_price = total_price.toFixed(2);
+    sales_tax = sales_tax.toFixed(2);
+    promocode_discount = promocode_discount.toFixed(2);
+    finalPrice = finalPrice.toFixed(2);
 
-        //check if the quantity of listingId is greater than updateCount
-
-        const listingIdQuantity = await ItemListing.findOne({where:{listingId:listingId}});
-        
-
-        //calculate total price of each listing
-        cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
-        total_price += cartDetails[i].totalPrice;
-    }
-
-    //get promoCode from request
-    const promoCode = req.body.promoCode;
-    let promocode_discount = 0;
-
-    if(promoCode)
-    {
-
-        //check if promoCode exists in db
-        const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
-        console.log("promoCodeData: ", promoCodeData);
-
-
-
-        if(!promoCodeData || promoCodeData.dataValues.is_active == false)
-        {
-            promocode_discount = 0
-        }
-        else
-        {
-            const discount_percent = promoCodeData.dataValues.discount_percent
-            promocode_discount = total_price*discount_percent/100
-            const max_discount = promoCodeData.dataValues.max_discount
-
-            if(promocode_discount > max_discount)
-            {
-                promocode_discount = max_discount
-            }
-            else
-            {
-                promocode_discount = promocode_discount
-            }
-
-        }
-
-    }
-
-    sales = total_price*0.1
-    finalPrice = total_price - promocode_discount + sales
-
-    //convert to string
-    total_price = total_price.toString();
-    promocode_discount_string = promocode_discount.toString();
-
-    console.log("debug");
 
     //return cart details
     res.status(200).json({
         cartDetails:cartDetails,
         TotalPrice:total_price,
-        Promocode: promocode_discount_string,
-        Sales:sales,
+        Promocode: promocode_discount,
+        Sales:sales_tax,
         FinalPrice:finalPrice});
 
 });
@@ -526,36 +547,12 @@ router.post('/check-promo-code', async (req, res)=>
 
     console.log("promoCode: ", promoCode1);
 
-        //check if promoCode exists in db
-        const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
-        console.log("promoCodeData: ", promoCodeData);
+    //check promo code
+    [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode1);
 
+    //send response
+    res.status(statusCode).send(promocode_discount_string);
 
-
-    if(!promoCodeData || promoCodeData.dataValues.is_active == false)
-    {
-        //return 400 error - promoCode is not active
-        promocode_discount = 0;
-        res.status(400).send(`Promocode Discount Applied is : ${promocode_discount}`);
-        return;
-    }
-    else
-    {
-        const discount_percent = promoCodeData.dataValues.discount_percent;
-        promocode_discount = total_price*discount_percent/100;
-        const max_discount = promoCodeData.dataValues.max_discount;
-
-        if(promocode_discount > max_discount)
-        {
-            promocode_discount = max_discount;
-        }
-        else
-        {
-            promocode_discount = promocode_discount;
-        }
-        res.status(200).send(`Promocode Discount Applied is : ${promocode_discount}`);
-        return;
-    }
 });
 
 router.get('/orderplace', async (req, res) => { 
@@ -602,7 +599,7 @@ router.post('/checkout', async (req, res)=>
 
 
     // get cart body
-    let cartDetails = await get_cart(userId)
+    let cartDetails = await get_cart(userId,include_cart_id = true)
 
     //calculate total price of each listing
     for (var i = 0; i < cartDetails.length; i++) 
@@ -620,9 +617,15 @@ router.post('/checkout', async (req, res)=>
     //get promoCode from request
     const promoCode = req.body.promoCode;
 
+    //get cartid from all cart details
+    let cartIds = []
+    for (var i = 0; i < cartDetails.length; i++) 
+    {
+        cartIds.push(cartDetails[i].cartId);
+    }
 
-    //clear cart where quantity in not zero for a particular userId
-    const deleteCartDetails = await Cart.destroy({where:{userId:userId, quantity:{[Sequelize.Op.ne]:0}}});
+    //delete cart details from db
+    const deleteCartDetails = await Cart.destroy({where:{cartId:cartIds}});
 
 
     console.log("deletecartDetails: ", deleteCartDetails);
