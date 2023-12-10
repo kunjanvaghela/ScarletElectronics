@@ -544,7 +544,7 @@ router.post('/checkout', async (req, res)=>
 
         const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
         const client = new EasyPostClient(EASYPOST_API_KEY);
-        let shipmentId, trackingId;
+        let shipmentId;
 
         for (var i = 0; i < cartDetails.length; i++) {
             const itemListing =  await ItemListing.findOne({where: {listingId: cartDetails[i].listingId}});
@@ -590,16 +590,16 @@ router.post('/checkout', async (req, res)=>
                 console.log(shipment);
             })();
 
-            await (async () => {
+            const tracker = await (async () => {
                 const tracker = await client.Tracker.create({
                     tracking_code: 'EZ1000000001',
                     carrier: 'USPS',
                 });
-                trackingId = tracker.id;
                 console.log(tracker);
+                return tracker;
             })();
 
-            const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, shipmentId:shipmentId, trackingId: trackingId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, order_status: "in transit"});
+            const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, shipmentId:shipmentId, trackingId: tracker.id, trackingUrl: tracker.public_url, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, order_status: "in transit"});
             console.log("Auto-generated Order ID: ", order.orderId);
         }
 

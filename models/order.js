@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
                     type: DataTypes.STRING(50),
                     allowNull: true,
                 },
+            trackingUrl:
+                {
+                    type: DataTypes.STRING(150),
+                    allowNull: true,
+                },
             quantity:
                 {
                     type: DataTypes.INTEGER,

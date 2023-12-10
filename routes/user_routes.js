@@ -302,7 +302,7 @@ router.get("/get-purchase-history", async (req, res) => {
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = userDetails.dataValues.userid;
 
-		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
+		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`return_shipment`, `order_detail`.`trackingId`, `order_detail`.`trackingUrl`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
 																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
 																				"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
 																				"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
@@ -310,131 +310,139 @@ router.get("/get-purchase-history", async (req, res) => {
 
 
 		// Create a hashmap to store arrays with purchaseId as key
-		// var purchaseHashMap = {};
-		//
-		// orderDetails.forEach((order) => {
-		// 	// Extract relevant data from the order object
-		// 	const {
-		// 		purchaseId,
-		// 		listingId,
-		// 		name,
-		// 		purchase_date,
-		// 		total_price,
-		// 		paymentId,
-		// 		shipmentId,
-		// 		quantity,
-		// 		total_cost_of_item,
-		// 		return_status
-		// 	} = order;
-		//
-		// 	// Check if the purchaseId already exists in the hashmap
-		// 	if (!purchaseHashMap.hasOwnProperty(purchaseId)) {
-		// 		// If not, create a new hashmap for the purchaseId
-		// 		purchaseHashMap[purchaseId] = {
-		// 			itemCount: 0, // Initialize the item count
-		// 			orderDetails: [], // Initialize the array for order details
-		// 			purchaseDate: null, // Initialize the purchase date
-		// 			paymentId: null, // Initialize the purchase date
-		// 			totalPrice: 0
-		// 		};
-		// 	}
-		//
-		// 	// Increment the item count for the purchaseId
-		// 	purchaseHashMap[purchaseId].itemCount++;
-		//
-		// 	// Push the order details to the array corresponding to the purchaseId
-		// 	purchaseHashMap[purchaseId].orderDetails.push({
-		// 		listingId,
-		// 		name,
-		// 		shipmentId,
-		// 		quantity,
-		// 		total_cost_of_item,
-		// 		return_status
-		// 	});
-		//
-		// 	// Update the purchase date if it's not set
-		// 	if (!purchaseHashMap[purchaseId].purchaseDate) {
-		// 		purchaseHashMap[purchaseId].purchaseDate = purchase_date;
-		// 	}
-		// 	if (!purchaseHashMap[purchaseId].paymentId) {
-		// 		purchaseHashMap[purchaseId].paymentId = paymentId;
-		// 	}
-		// 	if (!purchaseHashMap[purchaseId].totalPrice) {
-		// 		purchaseHashMap[purchaseId].totalPrice = total_price;
-		// 	}
-		// });
-		//
-		// // Output the hashmap
-		// console.log(purchaseHashMap);
+		var purchaseHashMap = {};
+
+		orderDetails.forEach((order) => {
+			// Extract relevant data from the order object
+			const {
+				orderId,
+				purchaseId,
+				listingId,
+				name,
+				purchase_date,
+				total_price,
+				paymentId,
+				shipmentId,
+				trackingId,
+				trackingUrl,
+				return_shipment,
+				quantity,
+				total_cost_of_item,
+				order_status
+			} = order;
+
+			// Check if the purchaseId already exists in the hashmap
+			if (!purchaseHashMap.hasOwnProperty(purchaseId)) {
+				// If not, create a new hashmap for the purchaseId
+				purchaseHashMap[purchaseId] = {
+					itemCount: 0, // Initialize the item count
+					orderDetails: [], // Initialize the array for order details
+					purchaseDate: null, // Initialize the purchase date
+					paymentId: null, // Initialize the purchase date
+					totalPrice: 0
+				};
+			}
+
+			// Increment the item count for the purchaseId
+			purchaseHashMap[purchaseId].itemCount++;
+
+			// Push the order details to the array corresponding to the purchaseId
+			purchaseHashMap[purchaseId].orderDetails.push({
+				orderId,
+				listingId,
+				name,
+				shipmentId,
+				trackingId,
+				trackingUrl,
+				return_shipment,
+				quantity,
+				total_cost_of_item,
+				order_status
+			});
+
+			// Update the purchase date if it's not set
+			if (!purchaseHashMap[purchaseId].purchaseDate) {
+				purchaseHashMap[purchaseId].purchaseDate = purchase_date;
+			}
+			if (!purchaseHashMap[purchaseId].paymentId) {
+				purchaseHashMap[purchaseId].paymentId = paymentId;
+			}
+			if (!purchaseHashMap[purchaseId].totalPrice) {
+				purchaseHashMap[purchaseId].totalPrice = total_price;
+			}
+		});
+
+		// Output the hashmap
+		console.log(purchaseHashMap);
 
 
-		res.render("purchase_history", { user: userDetails, order: orderDetails });
+		res.render("purchase_history", { user: userDetails, order: orderDetails, purchaseMap: purchaseHashMap });
 	} else {
 		res.redirect("login");
 	}
 });
 
-router.get("/view-order", async (req, res) => {
-	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
-
-
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
-		var userDetails = await db.User.findOne({where: {emailId}});
-		const userId = userDetails.dataValues.userid;
-
-		let orderId = req.query["orderId"];
-
-		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`return_shipment`, `order_detail`.`trackingId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
-																"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
-																"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
-																"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
-																"where `purchase`.`userId` = " + userId + " and `order_detail`.`orderId` = " + orderId + ";");
-
-		let order;
-		if (orderDetails.length > 0) {
-			// Take the first element from the array
-			const firstOrder = orderDetails[0];
-
-			let trackerDetails;
-			await (async () => {
-				const tracker = await client.Tracker.retrieve(firstOrder.trackingId);
-				trackerDetails = tracker;
-				console.log(tracker);
-			})();
-
-
-
-			// Create an object using the properties of the first element
-			const orderObject = {
-				purchaseId: firstOrder.purchaseId,
-				orderId: firstOrder.orderId,
-				listingId: firstOrder.listingId,
-				name: firstOrder.name,
-				purchase_date: firstOrder.purchase_date,
-				total_price: firstOrder.total_price,
-				paymentId: firstOrder.paymentId,
-				shipmentId: firstOrder.shipmentId,
-				returnShipmentId: firstOrder.return_shipment,
-				trackingId: firstOrder.trackingId,
-				trackerUrl: trackerDetails.public_url,
-				quantity: firstOrder.quantity,
-				total_cost_of_item: firstOrder.total_cost_of_item,
-				order_status: firstOrder.order_status
-			};
-
-			// Now, 'orderObject' is the object created from the first element
-			// console.log(orderObject);
-			order = orderObject;
-		} else {
-			console.log("orderDetails array is empty");
-		}
-		res.render("order_details", {order : order});
-	} else {
-		res.redirect("login");
-	}
-});
+// router.get("/view-order", async (req, res) => {
+// 	// const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
+// 	// console.log("ACCESSING USERID FROM TOKENPAAYLOAD:", payload.userId);
+//
+//
+// 	if (req.cookies.emailId) {
+// 		const emailId = req.cookies.emailId;
+// 		var userDetails = await db.User.findOne({where: {emailId}});
+// 		const userId = userDetails.dataValues.userid;
+//
+// 		let orderId = req.query["orderId"];
+//
+// 		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`return_shipment`, `order_detail`.`trackingId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
+// 																"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
+// 																"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
+// 																"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
+// 																"where `purchase`.`userId` = " + userId + " and `order_detail`.`orderId` = " + orderId + ";");
+//
+// 		let order;
+// 		if (orderDetails.length > 0) {
+// 			// Take the first element from the array
+// 			const firstOrder = orderDetails[0];
+//
+// 			let trackerDetails;
+// 			await (async () => {
+// 				const tracker = await client.Tracker.retrieve(firstOrder.trackingId);
+// 				trackerDetails = tracker;
+// 				console.log(tracker);
+// 			})();
+//
+//
+//
+// 			// Create an object using the properties of the first element
+// 			const orderObject = {
+// 				purchaseId: firstOrder.purchaseId,
+// 				orderId: firstOrder.orderId,
+// 				listingId: firstOrder.listingId,
+// 				name: firstOrder.name,
+// 				purchase_date: firstOrder.purchase_date,
+// 				total_price: firstOrder.total_price,
+// 				paymentId: firstOrder.paymentId,
+// 				shipmentId: firstOrder.shipmentId,
+// 				returnShipmentId: firstOrder.return_shipment,
+// 				trackingId: firstOrder.trackingId,
+// 				trackerUrl: trackerDetails.public_url,
+// 				quantity: firstOrder.quantity,
+// 				total_cost_of_item: firstOrder.total_cost_of_item,
+// 				order_status: firstOrder.order_status
+// 			};
+//
+// 			// Now, 'orderObject' is the object created from the first element
+// 			// console.log(orderObject);
+// 			order = orderObject;
+// 		} else {
+// 			console.log("orderDetails array is empty");
+// 		}
+// 		res.render("order_details", {order : order});
+// 	} else {
+// 		res.redirect("login");
+// 	}
+// });
 
 router.get("/return-order", async (req, res) => {
 	if (req.cookies.emailId) {
@@ -453,15 +461,15 @@ router.get("/return-order", async (req, res) => {
 		})();
 
 		const returnShipment = await (async () => {
-			const shipment = await client.Shipment.create({
+			const returnShipment = await client.Shipment.create({
 				parcel: {id: prevShipment.parcel.id},
 				to_address: {id: prevShipment.to_address.id},
 				from_address: {id: prevShipment.from_address.id},
 				is_return: true,
 			});
 
-			console.log(shipment);
-			return shipment;
+			console.log(returnShipment);
+			return returnShipment;
 		})();
 
 		Order.update(
@@ -480,26 +488,26 @@ router.get("/return-order", async (req, res) => {
 	}
 });
 
-router.post("/cancel-return", async (req, res) => {
-	if (req.cookies.emailId) {
-		const emailId = req.cookies.emailId;
-		var userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
-
-
-		Order.update(
-			{
-				order_status: "return requested"
-			},
-			{
-				where: { listingId: req.body.listingId }
-			}
-		)
-		res.redirect("get-purchase-history");
-	} else {
-		res.redirect("login");
-	}
-});
+// router.post("/cancel-return", async (req, res) => {
+// 	if (req.cookies.emailId) {
+// 		const emailId = req.cookies.emailId;
+// 		var userDetails = await db.User.findOne({ where: { emailId } });
+// 		const userId = userDetails.dataValues.userid;
+//
+//
+// 		Order.update(
+// 			{
+// 				order_status: "return requested"
+// 			},
+// 			{
+// 				where: { listingId: req.body.listingId }
+// 			}
+// 		)
+// 		res.redirect("get-purchase-history");
+// 	} else {
+// 		res.redirect("login");
+// 	}
+// });
 
 
 module.exports = router;
