@@ -20,8 +20,8 @@
             <thead>
                 <tr>
                     <th>Listing ID</th>
-                    <th>Item ID</th>
-                    <th>Seller ID</th>
+                    <th>Item Name</th>
+                    <th>Seller</th>
                     <th>Price</th>
                     <th>Quantity</th>
 
@@ -33,8 +33,8 @@
                 <% rep_listings.forEach(listing => { %>
                     <tr>
                         <td><%= listing.listingId %></td>
-                        <td><%= listing.itemId %></td>
-                        <td><%= listing.sellerId %></td>
+                        <td><a href="/item-listing/catalog?item-id=<%=listing.itemId%>"><%= listing.itemName %></a></td>
+                        <td><%= listing.username %></td>
                         <td><%= listing.price %></td>
                         <td><%= listing.quantity%></td>
                         <!-- Add more columns as needed -->
