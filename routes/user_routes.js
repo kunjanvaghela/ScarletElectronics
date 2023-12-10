@@ -16,6 +16,8 @@ const { encrypt, decrypt } = require("../util/encryptionUtil");
 
 const multer = require("multer");
 const EasyPostClient = require("@easypost/api");
+const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
+const client = new EasyPostClient(EASYPOST_API_KEY);
 const {cookies} = require("express/lib/request");
 const upload = multer();
 
@@ -722,7 +724,7 @@ router.get("/get-purchase-history", async (req, res) => {
 		var userDetails = await db.User.findOne({ where: { emailId } });
 		const userId = payload.userId;
 
-		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
+		var [orderDetails, metadata] = await db.sequelize.query("Select `purchase`.`purchaseId`, `order_detail`.`orderId`, `item_listing`.`listingId`, `ref_catalog`.`name`, `purchase`.`purchase_date`, `purchase`.`total_price`, `purchase`.`paymentId`, `order_detail`.`shipmentId`, `order_detail`.`return_shipment`, `order_detail`.`trackingId`, `order_detail`.`trackingUrl`, `order_detail`.`quantity`, `order_detail`.`total_cost_of_item`, `order_detail`.`order_status` from `order_detail` " +
 																				"INNER JOIN `purchase` ON `order_detail`.`purchaseId` = `purchase`.`purchaseId` " +
 																				"INNER JOIN `item_listing` ON `order_detail`.`listingId` = `item_listing`.`listingId`" +
 																				"INNER JOIN `ref_catalog` ON `ref_catalog`.`itemId` = `item_listing`.`itemId`" +
@@ -730,65 +732,73 @@ router.get("/get-purchase-history", async (req, res) => {
 
 
 		// Create a hashmap to store arrays with purchaseId as key
-		// var purchaseHashMap = {};
-		//
-		// orderDetails.forEach((order) => {
-		// 	// Extract relevant data from the order object
-		// 	const {
-		// 		purchaseId,
-		// 		listingId,
-		// 		name,
-		// 		purchase_date,
-		// 		total_price,
-		// 		paymentId,
-		// 		shipmentId,
-		// 		quantity,
-		// 		total_cost_of_item,
-		// 		return_status
-		// 	} = order;
-		//
-		// 	// Check if the purchaseId already exists in the hashmap
-		// 	if (!purchaseHashMap.hasOwnProperty(purchaseId)) {
-		// 		// If not, create a new hashmap for the purchaseId
-		// 		purchaseHashMap[purchaseId] = {
-		// 			itemCount: 0, // Initialize the item count
-		// 			orderDetails: [], // Initialize the array for order details
-		// 			purchaseDate: null, // Initialize the purchase date
-		// 			paymentId: null, // Initialize the purchase date
-		// 			totalPrice: 0
-		// 		};
-		// 	}
-		//
-		// 	// Increment the item count for the purchaseId
-		// 	purchaseHashMap[purchaseId].itemCount++;
-		//
-		// 	// Push the order details to the array corresponding to the purchaseId
-		// 	purchaseHashMap[purchaseId].orderDetails.push({
-		// 		listingId,
-		// 		name,
-		// 		shipmentId,
-		// 		quantity,
-		// 		total_cost_of_item,
-		// 		return_status
-		// 	});
-		//
-		// 	// Update the purchase date if it's not set
-		// 	if (!purchaseHashMap[purchaseId].purchaseDate) {
-		// 		purchaseHashMap[purchaseId].purchaseDate = purchase_date;
-		// 	}
-		// 	if (!purchaseHashMap[purchaseId].paymentId) {
-		// 		purchaseHashMap[purchaseId].paymentId = paymentId;
-		// 	}
-		// 	if (!purchaseHashMap[purchaseId].totalPrice) {
-		// 		purchaseHashMap[purchaseId].totalPrice = total_price;
-		// 	}
-		// });
-		//
-		// // Output the hashmap
-		// console.log(purchaseHashMap);
+		var purchaseHashMap = {};
+
+		orderDetails.forEach((order) => {
+			// Extract relevant data from the order object
+			const {
+				orderId,
+				purchaseId,
+				listingId,
+				name,
+				purchase_date,
+				total_price,
+				paymentId,
+				shipmentId,
+				trackingId,
+				trackingUrl,
+				return_shipment,
+				quantity,
+				total_cost_of_item,
+				order_status
+			} = order;
+
+			// Check if the purchaseId already exists in the hashmap
+			if (!purchaseHashMap.hasOwnProperty(purchaseId)) {
+				// If not, create a new hashmap for the purchaseId
+				purchaseHashMap[purchaseId] = {
+					itemCount: 0, // Initialize the item count
+					orderDetails: [], // Initialize the array for order details
+					purchaseDate: null, // Initialize the purchase date
+					paymentId: null, // Initialize the purchase date
+					totalPrice: 0
+				};
+			}
+
+			// Increment the item count for the purchaseId
+			purchaseHashMap[purchaseId].itemCount++;
+
+			// Push the order details to the array corresponding to the purchaseId
+			purchaseHashMap[purchaseId].orderDetails.push({
+				orderId,
+				listingId,
+				name,
+				shipmentId,
+				trackingId,
+				trackingUrl,
+				return_shipment,
+				quantity,
+				total_cost_of_item,
+				order_status
+			});
+
+			// Update the purchase date if it's not set
+			if (!purchaseHashMap[purchaseId].purchaseDate) {
+				purchaseHashMap[purchaseId].purchaseDate = purchase_date;
+			}
+			if (!purchaseHashMap[purchaseId].paymentId) {
+				purchaseHashMap[purchaseId].paymentId = paymentId;
+			}
+			if (!purchaseHashMap[purchaseId].totalPrice) {
+				purchaseHashMap[purchaseId].totalPrice = total_price;
+			}
+		});
+
+		// Output the hashmap
+		console.log(purchaseHashMap);
 
 
-		res.render("purchase_history", { user: userDetails, order: orderDetails });
+		res.render("purchase_history", { user: userDetails, order: orderDetails, purchaseMap: purchaseHashMap });
 	} else {
 		res.redirect("login");
 	}
@@ -863,32 +873,55 @@ router.get("/view-order", async (req, res) => {
 	}
 });
 
-router.post("/return-order", async (req, res) => {
+router.get("/return-order", async (req, res) => {
 	if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
 		// If not authenticated, send a 401 Unauthorized response
 		return res.status(401).send('Authentication failed');
 	}
 
 	const payload = UserUtil.retrieveTokenPayload(req.cookies.accessToken);
-
+    let orderId = req.query["orderId"];
 	if (payload.emailId) {
-		const emailId = payload.emailId;
-		var userDetails = await db.User.findOne({ where: { emailId } });
-		const userId = userDetails.dataValues.userid;
+        const emailId = payload.emailId;
+        var userDetails = await User.findOne({ where: { emailId } });
+        const userId = userDetails.dataValues.userid;
+        let orderId = req.query["orderId"];
+        var orderDetails = await Order.findOne({ where: { orderId } });
 
 
-		Order.update(
-			{
-				order_status: "Return Requested"
-			},
-			{
-				where: { listingId: req.body.listingId }
-			}
-		)
-		res.redirect("get-purchase-history");
-	} else {
-		res.redirect("login");
-	}
+        const prevShipment = await (async () => {
+            const shipment = await client.Shipment.retrieve(orderDetails.shipmentId);
+
+            console.log(shipment);
+            return shipment;
+        })();
+
+        const returnShipment = await (async () => {
+            const returnShipment = await client.Shipment.create({
+                parcel: {id: prevShipment.parcel.id},
+                to_address: {id: prevShipment.to_address.id},
+                from_address: {id: prevShipment.from_address.id},
+                is_return: true,
+            });
+
+            console.log(returnShipment);
+            return returnShipment;
+        })();
+
+        Order.update(
+            {
+                order_status: "return requested",
+                return_shipment: returnShipment.id,
+                shipmentId: "Order Requested for return"
+            },
+            {
+                where: { orderId: orderId }
+            }
+        )
+        res.redirect("get-purchase-history");
+    } else {
+        res.redirect("login");
+    }
 });
 
 router.post("/cancel-return", async (req, res) => {

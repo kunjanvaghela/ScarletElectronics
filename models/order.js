@@ -21,11 +21,16 @@ module.exports = (sequelize, DataTypes) => {
             shipmentId:
                 {
                     type: DataTypes.STRING(50),
-                    allowNull: false,
+                    allowNull: true,
                 },
             trackingId:
                 {
                     type: DataTypes.STRING(50),
+                    allowNull: true,
+                },
+            trackingUrl:
+                {
+                    type: DataTypes.STRING(150),
                     allowNull: true,
                 },
             quantity:
@@ -43,15 +48,10 @@ module.exports = (sequelize, DataTypes) => {
                     type: DataTypes.STRING(50),
                     allowNull: true
                 },
-            shipmentId:
+            return_shipment:
                 {
                     type: DataTypes.STRING(50),
-                    allowNull: false,
-                },
-            trackingId:
-                {
-                    type: DataTypes.STRING(50),
-                    allowNull: false,
+                    allowNull: true
                 }
         },
         {
