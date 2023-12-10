@@ -28,7 +28,7 @@
       </div>
 
       <div class="header__cart hide-for-mobile hearder__cart__btn flex flex-jc-c flex-ai-c"> 
-        <button href="#" class="hearder__cart__btn flex flex-jc-c flex-ai-c"><img class="header__cart__icon" src="../../public/landing_page/images/cart.png" alt="shopping cart"></button>
+        <button onclick="redirectToCart()" class="hearder__cart__btn flex flex-jc-c flex-ai-c"><img class="header__cart__icon" src="../../public/landing_page/images/cart.png" alt="shopping cart"></button>
       </div>
 
       <div id="user-login-container">
@@ -52,6 +52,11 @@
     </div>
 
     <script>
+
+      function redirectToCart()
+      {
+        window.location.href = "/cart/fetch-cart-display";
+      }
 
       $(document).ready(function() {
           $.ajax({
