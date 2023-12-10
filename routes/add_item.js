@@ -142,6 +142,6 @@ const postinsert = async (req, res) => {
 };
 
 router.get("/add", getadd);
-router.post('/insert', postinsert);
+router.post('/insert', upload.single('itemImage'), postinsert);
 
 module.exports = router;
