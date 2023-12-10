@@ -71,7 +71,7 @@ async function handleSubmit(e) {
                 if (response.ok) {
                     // If the response is successful, alert the message and then redirect
                     alert(data.message);
-                    window.location.href = data.redirectUrl || '/cart/orderplace';
+                    window.location.href = data.redirectUrl || '/users/get-purchase-history';
                 } else {
                     // If the response is not successful, throw an error with the message from the server
                     throw new Error(data.message);
