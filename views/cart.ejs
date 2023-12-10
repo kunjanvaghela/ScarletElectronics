@@ -97,7 +97,10 @@
         function cartSync() 
         {
             event.preventDefault();
-			fetch('/cart/fetch-cart')
+			//query param to be added
+            const queryString = `?filter=${encodeURIComponent(false)}`;
+            
+            fetch(`/cart/fetch-cart${queryString}`)
 			.then(response => response.json())
 			.then(data => {
                 console.log("data");
