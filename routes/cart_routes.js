@@ -113,7 +113,7 @@ async function get_cart(userId,filter=true, include_cart_id = true)
     return cartDetails;
 }
 
-async function checkPromoCode(promoCode)
+async function checkPromoCode(promoCode,total_price)
 {
     //check if promoCode exists in db
     const promoCodeData = await Promocode.findOne({where:{promocode:promoCode}});
@@ -142,9 +142,9 @@ async function checkPromoCode(promoCode)
         {
             promocode_discount = promocode_discount;
         }
-        promocode_discount_string = "Promocode Discount Applied is : "+promocode_discount;
-        return [promocode_discount, promocode_discount_string,statusCode];
     }
+    promocode_discount_string = "Promocode Discount Applied is : "+promocode_discount;
+    return [promocode_discount, promocode_discount_string,statusCode];
 
 }
 
@@ -166,7 +166,7 @@ async function caluculateCost(req,cartDetails,promoCode_string)
     if(promoCode_string !== undefined)
     {
         //check promo code
-        [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode_string);
+        [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode_string,total_price);
     }
     return [total_price, sales_tax, promocode_discount];
 
@@ -208,13 +208,13 @@ router.post('/add-itemlisting', async (req, res)=>
         return;
     }
 
-    if(listingIdExists.dataValues.quantity == 0)
-    {
-        //return 400 error - quantity of listingId is 0
-        res.status(400).send("quantity of listingId is 0");
-        console.log("quantity of listingId is 0");
-        return;
-    }
+    // if(listingIdExists.dataValues.quantity == 0)
+    // {
+    //     //return 400 error - quantity of listingId is 0
+    //     res.status(400).send("quantity of listingId is 0");
+    //     console.log("quantity of listingId is 0");
+    //     return;
+    // }
 
     //check if listingId already exists in cart
     const listingIdExistsInCart = await Cart.findOne({where:{listingId:listingId, userId:userId}});
@@ -425,7 +425,7 @@ router.get('/fetch-cart', async (req, res)=>
     }
 
     //get promocode string
-    const promocode_string = req.query.promoCode;
+    const promocode_string = req.cookies.promocode;
 
     //calculate cost
     [total_price, sales_tax, promocode_discount] = await caluculateCost(req,cartDetails,promocode_string);
@@ -507,7 +507,7 @@ router.post('/check-promo-code', async (req, res)=>
 
     let cartDetails = await get_cart(userId)
 
-    total_price = 0;
+    let total_price = 0;
 
     // check quantity of each listing
     for (var i = 0; i < cartDetails.length; i++)
@@ -549,7 +549,7 @@ router.post('/check-promo-code', async (req, res)=>
 
 
     //check promo code
-    [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode1);
+    [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promoCode1,total_price);
 
     //send response
     res.status(statusCode).send(promocode_discount_string);
@@ -646,8 +646,17 @@ router.post('/checkout', async (req, res)=>
         total_price += cartDetails[i].totalPrice;
     }
 
-    //get promoCode from request
-    const promoCode = req.body.promoCode;
+    //get promocode string
+    const promocode_string = req.cookies.promocode;
+
+    //check promo code
+    [promocode_discount, promocode_discount_string,statusCode] = await checkPromoCode(promocode_string,total_price)
+
+    //deactivate promocode
+    if(promocode_string !== undefined)
+    {
+        const deactivatePromoCode = await Promocode.update({is_active:false},{where:{promocode:promocode_string}});
+    }
 
     //get cartid from all cart details
     let cartIds = []
@@ -740,6 +749,13 @@ router.post('/checkout', async (req, res)=>
 
 
     console.log("req.body: ", req.body);
+
+    res.clearCookie("promocode");
+    res.clearCookie("address1");
+    res.clearCookie("address2");
+    res.clearCookie("address3");
+    res.clearCookie("address4");
+    res.clearCookie("address5");
     //res.render('orderplace');
 
     res.status(200).send(JSON.stringify({message: "Payment Successful", redirectUrl: "/cart/orderplace"}));
