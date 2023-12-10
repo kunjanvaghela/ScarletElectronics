@@ -14,7 +14,7 @@
         // $(document).ready(function () {
             // Event listener for 'Add to Cart' button clicks
             // $('.add-to-cart-btn').click(function (event) {
-                $(document).on('click', '.add-to-cart-btn', function(event) {
+            $(document).on('click', '.add-to-cart-btn', function(event) {
                 // Prevent the default form submit action
                 event.preventDefault();
 
@@ -66,7 +66,7 @@
 <body>
     <%- include('Common/header2.ejs') %>
     <br><br><br>
-    <h1 class="text-primary text-center mx-auto">Scarlet Electronics</h1>
+    <h1 class="text-center mx-auto">Scarlet Electronics</h1>
     <br><br><br>
     <div class="container">
         <div class="row">
@@ -180,7 +180,7 @@
     <div class="container">
         <div class="d-flex align-items-end">
             <form action="/item-listing/create" method="GET">
-                <button type="submit" class="btn btn-primary">Sell Item</button>
+                <button type="submit" class="btn btn-primary login-check-element">Sell Item</button>
             </form>
         </div>
     </div>
@@ -353,49 +353,72 @@
 
             console.log(url);
             
-        $.ajax({
-            type: "GET",
-            url: url,
-            // data: $(this).serialize(), // Serialize form data
-            success: function(response) {
-                var divParent = $('#listings-div');
-                divParent.empty(); // Clear existing content in the parent div
-
-                response.serializedListings.forEach(function(item) {
-                    // Create a new card for each item in serializedListings
-                    var cardHtml = `
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="image-container">
-                                        <img src="https://drive.google.com/uc?export=view&id=${item.imageFiles[0].id}" class="img_contain" alt="Image Unavailable">
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title">${item.name}</h5>
-                                        <h6 class="card-text">From Price: $${item.price}</h6>
-                                        <h7 class="card-subtitle mb-2 text-muted">${item.category}</h7>
-                                        <p class="card-text">${item.description}</p>
-                                        <a href="/item-listing/catalog?item-id=${item.itemId}" class="btn btn-primary"
-                                            data-item-id="${item.listingId}">
-                                            View Details
-                                        </a>
-                                        <a href="#" class="btn btn-secondary add-to-cart-btn"   
-                                            data-item-id="${item.listingId}"
-                                            data-item-name="${item.name}"
-                                            data-item-price="${item.price}"
-                                            data-item-category="${item.category}">
-                                            Add to Cart
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>`;
-                        divParent.append(cardHtml); // Append the new card to the parent div
+            $.ajax({
+                type: "GET",
+                url: url,
+                // data: $(this).serialize(), // Serialize form data
+                success: function(response) {
+                    var divParent = $('#listings-div');
+                    divParent.empty(); // Clear existing content in the parent div
+                    response.serializedListings.forEach(function(item) {
+                            // Create a new card for each item in serializedListings
+                            var cardHtml = `
+                                    <div class="col-md-4">
+                                        <div class="card card-listings-page">
+                                            <div class="image-container">
+                                                <img src="https://drive.google.com/uc?export=view&id=${item.imageFiles[0].id}" class="img_contain" alt="Image Unavailable">
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">${item.name}</h5>
+                                                <h6 class="card-text">From Price: $${item.price}</h6>
+                                                <h7 class="card-subtitle mb-2 text-muted">${item.category}</h7>
+                                                <p class="card-text card-text-description">${item.description}</p>
+                                                <a href="/item-listing/catalog?item-id=${item.itemId}" class="btn btn-primary"
+                                                    data-item-id="${item.listingId}">
+                                                    View Details
+                                                </a>
+                                                <a href="#" class="btn btn-secondary add-to-cart-btn login-check-element"   
+                                                    data-item-id="${item.listingId}"
+                                                    data-item-name="${item.name}"
+                                                    data-item-price="${item.price}"
+                                                    data-item-category="${item.category}">
+                                                    Add to Cart
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                divParent.append(cardHtml); // Append the new card to the parent div
                         });
+                        checkElementsWithLoginRequirement();
                     },
                     error: function(error) {
                         console.error('Error fetching claimed requests:', error);
                     }
                 });
+        }
+
+        function checkElementsWithLoginRequirement() {
+            console.log("Checking for button disabling!");
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/users/", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status !== 200) {
+                            console.log("Not logged in check for the button disabling");
+                            disableButtons();
+                        }
+                    } else {
+                        console.error('Unable to check if the user is logged in. Error:', xhr.status, xhr.statusText);
+                    }
+                }
+            xhr.send();
+            function disableButtons() {
+                var elementsToDisable = document.querySelectorAll('.login-check-element');
+                elementsToDisable.forEach(function(element) {
+                    element.disabled = true;
+                });
             }
+        }
 
 
         $(document).ready(function() {

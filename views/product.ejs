@@ -59,48 +59,58 @@
 			</h2>
 
 			<div class="row mt-5" id="product-div-details">
-				<div class="col-md-4" id="product-image-div">
-					<img
-						src="https://drive.google.com/uc?export=view&id="
-						style="height: 100%; width: 100%; object-fit: contain"
-						alt="Image Unavailable" />
+				<div class="col-md-5" id="product-image-div">
+					<img src="https://drive.google.com/uc?export=view&id=" style='height: 100%; width: 100%; object-fit: contain' alt="Image Unavailable">
+	
 				</div>
-
-				<div class="col-md-8" id="product-div-2">
+	
+				<div class="col-md-7" id="product-div-2">
 					<div class="row mb-3" id="product-div-rating">
-						<span class="star-rating">
-							&#9733;
-							<!-- Unicode star character -->
-						</span>
+						<div class="star-rating">
+							<span class="star">&#9733;</span>
+							<span class="star">&#9733;</span>
+							<span class="star">&#9733;</span>
+							<span class="star">&#9733;</span>
+							<span class="star">&#9733;</span>
+						</div>
 					</div>
 					<div class="row mb-3" id="product-div-description">
 						<p><!--= product.description %>--></p>
 					</div>
-
+	
+					<div id ="product-div-specifications">
+	
+					</div>
+	
 					<div class="row" id="product-div-listings">
 						<table class="table">
 							<thead>
 								<tr>
+									<th scope="col">Seller</th>
 									<th scope="col">Price</th>
-									<th scope="col">Quantity</th>
 									<th scope="col">Add to Cart</th>
 								</tr>
 							</thead>
 							<tbody id="product-div-listings-list">
-								<!-- product.ItemListings.forEach((item) => { %>-->
-								<tr></tr>
-								<!-- }) %>-->
+								
 							</tbody>
 						</table>
 					</div>
-					<button class="btn btn-primary add-to-cart-btn">
-						Add Selected Item to Cart
-					</button>
+	
+					<div class="row">
+						<div class="col-md-3">
+							<label for="quantity">Quantity:</label>
+						</div>
+						<div class="col-md-3">
+							<input type="number" id="quantity-input" name="quantity" min="0" max="0" class="form-control">
+						</div>
+					</div>
+					<button class="btn btn-primary add-to-cart-btn login-check-element">Add Selected Item to Cart</button>
 				</div>
 			</div>
-
-			<br /><br /><br /><br />
-
+	
+			<br><br><br><br>
+	
 			<div class="mt-5">
 				<h2>Reviews</h2>
 				<br />
@@ -198,86 +208,139 @@
 
 			// Function to make the AJAX call and update HTML content
 			function fetchItemDetails() {
-				var itemId = getParameterByName("item-id");
-
+				var itemId = getParameterByName('item-id');
+		
 				if (!itemId) {
-					console.error("Item ID not found in the URL parameters.");
+					console.error('Item ID not found in the URL parameters.');
 					return;
 				}
-				console.log("Item ID found : " + itemId);
+				console.log('Item ID found : '+itemId);
 				// Make AJAX call
 				$.ajax({
-					url: "/item-listing/product?item-id=" + itemId,
-					type: "GET",
+					url: '/item-listing/product?item-id=' + itemId,
+					type: 'GET',
 					success: function (response) {
 						if (response.success) {
-							updateProductDetails(
-								response.product,
-								response.imageFiles
-							);
+							updateProductDetails(response.product, response.imageFiles, response.averageRating);
 						} else {
-							console.error(
-								"Failed to retrieve item information."
-							);
+							console.error('Failed to retrieve item information.');
 						}
 					},
 					error: function () {
-						console.error("Failed to make the AJAX call.");
-					},
+						console.error('Failed to make the AJAX call.');
+					}
 				});
 			}
+		
 
 			// Function to update HTML content with received data
-			function updateProductDetails(product, imageFiles) {
+			function updateProductDetails(product, imageFiles, averageRating) {
 				// Update product name
-				var productNameHeader = document.querySelector(
-					"#product-name-header"
-				);
+				var productNameHeader = document.querySelector('#product-name-header');
 				productNameHeader.innerHTML = product.name;
-
+		
 				// Update product image
-				var productImage = document.querySelector(
-					"#product-image-div img"
-				);
-				productImage.src =
-					"https://drive.google.com/uc?export=view&id=" +
-					imageFiles[0].id;
-
+				var productImage = document.querySelector('#product-image-div img');
+				productImage.src = 'https://drive.google.com/uc?export=view&id=' + imageFiles[0].id;
+		
 				// Update other product details
-				var productDiv2 = document.querySelector("#product-div-2");
-				productDiv2.querySelector(
-					"#product-div-rating .star-rating"
-				).innerHTML = "&#9733;&#9733;&#9733;&#9733;&#9733;";
-				productDiv2.querySelector(
-					"#product-div-description p"
-				).innerHTML = product.description;
+				var productDiv2 = document.querySelector('#product-div-2');
+				// productDiv2.querySelector('#product-div-rating .star-rating').innerHTML = '&#9733;&#9733;&#9733;&#9733;&#9733;';
+				const productRatingElement = document.querySelector('.star-rating');
+				productRatingElement.dataset.rating = roundToNearestHalf(averageRating);
+				console.log('productRatingElement : '+productRatingElement.dataset.rating);
+				console.log('productRatingElement : '+averageRating);
+
+				productDiv2.querySelector('#product-div-description p').innerHTML = product.description;
+		
+				var productDetailsDiv = document.querySelector('#product-div-specifications');
+				productDetailsDiv.innerHTML = '';
+				var excludeKeys = ['itemId', 'name', 'description', 'itemImage', 'listing_Status', 'created_on', 'remarks', 'updated_on', 'ItemListings', 'approval_Status', 'created_by', 'updated_by', 'Reviews'];
+				var keyDictionary = {
+					"category": "Category",
+					"storage": "Storage",
+					"cpu": "CPU",
+					"gpu": "GPU",
+					"ram": "RAM",
+					"operating_system": "Operating System",
+					"screen_size": "Screen Size",
+					"screen_type": "Screen Type",
+					"screen_resolution": "Screen Resolution",
+					"front_camera": "Front Camera",
+					"rear_camera": "Rear Camera",
+				};
+
+				// Iterate through product attributes and create HTML elements dynamically for non-null values
+				for (var key in product) {
+					if (product.hasOwnProperty(key) && !excludeKeys.includes(key) && product[key] !== null) {
+						console.log("Key : "+key);
+						var displayName = keyDictionary[key] || key;
+						var detailDiv = document.createElement('div');
+						detailDiv.classList.add('row', 'mb-3');
+
+						// var spacingDiv = document.createElement('div');
+						// spacingDiv.classList.add('col-md-1');
+
+						var labelDiv = document.createElement('div');
+						labelDiv.classList.add('col-md-6');
+
+						var valueDiv = document.createElement('div');
+						valueDiv.classList.add('col-md-6');
+
+						var strong = document.createElement('strong');
+						strong.innerHTML = displayName;
+
+						var p = document.createElement('p');
+						p.innerHTML = product[key];
+
+						labelDiv.appendChild(strong);
+						valueDiv.appendChild(p);
+						// detailDiv.appendChild(spacingDiv);
+						detailDiv.appendChild(labelDiv);
+						detailDiv.appendChild(valueDiv);
+						// detailDiv.appendChild(spacingDiv);
+
+						productDetailsDiv.appendChild(detailDiv);
+					}
+				}
 
 				// Update table with item listings
-				var tableBody = productDiv2.querySelector(
-					"#product-div-listings-list"
-				);
-				tableBody.innerHTML = ""; // Clear existing rows
-
+				var tableBody = productDiv2.querySelector('#product-div-listings-list');
+				tableBody.innerHTML = '';
+		
 				product.ItemListings.forEach(function (item) {
 					var row = tableBody.insertRow();
 					var cell1 = row.insertCell(0);
 					var cell2 = row.insertCell(1);
 					var cell3 = row.insertCell(2);
+		
+					console.log("Attaching : "+ item.listingId + ", " + item.price + ", " + item.quantity);
 
-					cell1.innerHTML = item.price;
-					cell2.innerHTML = item.quantity;
-
+					cell1.innerHTML = item.EndUser.User.name;
+					cell2.innerHTML = item.price;
+		
 					// Create radio button and attach data attributes
-					var radioBtn = document.createElement("input");
-					radioBtn.type = "radio";
-					radioBtn.name = "listingId";
+					var radioBtn = document.createElement('input');
+					radioBtn.type = 'radio';
+					radioBtn.name = 'listingId';
 					radioBtn.dataset.listingId = item.listingId;
 					radioBtn.dataset.itemName = product.name;
 					radioBtn.dataset.itemPrice = item.price;
 					radioBtn.dataset.itemCategory = product.category;
 
+					radioBtn.classList.add('listing-radio-button');
+					// radioBtn.classList.add('login-check-element');
+		
 					cell3.appendChild(radioBtn);
+
+					radioBtn.addEventListener('change', function() {
+						if (this.checked) {
+							document.getElementById('quantity-input').max = item.quantity;
+							quantityInputValidation();
+						}
+					});
 				});
+		
 			}
 
 			function displayReviews(comments) {
@@ -491,65 +554,136 @@
 				});
 			}
 
-			// Call the function to fetch item details on page load
-			fetchItemDetails();
-			getComments();
-			getRecommendations();
+
+			function checkElementsWithLoginRequirement() {
+				console.log("Checking for button disabling!");
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "/users/", true);
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4) {
+						if (xhr.status !== 200) {
+								console.log("Not logged in check for the button disabling");
+								disableButtons();
+							}
+						} else {
+							console.error('Unable to check if the user is logged in. Error:', xhr.status, xhr.statusText);
+						}
+					}
+				xhr.send();
+				function disableButtons() {
+					var elementsToDisable = document.querySelectorAll('.login-check-element');
+					console.log("Checking for buttons : " + JSON.stringify(elementsToDisable));
+					elementsToDisable.forEach(function(element) {
+						console.log("Disabling : " + element);
+						element.disabled = true;
+					});
+				}
+			}
+
+			// Round to the nearest 0.50
+			function roundToNearestHalf(value) {
+				const roundedValue = Math.round(value * 100) / 100;
+				const remainder = roundedValue % 0.50;
+				const roundedToHalf = remainder < 0.25
+					? roundedValue - remainder
+					: roundedValue + (0.50 - remainder);
+
+				return roundedToHalf;
+			}
+
+			var quantityInput = document.getElementById('quantity-input');
+			const quantityInputValidation = function () {
+				console.log("Calledd");
+				var maxQuantity = parseInt(quantityInput.max, 10);
+				var enteredQuantity = parseInt(quantityInput.value, 10);
+				if (enteredQuantity > maxQuantity) {
+					quantityInput.value = maxQuantity;
+				}
+			}
+
+			quantityInput.addEventListener('change', quantityInputValidation);
+
+
+
+			$(document).ready(function () {
+				// Call the function to fetch item details on page load
+				fetchItemDetails();
+				checkElementsWithLoginRequirement();            
+				getComments();
+				getRecommendations();
+	        });
+
+            // Event listener for 'Add to Cart' button clicks
+            $('.add-to-cart-btn').click(function (event) {
+                // Prevent the default form submit action
+                event.preventDefault();
+
+                var selectedRadio = $("input[name='listingId']:checked");
+
+                if (selectedRadio.length > 0) {
+                    var listingId = selectedRadio.data("listing-id");
+                    var itemName = selectedRadio.data("item-name");
+                    var itemPrice = selectedRadio.data("item-price");
+                    var itemCategory = selectedRadio.data("item-category");
+
+                    var quantity = parseInt($('#quantity-input').val(), 10);
+                    if (isNaN(quantity) || quantity <= 0) {
+                        alert("Please enter a valid quantity.");
+                        return;
+                    }
+
+                    var maxQuantity = parseInt(selectedRadio.data("max-quantity"), 10);
+                    if (quantity > maxQuantity) {
+                        alert("Quantity exceeds available stock.");
+                        return;
+                    }
+
+                    console.log("Listing ID: " + listingId);
+                    console.log("Item Name: " + itemName);
+                    console.log("Item Price: " + itemPrice);
+                    console.log("Item Category: " + itemCategory);
+                    // console.log($(this).data('item-id'));
+                    // var listingId = $(this).data('item-id');
+                    // var itemName = $(this).data('item-name');
+                    // var itemPrice = $(this).data('item-price');
+                    // var itemCategory = $(this).data('item-category');
+                    // console.log(listingId, itemName, itemPrice, itemCategory);
+
+                    // Create an object with the item details
+                    var itemData = {
+                        listingId: listingId,
+                        name: itemName,
+                        price: itemPrice,
+                        category: itemCategory,
+                        quantity: quantity
+                    };
+
+                    // Make the AJAX request to the API
+                    $.ajax({
+                        type: 'POST',
+                        url: '/cart/add-itemlisting', // Replace with your actual API endpoint
+                        data: itemData,
+                        success: function(response) {
+                            // Handle success - perhaps confirm to the user that the item was added
+                            alert('Item added to cart!');
+                        },
+                        error: function(error) {
+                            // Handle error - perhaps notify the user that an error occurred
+                            alert('Error adding item to cart.');
+                        }
+                    });
+
+                } else {
+                    alert("Please select an item before adding to cart.");
+                } 
+            });
+
+
 		</script>
 
 		<script type="text/javascript">
 			// Wait for the DOM to be ready
 			$(document).ready(function () {
-				// Event listener for 'Add to Cart' button clicks
-				$(".add-to-cart-btn").click(function (event) {
-					// Prevent the default form submit action
-					event.preventDefault();
-
-					var selectedRadio = $("input[name='listingId']:checked");
-
-					if (selectedRadio.length > 0) {
-						var listingId = selectedRadio.data("listing-id");
-						var itemName = selectedRadio.data("item-name");
-						var itemPrice = selectedRadio.data("item-price");
-						var itemCategory = selectedRadio.data("item-category");
-
-						console.log("Listing ID: " + listingId);
-						console.log("Item Name: " + itemName);
-						console.log("Item Price: " + itemPrice);
-						console.log("Item Category: " + itemCategory);
-						// console.log($(this).data('item-id'));
-						// var listingId = $(this).data('item-id');
-						// var itemName = $(this).data('item-name');
-						// var itemPrice = $(this).data('item-price');
-						// var itemCategory = $(this).data('item-category');
-						// console.log(listingId, itemName, itemPrice, itemCategory);
-
-						// Create an object with the item details
-						var itemData = {
-							listingId: listingId,
-							name: itemName,
-							price: itemPrice,
-							category: itemCategory,
-						};
-
-						// Make the AJAX request to the API
-						$.ajax({
-							type: "POST",
-							url: "/cart/add-itemlisting", // Replace with your actual API endpoint
-							data: itemData,
-							success: function (response) {
-								// Handle success - perhaps confirm to the user that the item was added
-								alert("Item added to cart!");
-							},
-							error: function (error) {
-								// Handle error - perhaps notify the user that an error occurred
-								alert("Error adding item to cart.");
-							},
-						});
-					} else {
-						alert("Please select an item before adding to cart.");
-					}
-				});
 				$("#edit_button").click(function (event) {
 					event.preventDefault();
 					const buttonText = $(this).text();

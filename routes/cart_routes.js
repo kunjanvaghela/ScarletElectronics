@@ -612,7 +612,6 @@ async function generate_shipment(userDetails, endUserDetails, sellerUserDetails,
     }
 }
 
-
 router.post('/checkout', async (req, res)=>
 {
     console.log("checkout inside ------------------------");
