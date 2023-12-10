@@ -1,7 +1,12 @@
 const nodemailer = require("nodemailer");
+require('dotenv').config();
 
-const AUTH_mail= "scarletelectronics@hotmail.com";
-const AUTH_pwd = "ScarletSEProject_123";
+// const AUTH_mail= process.env.AUTH_MAIL;
+// const AUTH_pwd =  process.env.AUTH_PWD;
+
+const AUTH_mail= process.env.AUTH_MAIL;
+const AUTH_pwd =  process.env.AUTH_PWD;
+
 
 let transport = nodemailer.createTransport({
     host : "smtp-mail.outlook.com",

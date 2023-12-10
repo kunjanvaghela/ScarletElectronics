@@ -71,40 +71,86 @@
     <div class="container">
         <div class="row">
             <div class="col-md-2">
-                <form>
+                <form id="seller-filter">
                     <div class="form-row">
                         <div class="form-group col-md-10">
                             <label for="price">Price:</label>
                             <select class="form-control" id="price">
                                 <option value="">Any</option>
-                                <option value="under-100">Under $100</option>
+                                <option value="0-100">Under $100</option>
                                 <option value="100-500">$100 - $500</option>
                                 <option value="500-1000">$500 - $1000</option>
                                 <option value="1000-2000">$1000 - $2000</option>
-                                <option value="above-2000">$2000 Above</option>
+                                <option value="2000-100000">$2000 Above</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="category">Category:</label>
                             <select class="form-control" id="category">
-                                <option value="">Any</option>
-                                <option value="laptops">Laptops</option>
-                                <option value="smartphones">Smartphones</option>
-                                <option value="television">Television</option>
-                                <option value="accessories">Accessories</option>
+                                <option value="">Select Category</option>
                             </select>
                         </div>
                         <div class="form-group col-md-10">
                             <label for="storage">Storage:</label>
                             <select class="form-control" id="storage">
-                                <option value="">Any</option>
-                                <option value="32gb">32GB</option>
-                                <option value="64gb">64GB</option>
-                                <option value="128gb">128GB</option>
-                                <!-- Add more storage options as needed -->
+                                <option value="">Select Storage</option>
                             </select>
                         </div>
                         <!-- Add more filter criteria dropdowns as needed -->
+                        <div class="form-group col-md-10">
+                            <label for="cpu">CPU:</label>
+                            <select class="form-control" id="cpu">
+                                <option value="">Select CPU</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="gpu">GPU:</label>
+                            <select class="form-control" id="gpu">
+                                <option value="">Select GPU</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="ram">RAM:</label>
+                            <select class="form-control" id="ram">
+                                <option value="">Select RAM</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="operating_system">Operating System:</label>
+                            <select class="form-control" id="operating_system">
+                                <option value="">Select Operating System</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_size">Screen Size:</label>
+                            <select class="form-control" id="screen_size">
+                                <option value="">Select Screen Size</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_type">Screen Type:</label>
+                            <select class="form-control" id="screen_type">
+                                <option value="">Select Screen Type</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="screen_resolution">Screen Resolution:</label>
+                            <select class="form-control" id="screen_resolution">
+                                <option value="">Select Screen Resolution</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="front_camera">Front Camera:</label>
+                            <select class="form-control" id="front_camera">
+                                <option value="">Select Front Camera</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-10">
+                            <label for="rear_camera">Rear Camera:</label>
+                            <select class="form-control" id="rear_camera">
+                                <option value="">Select Rear Camera</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
@@ -138,52 +184,217 @@
             </form>
         </div>
     </div>
-    
 
+    
     <script>
-        function fetchItemListings() {
+
+        //helper function to load the options of the Buyer filter dynamically
+        function populateSelect(selectId, options) {
+            var selectElement = document.getElementById(selectId);
+            
+            // Clear existing options except the first one
+            selectElement.length = 1;
+
+            // Add new options from the data
+            options.forEach(function(option, index) {
+                var opt = document.createElement('option');
+                opt.value = option.toLowerCase().replace(/\s+/g, '-');
+                opt.textContent = option;
+                opt.setAttribute('data-id', index); // Setting a custom attribute as ID
+                selectElement.appendChild(opt);
+            });
+        }
+
+        // Ajax call for loading the buyer filters.
+        document.addEventListener('DOMContentLoaded', function (event) {
+            event.preventDefault();
+            fetch('/item-listing/getUniqueValues')
+            .then(response => response.json())
+			.then(data => {
+				if (data.success) {
+                    const columns = ['CATEGORY', 'STORAGE', 'CPU', 'GPU', 'RAM', 'OS', 'ScreenSize', 
+                    'ScreenType', 'ScreenResolution', 'FrontCamera', 'RearCamera']
+                    populateSelect('category', data.body.CATEGORY);
+                    populateSelect('storage', data.body.STORAGE);
+                    populateSelect('cpu', data.body.CPU);
+                    populateSelect('gpu', data.body.GPU);
+                    populateSelect('ram', data.body.RAM);
+                    populateSelect('operating_system', data.body.OPERATING_SYSTEM);
+                    populateSelect('screen_size', data.body.SCREEN_SIZE);
+                    populateSelect('screen_type', data.body.SCREEN_TYPE);
+                    populateSelect('screen_resolution', data.body.SCREEN_RESOLUTION);
+                    populateSelect('front_camera', data.body.FRONT_CAMERA);
+                    populateSelect('rear_camera', data.body.REAR_CAMERA);
+                    //others
+				} else {
+					window.location.href = data.redirectUrl;
+				}
+			})
+			.catch(error => {
+				// document.getElementById('errorMsg').innerText = error.message || 'An unexpected error occurred.';
+				console.error('Error:', error);
+			});
+        });
+
+
+        document.getElementById('seller-filter').addEventListener('submit', function (event) {
+            event.preventDefault();
+            console.log("in seller-filter submission")
+
+            // console.log(document.getElementById("category").value);
+            // console.log(document.getElementById("storage").value);
+
+            // fetch('/item-listing/apply-filter', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         category: document.getElementById("category").value,
+            //         storage: document.getElementById("storage").value
+            //     })
+            // })
+            //     .then(response => {  ///check the below code.
+            //         // Check if the response is not ok (e.g., status code 400, 409, etc.)
+            //         if (!response.ok) {
+            //             // Convert the response to JSON and then throw an error with the backend's message
+            //             return response.json().then(data => {
+            //                 throw new Error(data.message);
+            //             });
+            //         }
+            //         return response.json();
+            //     })
+            //     .then(data => {
+            //         if (data.success) {
+            //             // Redirect to the specified URL
+            //             alert(data.message);
+            //             // window.location.href = data.redirectUrl || '/users/login';
+            //         }
+            //     })
+            //     .catch(error => {
+            //         // This will now catch errors with specific messages from the backend
+            //         console.error('Error:', error);
+            //         alert(error.message);
+            //     });
+            
+            fetchClaimedRequests();
+        });
+
+        function fetchClaimedRequests() {
+
+            let price = document.getElementById('price').value;
+            let category = document.getElementById('category').value;
+            let storage = document.getElementById('storage').value;
+            let cpu = document.getElementById('cpu').value;
+            let gpu = document.getElementById('gpu').value;
+            let ram = document.getElementById('ram').value;
+            let operating_system = document.getElementById('operating_system').value;
+            let screen_size = document.getElementById('screen_size').value;
+            let screen_type = document.getElementById('screen_type').value;
+            let screen_resolution = document.getElementById('screen_resolution').value;
+            let front_camera = document.getElementById('front_camera').value;
+            let rear_camera = document.getElementById('rear_camera').value;
+
+            let url = "/item-listing/";
+            if (price || category || storage || cpu || gpu || ram || operating_system || screen_size || screen_type || screen_resolution || front_camera || rear_camera) {
+                let queryParams = [];
+
+                if (price) {
+                    queryParams.push("price=" + encodeURIComponent(price));
+                }
+
+                if (category) {
+                    queryParams.push("category=" + encodeURIComponent(category));
+                }
+
+                if (storage) {
+                    queryParams.push("storage=" + encodeURIComponent(storage));
+                }
+
+                if (cpu) {
+                    queryParams.push("cpu=" + encodeURIComponent(cpu));
+                }
+
+                if (gpu) {
+                    queryParams.push("gpu=" + encodeURIComponent(gpu));
+                }
+
+                if (ram) {
+                    queryParams.push("ram=" + encodeURIComponent(ram));
+                }
+
+                if (operating_system) {
+                    queryParams.push("operating_system=" + encodeURIComponent(operating_system));
+                }
+
+                if (screen_size) {
+                    queryParams.push("screen_size=" + encodeURIComponent(screen_size));
+                }
+
+                if (screen_type) {
+                    queryParams.push("screen_type=" + encodeURIComponent(screen_type));
+                }
+
+                if (screen_resolution) {
+                    queryParams.push("screen_resolution=" + encodeURIComponent(screen_resolution));
+                }
+
+                if (front_camera) {
+                    queryParams.push("front_camera=" + encodeURIComponent(front_camera));
+                }
+
+                if (rear_camera) {
+                    queryParams.push("rear_camera=" + encodeURIComponent(rear_camera));
+                }
+
+                url += "?" + queryParams.join("&");
+
+            }
+
+            console.log(url);
+            
             $.ajax({
                 type: "GET",
-                url: "/item-listing",
+                url: url,
+                // data: $(this).serialize(), // Serialize form data
                 success: function(response) {
                     var divParent = $('#listings-div');
                     divParent.empty(); // Clear existing content in the parent div
-
                     response.serializedListings.forEach(function(item) {
-                        // Create a new card for each item in serializedListings
-                        var cardHtml = `
-                                <div class="col-md-4">
-                                    <div class="card card-listings-page">
-                                        <div class="image-container">
-                                            <img src="https://drive.google.com/uc?export=view&id=${item.imageFiles[0].id}" class="img_contain" alt="Image Unavailable">
+                            // Create a new card for each item in serializedListings
+                            var cardHtml = `
+                                    <div class="col-md-4">
+                                        <div class="card card-listings-page">
+                                            <div class="image-container">
+                                                <img src="https://drive.google.com/uc?export=view&id=${item.imageFiles[0].id}" class="img_contain" alt="Image Unavailable">
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">${item.name}</h5>
+                                                <h6 class="card-text">From Price: $${item.price}</h6>
+                                                <h7 class="card-subtitle mb-2 text-muted">${item.category}</h7>
+                                                <p class="card-text card-text-description">${item.description}</p>
+                                                <a href="/item-listing/catalog?item-id=${item.itemId}" class="btn btn-primary"
+                                                    data-item-id="${item.listingId}">
+                                                    View Details
+                                                </a>
+                                                <a href="#" class="btn btn-secondary add-to-cart-btn login-check-element"   
+                                                    data-item-id="${item.listingId}"
+                                                    data-item-name="${item.name}"
+                                                    data-item-price="${item.price}"
+                                                    data-item-category="${item.category}">
+                                                    Add to Cart
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="card-body">
-                                            <h5 class="card-title">${item.name}</h5>
-                                            <h6 class="card-text">From Price: $${item.price}</h6>
-                                            <h7 class="card-subtitle mb-2 text-muted">${item.category}</h7>
-                                            <p class="card-text card-text-description">${item.description}</p>
-                                            <a href="/item-listing/catalog?item-id=${item.itemId}" class="btn btn-primary"
-                                                data-item-id="${item.listingId}">
-                                                View Details
-                                            </a>
-                                            <a href="#" class="btn btn-secondary add-to-cart-btn login-check-element"   
-                                                data-item-id="${item.listingId}"
-                                                data-item-name="${item.name}"
-                                                data-item-price="${item.price}"
-                                                data-item-category="${item.category}">
-                                                Add to Cart
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>`;
-                            divParent.append(cardHtml); // Append the new card to the parent div
-                    });
-                    checkElementsWithLoginRequirement();
-                },
-                error: function(error) {
-                    console.error('Error fetching claimed requests:', error);
-                }
-            });
+                                    </div>`;
+                                divParent.append(cardHtml); // Append the new card to the parent div
+                        });
+                        checkElementsWithLoginRequirement();
+                    },
+                    error: function(error) {
+                        console.error('Error fetching claimed requests:', error);
+                    }
+                });
         }
 
         function checkElementsWithLoginRequirement() {
@@ -209,11 +420,10 @@
             }
         }
 
-        $(document).ready(function() {
-        
-            fetchItemListings();
 
-            // checkElementsWithLoginRequirement();
+        $(document).ready(function() {
+            
+            fetchClaimedRequests();
 
         });
     </script>

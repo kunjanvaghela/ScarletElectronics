@@ -1,3 +1,4 @@
+.env
 .DS_Store
 util/scarletelectronics-key.json
 routes/try.js

@@ -25,76 +25,76 @@
                             class="filterOptionStyling">Item name:</label> <input
                             type="text" id="itemName" name="itemName"
                             class="filterOptionStyling"> <br>
-                        <br> <select name="category" class="filterOptionStyling">
+                        <br> <select name="category" id="category" class="filterOptionStyling">
                             <option value="">Select Category</option>
-                            <c:forEach items="${listUniqueCategory}"
+                            <!-- <c:forEach items="${listUniqueCategory}"
                                 var="listUniqueCategory">
                                 <option>${listUniqueCategory}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="cpu" class="filterOptionStyling">
+                        <br> <select name="cpu" id="cpu" class="filterOptionStyling">
                             <option value="">Select CPU</option>
-                            <c:forEach items="${listUniqueCPU}" var="listUniqueCPU">
+                            <!-- <c:forEach items="${listUniqueCPU}" var="listUniqueCPU">
                                 <option>${listUniqueCPU}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="gpu" class="filterOptionStyling">
+                        <br> <select name="gpu" id="gpu" class="filterOptionStyling">
                             <option value="">Select GPU</option>
-                            <c:forEach items="${listUniqueGPU}" var="listUniqueGPU">
+                            <!-- <c:forEach items="${listUniqueGPU}" var="listUniqueGPU">
                                 <option>${listUniqueGPU}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="ram" class="filterOptionStyling">
+                        <br> <select name="ram" id="ram" class="filterOptionStyling">
                             <option value="">Select RAM</option>
-                            <c:forEach items="${listUniqueRAM}" var="listUniqueRAM">
+                            <!-- <c:forEach items="${listUniqueRAM}" var="listUniqueRAM">
                                 <option>${listUniqueRAM}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="storage" class="filterOptionStyling">
+                        <br> <select name="storage" id="storage" class="filterOptionStyling">
                             <option value="">Select Storage</option>
-                            <c:forEach items="${listUniqueStorage}" var="listUniqueStorage">
+                            <!-- <c:forEach items="${listUniqueStorage}" var="listUniqueStorage">
                                 <option>${listUniqueStorage}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="os" class="filterOptionStyling">
+                        <br> <select name="operating_system" id="operating_system" class="filterOptionStyling">
                             <option value="">Select Operating System</option>
-                            <c:forEach items="${listUniqueOS}" var="listUniqueOS">
+                            <!-- <c:forEach items="${listUniqueOS}" var="listUniqueOS">
                                 <option>${listUniqueOS}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="screenSize" class="filterOptionStyling">
+                        <br> <select name="screen_size" id="screen_size" class="filterOptionStyling">
                             <option value="">Select Screen Size</option>
-                            <c:forEach items="${listUniqueScreenSize}"
+                            <!-- <c:forEach items="${listUniqueScreenSize}"
                                 var="listUniqueScreenSize">
                                 <option>${listUniqueScreenSize}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="screenType" class="filterOptionStyling">
+                        <br> <select name="screen_type" id="screen_type" class="filterOptionStyling">
                             <option value="">Select Screen Type</option>
-                            <c:forEach items="${listUniqueScreenType}"
+                            <!-- <c:forEach items="${listUniqueScreenType}"
                                 var="listUniqueScreenType">
                                 <option>${listUniqueScreenType}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="screenRes" class="filterOptionStyling">
+                        <br> <select name="screen_resolution" id="screen_resolution" class="filterOptionStyling">
                             <option value="">Select Screen Resolution</option>
-                            <c:forEach items="${listUniqueScreenRes}"
+                            <!-- <c:forEach items="${listUniqueScreenRes}"
                                 var="listUniqueScreenRes">
                                 <option>${listUniqueScreenRes}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="frontCam" class="filterOptionStyling">
+                        <br> <select name="front_camera" id="front_camera" class="filterOptionStyling">
                             <option value="">Select Front Camera</option>
-                            <c:forEach items="${listUniqueFrontCam}"
+                            <!-- <c:forEach items="${listUniqueFrontCam}"
                                 var="listUniqueFrontCam">
                                 <option>${listUniqueFrontCam}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br>
-                        <br> <select name="rearCam" class="filterOptionStyling">
+                        <br> <select name="rear_camera" id="rear_camera" class="filterOptionStyling">
                             <option value="">Select Rear Camera</option>
-                            <c:forEach items="${listUniqueRearCam}" var="listUniqueRearCam">
+                            <!-- <c:forEach items="${listUniqueRearCam}" var="listUniqueRearCam">
                                 <option>${listUniqueRearCam}</option>
-                            </c:forEach>
+                            </c:forEach> -->
                         </select> <br> <br>
                         <br>
                         <!-- <input type="submit" value="Search" /> -->
@@ -231,23 +231,6 @@
             tbody.append(row);
         });
     }
-
-    $.ajax({
-        url: '/item-listing/get-existing-listing',
-        method: 'GET',
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                populateTable(response.catalog);
-            } else {
-                console.error('Error fetching data:', response.message);
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error('AJAX Error:', textStatus, errorThrown);
-        }
-    });
-
     
     // Function to make the AJAX call on form submission
     function submitForm() {
@@ -281,8 +264,124 @@
         }
     });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // AJAX call to check if the user is logged in
+
+    //helper function to load the options of the Seller filter dynamically
+    function populateSelect(selectId, options) {
+        var selectElement = document.getElementById(selectId);
+        
+        // Clear existing options except the first one
+        selectElement.length = 1;
+
+        // Add new options from the data
+        options.forEach(function(option, index) {
+            var opt = document.createElement('option');
+            opt.value = option.toLowerCase().replace(/\s+/g, '-');
+            opt.textContent = option;
+            opt.setAttribute('data-id', index); // Setting a custom attribute as ID
+            selectElement.appendChild(opt);
+        });
+    }
+
+
+    function callAndGetListingData() {
+        let category = document.getElementById('category').value;
+        let storage = document.getElementById('storage').value;
+        let cpu = document.getElementById('cpu').value;
+        let gpu = document.getElementById('gpu').value;
+        let ram = document.getElementById('ram').value;
+        let operating_system = document.getElementById('operating_system').value;
+        let screen_size = document.getElementById('screen_size').value;
+        let screen_type = document.getElementById('screen_type').value;
+        let screen_resolution = document.getElementById('screen_resolution').value;
+        let front_camera = document.getElementById('front_camera').value;
+        let rear_camera = document.getElementById('rear_camera').value;
+
+        let url = "/item-listing/get-existing-listing";
+        if (category || storage || cpu || gpu || ram || operating_system || screen_size || screen_type || screen_resolution || front_camera || rear_camera) {
+            let queryParams = [];
+
+            if (category) {
+                queryParams.push("category=" + encodeURIComponent(category));
+            }
+
+            if (storage) {
+                queryParams.push("storage=" + encodeURIComponent(storage));
+            }
+
+            if (cpu) {
+                queryParams.push("cpu=" + encodeURIComponent(cpu));
+            }
+
+            if (gpu) {
+                queryParams.push("gpu=" + encodeURIComponent(gpu));
+            }
+
+            if (ram) {
+                queryParams.push("ram=" + encodeURIComponent(ram));
+            }
+
+            if (operating_system) {
+                queryParams.push("operating_system=" + encodeURIComponent(operating_system));
+            }
+
+            if (screen_size) {
+                queryParams.push("screen_size=" + encodeURIComponent(screen_size));
+            }
+
+            if (screen_type) {
+                queryParams.push("screen_type=" + encodeURIComponent(screen_type));
+            }
+
+            if (screen_resolution) {
+                queryParams.push("screen_resolution=" + encodeURIComponent(screen_resolution));
+            }
+
+            if (front_camera) {
+                queryParams.push("front_camera=" + encodeURIComponent(front_camera));
+            }
+
+            if (rear_camera) {
+                queryParams.push("rear_camera=" + encodeURIComponent(rear_camera));
+            }
+
+            url += "?" + queryParams.join("&");
+
+        }
+
+        console.log(url);
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    populateTable(response.body);
+                } else {
+                    console.error('Error fetching data:', response.message);
+                    window.location.href = response.redirectUrl
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX Error:', textStatus, errorThrown);
+                window.location.href = response.redirectUrl
+            }
+        });
+
+    }
+
+
+    function disableButtons() {
+            var elementsToDisable = document.querySelectorAll('.login-check-element');
+            elementsToDisable.forEach(function(element) {
+                element.disabled = true;
+            });
+        }
+
+    // Ajax call for loading the seller filters.
+    document.addEventListener('DOMContentLoaded', function (event) {
+        event.preventDefault();
+
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "/users/", true);
 
@@ -297,13 +396,44 @@
                 }
             }
         xhr.send();
-        function disableButtons() {
-            var elementsToDisable = document.querySelectorAll('.login-check-element');
-            elementsToDisable.forEach(function(element) {
-                element.disabled = true;
-            });
-        }
+
+        fetch('/item-listing/getUniqueValues')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // const columns = ['CATEGORY', 'STORAGE']
+                populateSelect('category', data.body.CATEGORY);
+                populateSelect('storage', data.body.STORAGE);
+                populateSelect('cpu', data.body.CPU);
+                populateSelect('gpu', data.body.GPU);
+                populateSelect('ram', data.body.RAM);
+                populateSelect('operating_system', data.body.OPERATING_SYSTEM);
+                populateSelect('screen_size', data.body.SCREEN_SIZE);
+                populateSelect('screen_type', data.body.SCREEN_TYPE);
+                populateSelect('screen_resolution', data.body.SCREEN_RESOLUTION);
+                populateSelect('front_camera', data.body.FRONT_CAMERA);
+                populateSelect('rear_camera', data.body.REAR_CAMERA);
+                //others
+            } else {
+                window.location.href = data.redirectUrl;
+            }
+        })
+        .catch(error => {
+            // document.getElementById('errorMsg').innerText = error.message || 'An unexpected error occurred.';
+            console.error('Error:', error);
+        });
+
+        callAndGetListingData();
     });
+
+
+    document.getElementById('itemFilter1').addEventListener('submit', function (event) {
+        event.preventDefault();
+        console.log("in seller-filter submission")
+
+        callAndGetListingData();
+    });
+
 
 </script>
 

@@ -9,10 +9,123 @@ const Review = db.Review;
 const EndUsers = db.EndUsers;
 const User = db.User;
 const UserUtil = require('../util/userUtil');
+const { Sequelize } = require('sequelize');
 const GoogleDriveUtil = require('../util/googleDriveUtil');
+const e = require("express");
+const { Op } = require('sequelize');
 
 const getItemListings = async (req, res) => {
   console.log('in item_listing_routes.js route :/ ');
+  console.log("BODY " , req.query);
+  let listings;
+
+  if (Object.keys(req.query).length === 0 && req.query.constructor === Object) {
+    listings = await ItemListing.findAll({
+        where: {
+            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+        },
+        include: [Catalog],
+    });
+  } else {
+
+    let catalogWhere = {};
+
+    // Add category condition if it exists and is not empty
+    if (req.query.category && req.query.category.trim() !== '') {
+      catalogWhere.category = req.query.category;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.storage && req.query.storage.trim() !== '') {
+      catalogWhere.storage = req.query.storage;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.cpu && req.query.cpu.trim() !== '') {
+      catalogWhere.cpu = req.query.cpu;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.gpu && req.query.gpu.trim() !== '') {
+      catalogWhere.gpu = req.query.gpu;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.ram && req.query.ram.trim() !== '') {
+      catalogWhere.ram = req.query.ram;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.operating_system && req.query.operating_system.trim() !== '') {
+      catalogWhere.operating_system = req.query.operating_system;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.screen_size && req.query.screen_size.trim() !== '') {
+      catalogWhere.screen_size = req.query.screen_size;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.screen_type && req.query.screen_type.trim() !== '') {
+      catalogWhere.screen_type = req.query.screen_type;
+    }
+
+    // Add category condition if it exists and is not empty
+    if (req.query.screen_resolution && req.query.screen_resolution.trim() !== '') {
+      catalogWhere.screen_resolution = req.query.screen_resolution;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.front_camera && req.query.front_camera.trim() !== '') {
+      catalogWhere.front_camera = req.query.front_camera;
+    }
+
+    // Add storage condition if it exists and is not empty
+    if (req.query.rear_camera && req.query.rear_camera.trim() !== '') {
+      catalogWhere.rear_camera = req.query.rear_camera;
+    }
+    
+    // let priceCondition = db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)');
+
+    // let itemListingWhere = {
+    //     [Op.and]: [
+    //         { price: priceCondition }
+    //     ]
+    // };
+
+    // // Add 'between' condition for price if small and big values are present
+    // if (req.query.price && req.query.price.trim() != '') {
+    //   let small = Number(req.query.price.split("-")[0])
+    //   let big = Number(req.query.price.split("-")[1])
+    //   itemListingWhere[Op.and].push({
+    //       price: { [Op.between]: [small, big] }
+    //   });
+    // }
+
+
+    // Initialize the where condition for the ItemListing
+    let itemListingWhere = {
+      price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+    };
+
+    // Assuming small and big are your query parameters for price range
+    if (req.query.price && req.query.price.trim() != '') {
+      let small = Number(req.query.price.split("-")[0])
+      let big = Number(req.query.price.split("-")[1])
+      itemListingWhere.price = {
+          [db.Sequelize.Op.between]: [small, big]
+      };
+    }
+
+    listings = await ItemListing.findAll({
+        where: itemListingWhere,
+        include: [{
+          model: Catalog,
+          where: catalogWhere
+        }],
+    });
+
+  }
 
   // Check if the user is authenticated
   // if (!UserUtil.authenticateToken(req.cookies.accessToken)) {
@@ -32,12 +145,12 @@ const getItemListings = async (req, res) => {
     // const userDetails = await UserUtil.check_email(payload.emailId);
     // const username = userDetails.name;
 
-    const listings = await ItemListing.findAll({
-        where: {
-            price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
-        },
-        include: [Catalog],
-    });
+    // const listings = await ItemListing.findAll({
+    //     where: {
+    //         price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+    //     },
+    //     include: [Catalog],
+    // });
 
     const serializedListings = await Promise.all(listings.map(async (listing) => {
         let imageFiles = [{"id" : "NoImage"}];
@@ -68,6 +181,13 @@ const getItemListings = async (req, res) => {
     }));
 
     console.log("serializedListings : " + serializedListings)
+    // return {
+		// 	success: true,
+		// 	message: "Item Listings retrieved.",
+    //   serializedListings: serializedListings,
+    //   redirectUrl: "/item-listing/listings"
+    // };
+
     return res.status(200).json({
 			success: true,
 			message: "Item Listings retrieved.",
@@ -198,22 +318,134 @@ const getAllProducts = async (req, res) => {
   // userDetails = await UserUtil.check_email(req.cookies.emailId);
   // console.log(userDetails.userid);
   // const username = userDetails.name;
-  const item_listing = Catalog.findAll().then(function(Catalog){
-      
-      return res.status(200).json({
-        success: true,
-        message: "Item Information retrieved.",
-        catalog: Catalog,
-      });
-      // res.render('seller_listing', {Catalog, username});
-      //console.log(Catalog);
-      
-    }).catch(function(err){
-      console.log('Oops! something went wrong, : ', err);
-    });
-  //console.log(item_listing);
-  //console.log(typeof(item_listing));
+  console.log("BODY " , req.query);
+
+  try {
+    let item_listing;
+    if (Object.keys(req.query).length === 0 && req.query.constructor === Object) {
+      item_listing = await Catalog.findAll();
+    } else {
+
+      let catalogWhere = {};
+
+      // Add category condition if it exists and is not empty
+      if (req.query.category && req.query.category.trim() !== '') {
+        catalogWhere.category = req.query.category;
+      }
   
+      // Add storage condition if it exists and is not empty
+      if (req.query.storage && req.query.storage.trim() !== '') {
+        catalogWhere.storage = req.query.storage;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.cpu && req.query.cpu.trim() !== '') {
+        catalogWhere.cpu = req.query.cpu;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.gpu && req.query.gpu.trim() !== '') {
+        catalogWhere.gpu = req.query.gpu;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.ram && req.query.ram.trim() !== '') {
+        catalogWhere.ram = req.query.ram;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.operating_system && req.query.operating_system.trim() !== '') {
+        catalogWhere.operating_system = req.query.operating_system;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.screen_size && req.query.screen_size.trim() !== '') {
+        catalogWhere.screen_size = req.query.screen_size;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.screen_type && req.query.screen_type.trim() !== '') {
+        catalogWhere.screen_type = req.query.screen_type;
+      }
+  
+      // Add category condition if it exists and is not empty
+      if (req.query.screen_resolution && req.query.screen_resolution.trim() !== '') {
+        catalogWhere.screen_resolution = req.query.screen_resolution;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.front_camera && req.query.front_camera.trim() !== '') {
+        catalogWhere.front_camera = req.query.front_camera;
+      }
+  
+      // Add storage condition if it exists and is not empty
+      if (req.query.rear_camera && req.query.rear_camera.trim() !== '') {
+        catalogWhere.rear_camera = req.query.rear_camera;
+      }
+      
+      // let priceCondition = db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)');
+  
+      // let itemListingWhere = {
+      //     [Op.and]: [
+      //         { price: priceCondition }
+      //     ]
+      // };
+  
+      // // Add 'between' condition for price if small and big values are present
+      // if (req.query.price && req.query.price.trim() != '') {
+      //   let small = Number(req.query.price.split("-")[0])
+      //   let big = Number(req.query.price.split("-")[1])
+      //   itemListingWhere[Op.and].push({
+      //       price: { [Op.between]: [small, big] }
+      //   });
+      // }
+    
+      // listings = await ItemListing.findAll({
+      //     where: itemListingWhere,
+      //     include: [{
+      //       model: Catalog,
+      //       where: catalogWhere
+      //     }],
+      // });
+  
+      item_listing = await Catalog.findAll({
+        where: catalogWhere
+      });
+      
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Item Information retrieved.",
+      body: item_listing
+    });
+
+    // const item_listing = Catalog.findAll().then(function(Catalog){
+        
+    //     return res.status(200).json({
+    //       success: true,
+    //       message: "Item Information retrieved.",
+    //       catalog: Catalog,
+    //     });
+    //     // res.render('seller_listing', {Catalog, username});
+    //     //console.log(Catalog);
+        
+    //   }).catch(function(err){
+    //     console.log('Oops! something went wrong, : ', err);
+    //   });
+    //console.log(item_listing);
+    //console.log(typeof(item_listing));
+    
+  
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      redirectUrl: "/item-listing/listings"
+    });
+  }
+
 }
 
 const createItemListing = async (req, res) => {
@@ -311,5 +543,77 @@ router.get("/create", async (req, res) => {
 router.get("/get-existing-listing", getAllProducts);
 
 router.post('/create', createItemListing);
+
+
+//Mitul: Search&Filter APIs
+
+// router.get("/getUniqueValues", async (req, res) => {
+//   const distinctValues = await db.Catalog.findAll({
+//     attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('cpu')), 'cpu']]
+//   });
+//   console.log(distinctValues);
+//   res.status(200).send(distinctValues);
+// });
+
+router.get("/getUniqueValues", async (req, res) => {
+  try {
+    // Define the columns you want to get distinct values for
+    const columns = ['category', 'cpu', 'gpu', 'ram', 'storage', 'operating_system', 'screen_size', 
+    'screen_type', 'screen_resolution', 'front_camera', 'rear_camera'];
+
+    const approval_Status = "Approved";
+
+    // A function to fetch distinct values for a given column
+    const getDistinctValues = async (column) => {
+      const distinctValues = await db.Catalog.findAll({
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col(column)), column]],
+        where: {
+          approval_Status,
+          [column]: { [Sequelize.Op.ne]: null }
+        },
+        order: [[column, 'ASC']]
+      });
+      return distinctValues.map(item => item[column]);
+    };
+
+    // Use Promise.all to fetch all distinct values in parallel
+    const results = await Promise.all(columns.map(getDistinctValues));
+
+    // Combine the results into a single object
+    const response = columns.reduce((obj, column, index) => {
+      obj[column.toUpperCase()] = results[index];
+      return obj;
+    }, {});
+
+    console.log("RESPONSE ", response);
+
+    // Send the response
+    res.status(200).json({
+      success: true,
+      body: response
+    });
+
+    // res.status(200).send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+
+router.post("/apply-filter", async (req, res) => {
+  console.log("apply-filter-req ", req.body);
+
+  b = await getItemListings();
+  console.log(b);
+  return res.status(200).send(b);
+
+  // //apply the filters.
+  // res.status(200).json({
+  //   success: true,
+  //   message: req.body
+  // });
+
+});
 
 module.exports = router;

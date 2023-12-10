@@ -16,7 +16,12 @@ const stripe = require("stripe")('sk_test_51O49dTDB1UugWx3SlwFKiiQc8JDwiBU5QX343
 router.use(express.urlencoded({ extended: true }));
 
 router.post("/create-payment-intent", async (req, res) => {  
-    const userDetails = await userUtil.check_email(req.cookies.emailId);
+    
+    const payload = userUtil.retrieveTokenPayload(req.cookies.accessToken);
+  
+    //USING THE EMAIL ID FROM PAYLOAD OBJECT
+    userDetails = await userUtil.check_email(payload.emailId);
+
     const customerId = paymentService.fetchCustomerFromStripe(userDetails);
     const total = Math.ceil(await paymentService.calculateTotal(userDetails) * 100);
     // Create a PaymentIntent with the order amount and currency
