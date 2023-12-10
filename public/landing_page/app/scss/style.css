@@ -451,16 +451,6 @@ button, .button {
 }
 
 
-.btn-primary {
-  background-color: #CD4631;
-  border-color: darkred;
-}
-
-.btn-primary:hover {
-  background-color: #a8301d;
-  border-color: darkred;
-}
-
 .btn-primary:disabled,
 .btn-secondary:disabled {
   background-color: #e6e6e6;

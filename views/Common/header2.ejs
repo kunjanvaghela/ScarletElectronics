@@ -61,7 +61,7 @@
       $(document).ready(function() {
           $.ajax({
               type: "GET",
-              url: "/users/header", // Replace with the actual endpoint
+              url: "/users",
               success: function(response) {
                   if (response.success) {
                       var user = response.body;
