@@ -54,21 +54,22 @@ const fetchCustomerFromStripe = async function(userDetails) {
 const calculateTotal = async function(userDetails) {
   const userId = userDetails.userid;
   const cartDetails = await get_cart(userId);
-  total_price = 0;
+  var total_price = 0;
   // calculate total price of each listing
   for (var i = 0; i < cartDetails.length; i++) 
   {
       cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
       total_price += cartDetails[i].totalPrice;
   }
-  promocode = 50;
-  sales = total_price*0.1;
-  finalPrice = total_price - promocode + sales;
+  // promocode = 50;
+  // sales = total_price*0.1;
+  // finalPrice = total_price - promocode + sales;
+
   //Remove this later.
-  if(finalPrice <= 0) {
-    finalPrice = 1;
-  }
-  return finalPrice.toFixed(2);
+  // if(finalPrice <= 0) {
+  //   finalPrice = 1;
+  // }
+  return total_price.toFixed(2);
 };
 
 module.exports = { chargeCustomer, fetchCustomerFromStripe, calculateTotal };
