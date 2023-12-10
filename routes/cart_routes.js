@@ -581,13 +581,23 @@ router.get('/get-final-cost', async (req, res)=>
 
 });
 
+async function generate_shipment(userDetails, endUserDetails, sellerUserDetails, sellerEndUserDetails) {
+
+
+
+    return {
+        shipmentId: shipmentId
+    }
+}
+
+
 router.post('/checkout', async (req, res)=>
 {
     console.log("checkout inside ------------------------");
     
     //get authentication status and user id
     const [authentication, userId] = await authent(req,res);
-
+    const userid = userId;
 
     if(!authentication)
     {
@@ -641,56 +651,68 @@ router.post('/checkout', async (req, res)=>
     }
 
 
-    // Victor's Code
-    const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
-    const client = new EasyPostClient(EASYPOST_API_KEY);
-    let shipmentId;
-
-    await (async () => {
-        let shipment;
-
-        shipment = await client.Shipment.create({
-            to_address: {
-                name: userDetails.dataValues.name,
-                street1: endUserDetails.address_line1,
-                city: endUserDetails.address_city,
-                state: endUserDetails.address_state_code,
-                zip: endUserDetails.address_zipcode,
-                country: 'US',
-                email: userDetails.emailId,
-                phone: endUserDetails.phone_nr,
-            },
-            from_address: {
-                street1: '417 montgomery street',
-                street2: 'FL 5',
-                city: 'San Francisco',
-                state: 'CA',
-                zip: '94104',
-                country: 'US',
-                company: 'EasyPost',
-                phone: '415-123-4567',
-            },
-            parcel: {
-                length: 20.2,
-                width: 10.9,
-                height: 5,
-                weight: 65.9,
-            },
-            customs_info: null,
-        });
-        shipmentId = shipment.id;
-        console.log(shipment);
-    })();
-
-
     const paymentId = req.body["paymentID"];
-    const purchase = await db.Purchase.create({paymentId: paymentId, total_price: total_price, userId: userId});
+    const purchase = await db.Purchase.create({paymentId: paymentId, total_price: total_price, userId: userid});
     console.log("Auto-generated ID for Purchase: ", purchase.purchaseId);
 
-    console.log("purchase: ", purchase);
+    const EASYPOST_API_KEY = 'EZTKf21d82fc6abc492ca6f36522677d267aLtEijfmNnjsHlbQLWWYG4w';
+    const client = new EasyPostClient(EASYPOST_API_KEY);
+    let shipmentId, trackingId;
 
     for (var i = 0; i < cartDetails.length; i++) {
-        const order = await Order.create({listingId: cartDetails[i].listingId,shipmentId:shipmentId, trackingId:'dummy', purchaseId: purchase.purchaseId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, return_status: "not requested"});
+        const itemListing =  await ItemListing.findOne({where: {listingId: cartDetails[i].listingId}});
+        const sellerId = itemListing.sellerId;
+        const sellerEndUserDetails = await EndUser.findOne({where: {userId: sellerId}})
+
+
+        const sellerUserDetails = await User.findOne({where: {userId: sellerId}})
+
+        await (async () => {
+            let shipment;
+
+            shipment = await client.Shipment.create({
+                to_address: {
+                    name: userDetails.dataValues.name,
+                    street1: endUserDetails.address_line1,
+                    street2: endUserDetails.address_line2,
+                    city: endUserDetails.address_city,
+                    state: endUserDetails.address_state_code,
+                    zip: endUserDetails.address_zipcode,
+                    country: 'US',
+                    email: userDetails.emailId,
+                    phone: endUserDetails.phone_nr,
+                },
+                from_address: {
+                    street1: sellerEndUserDetails.address_line1,
+                    street2: sellerEndUserDetails.address_line2,
+                    city: sellerEndUserDetails.address_city,
+                    state: sellerEndUserDetails.address_state_code,
+                    zip: sellerEndUserDetails.address_zipcode,
+                    country: 'US',
+                    company: 'ScarletElectronics',
+                    phone: sellerEndUserDetails.phone_nr,
+                },
+                parcel: {
+                    length: 20.2,
+                    width: 10.9,
+                    height: 5,
+                    weight: 65.9,
+                }
+            });
+            shipmentId = shipment.id;
+            console.log(shipment);
+        })();
+
+        await (async () => {
+            const tracker = await client.Tracker.create({
+                tracking_code: 'EZ1000000001',
+                carrier: 'USPS',
+            });
+            trackingId = tracker.id;
+            console.log(tracker);
+        })();
+
+        const order = await Order.create({listingId: cartDetails[i].listingId, purchaseId: purchase.purchaseId, shipmentId:shipmentId, trackingId: trackingId, quantity: cartDetails[i].quantity, total_cost_of_item: cartDetails[i].price * 1.1, order_status: "not requested"});
         console.log("Auto-generated Order ID: ", order.orderId);
     }
 
