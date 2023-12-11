@@ -59,7 +59,7 @@
     <div class="container">
     <div align="center" id="allRequestsTableDiv" style="display: none;">
         <br>
-        <h2 class="text-primary text-left mx-auto">View and Claim Requests</h2>
+        <h2 class="text-left mx-auto">View and Claim Requests</h2>
         <table class="table table-bordered" id="allRequestsTable" cellspacing="0" width="100%">
             <thead>
                 <th width="5%">Request ID</th>
@@ -159,6 +159,7 @@
                         response.serializedRequests.forEach(function(request) {
                             var listingIdDisplay = request.listingId ? request.listingId : "N/A";
                             var customerRepDisplay = request.customerRep ? "Claimed" : "Unclaimed";
+                            var statusDisplay = getStatusDisplay(request.currentStatus); // Get status display text
                             var row = '<tr>' +
                                         '<td>' + request.requestId + '</td>' +
                                         '<td>' + request.userName + '</td>' +
@@ -166,7 +167,7 @@
                                         '<td>' + listingIdDisplay + '</td>' +
                                         '<td><a href="/customer_representative/thread?reqId="'+ request.requestId +'"">' + request.updateDescription + '</a></td>' +
                                         '<td>' + request.createdOn.split(".")[0] + '</td>' +
-                                        '<td>' + request.currentStatus + '</td>' +
+                                        '<td>' + statusDisplay + '</td>' +
                                         '<td>' + customerRepDisplay + '</td>' +
                                         '<td>' + request.updatedOn.split(".")[0] + '</td>' +
                                         '<td><button class="claim-button" data-reqid="'+ request.requestId +'">Claim</button></td>' +
@@ -179,6 +180,15 @@
                     }
                 });
             }
+
+            function getStatusDisplay(statusCode) {
+            switch(statusCode) {
+                case 'A': return 'Active';
+                case 'I': return 'Inactive';
+                case 'C': return 'Completed';
+                default: return 'Unknown'; // Handle unknown status
+            }
+    }
         
             function claimRequest(requestId) {
                 $.ajax({
