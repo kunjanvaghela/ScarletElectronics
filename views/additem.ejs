@@ -34,6 +34,7 @@
 <body>
     <%- include('Common/header2.ejs') %>
 
+    <div class="content">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -51,7 +52,7 @@
                 </div>
 
                 <!-- Laptop Form -->
-                <form method="POST" action="/add-item/insert" id="laptopForm" style="display: none;">
+                <form method="POST" action="/add-item/insert" id="laptopForm" style="display: none;" enctype="multipart/form-data">
                     <input type="hidden" name="category" value="laptop">
 
                     <!-- Common Fields -->
@@ -111,7 +112,7 @@
                 </form>
 
                 <!-- Smartphone Form -->
-                <form method="POST" action="/add-item/insert" id="smartphoneForm" style="display: none;">
+                <form method="POST" action="/add-item/insert" id="smartphoneForm" style="display: none;" enctype="multipart/form-data">
                     <input type="hidden" name="category" value="smartphone">
 
                     <!-- Common Fields -->
@@ -186,6 +187,10 @@
             </div>
         </div>
     </div>
+    </div>
+
+    <%- include('Common/footer.ejs') %>
+
 </body>
 
 </html>
