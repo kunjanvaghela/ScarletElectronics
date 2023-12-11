@@ -134,7 +134,7 @@ const addReview = async (req, res) => {
 				success: false,
 				status: 403,
 				message: "You must purchase the item before adding a review.",
-				redirectUrl: "/users/login",
+				redirectUrl: "/item-listing/listings",
 			});
 		}
 
