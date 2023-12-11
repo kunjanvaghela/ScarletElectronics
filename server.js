@@ -8,7 +8,7 @@ const userRouter = require("./routes/user_routes.js");
 const addItem = require("./routes/add_item.js");
 const itemListing = require("./routes/item_listing_routes.js");
 // const cart = require("./routes/cart_routes.js");
-const reivew = require("./routes/review_rating.js");
+const review = require("./routes/review_rating.js");
 const { router: cart } = require("./routes/cart_routes.js");
 const paymentRoutes = require("./routes/paymentRoutes.js");
 const cookieParser = require("cookie-parser");
@@ -16,6 +16,7 @@ const Admin = require("./routes/admin.js");
 const CustomerRepLogin = require("./routes/staff-login.js");
 const customerRepresentative = require("./routes/customer_representative.js");
 const recommendations = require("./routes/recommendation_routes.js");
+const salesReportRouter = require('./routes/crSalesReport'); // Adjust the path as necessary
 
 const mysql = require("mysql2");
 const { encrypt, decrypt } = require("./util/encryptionUtil"); // Assuming the encryptionUtil.js file is in the same directory
@@ -50,9 +51,10 @@ app.use("/add-item", addItem);
 app.use("/item-listing", itemListing);
 app.use("/cart", cart);
 
-app.use("/review", reivew);
+app.use("/review", review);
 app.use("/recommendations", recommendations);
 app.use("/payments", paymentRoutes);
+app.use('/reports', salesReportRouter); // Prefixing with '/api'
 
 app.post("/token", (req, res) => {
 	const refreshToken = req.body.token;
