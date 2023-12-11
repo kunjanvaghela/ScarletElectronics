@@ -82,7 +82,7 @@ async function get_cart(userId,filter=true, include_cart_id = true)
         {
             if(cartDetails[i].listingId == listingDetailsSQL[j].dataValues.listingId)
             {
-                cartDetails[i].price = listingDetailsSQL[j].dataValues.price;
+                cartDetails[i].price = listingDetailsSQL[j].dataValues.price.toFixed(2);
                 cartDetails[i].max_quantity = listingDetailsSQL[j].dataValues.quantity;
                 itemIDs.push(listingDetailsSQL[j].dataValues.itemId);
             }
@@ -112,6 +112,19 @@ async function get_cart(userId,filter=true, include_cart_id = true)
     }
 
     return cartDetails;
+}
+
+async function getCartMaxQty(cartDetails)
+{
+    let cart_max_qty=0;
+
+    console.log("getCartMaxQty inside ------------------------",cartDetails);
+
+    for (var i = 0; i < cartDetails.length; i++)
+    {
+        cart_max_qty += cartDetails[i].max_quantity;
+    }
+    return cart_max_qty;
 }
 
 async function checkPromoCode(promoCode,total_price)
@@ -152,7 +165,6 @@ async function checkPromoCode(promoCode,total_price)
 async function caluculateCost(req,cartDetails,promoCode_string)
 {
     total_price = 0;
-
 
     for (var i = 0; i < cartDetails.length; i++) 
     {
@@ -318,7 +330,7 @@ router.post('/update-itemlisting', async (req, res)=>
     if(listingIdQuantity.dataValues.quantity < updateCount)
     {
         //return 400 error - quantity of listingId is less than updateCount
-        res.status(400).send("quantity of listingId is less than updateCount");
+        res.status(400).send("item count exceded the total stock in the inventory");
         console.log("quantity of listingId is less than updateCount");
         return;
     }
@@ -437,30 +449,77 @@ router.get('/fetch-cart', async (req, res)=>
         cartDetails = await get_cart(userId);
     }
     
-    console.log("cartDetails: ", cartDetails);
+    
 
+    if(cartDetails.length === 0)
+    {
+        console.log("cart is empty")
+        await res.status(400).send("Cart is empty");
+        return;
+    }
 
 
 
     //add total price to cartDetails
     for (var i = 0; i < cartDetails.length; i++) 
     {
-        cartDetails[i].totalPrice = cartDetails[i].price * cartDetails[i].quantity;
+        if(cartDetails[i].max_quantity != 0)
+        {
+            cartDetails[i].totalPrice = (cartDetails[i].price * cartDetails[i].quantity).toFixed(2);
+        }
     }
 
-    //get promocode string
-    const promocode_string = req.cookies.promocode;
+    //calculate total price by adding all the total prices of each listing
+    const justCart = req.query.justCart;
 
-    //calculate cost
-    [total_price, sales_tax, promocode_discount] = await caluculateCost(req,cartDetails,promocode_string);
+    console.log("just_cart: ", justCart);
 
-    let finalPrice = total_price + sales_tax - promocode_discount;
+    let total_price = 0;
+    let sales_tax = 0;
+    let promocode_discount = 0;
+    let finalPrice = 0;
 
-    //convert to 2 decimal places
-    total_price = total_price.toFixed(2);
-    sales_tax = sales_tax.toFixed(2);
-    promocode_discount = promocode_discount.toFixed(2);
-    finalPrice = finalPrice.toFixed(2);
+    if (justCart != "true" )
+    {
+
+        //get promocode string
+        const promocode_string = req.cookies.promocode;
+
+        //calculate cost
+        [total_price, sales_tax, promocode_discount] = await caluculateCost(req,cartDetails,promocode_string);
+
+        finalPrice = total_price + sales_tax - promocode_discount;
+
+        
+        //convert to 2 decimal places
+        if (total_price != 0)
+        {
+            total_price = await total_price.toFixed(2);
+        }
+        sales_tax = await sales_tax.toFixed(2);
+        promocode_discount = await promocode_discount.toFixed(2);
+        finalPrice = await finalPrice.toFixed(2);
+
+        console.log("in if finalPrice: ", finalPrice);
+
+    }
+    else
+    {
+        //calculate total price by adding all the total prices of each listing
+        
+        for (var i = 0; i < cartDetails.length; i++)
+        {
+            total_price += cartDetails[i].totalPrice;
+        }
+        
+        sales_tax = 0;
+        promocode_discount = 0;
+        finalPrice = 0;
+    }
+
+
+    console.log("TotalPrice: ", total_price);
+    let cartMaxQty = await getCartMaxQty(cartDetails);
 
 
     //return cart details
@@ -469,7 +528,10 @@ router.get('/fetch-cart', async (req, res)=>
         TotalPrice:total_price,
         Promocode: promocode_discount,
         Sales:sales_tax,
-        FinalPrice:finalPrice});
+        FinalPrice:finalPrice,
+        CartMaxQty: cartMaxQty});
+
+    
 
 });
 
@@ -583,7 +645,7 @@ router.post('/check-promo-code', async (req, res)=>
 router.get('/orderplace', async (req, res) => { 
     
     console.log("orderplace inside ------------------------");
-    res.render('orderplace');
+    res.redirect('/users/get-purchase-history');
 });
 
 router.get('/get-final-cost', async (req, res)=>
@@ -657,6 +719,12 @@ router.post('/checkout', async (req, res)=>
 
     // get cart body
     let cartDetails = await get_cart(userId,include_cart_id = true)
+
+    if(cartDetails.length == 0)
+    {
+        res.status(400).send("Cart is empty");
+        return;
+    }
 
     //calculate total price of each listing
     for (var i = 0; i < cartDetails.length; i++) 
@@ -783,7 +851,7 @@ router.post('/checkout', async (req, res)=>
     res.clearCookie("address5");
     //res.render('orderplace');
 
-    res.status(200).send(JSON.stringify({message: "Payment Successful", redirectUrl: "/cart/orderplace"}));
+    res.status(200).send(JSON.stringify({message: "Payment Successful and order placed", redirectUrl: "/cart/orderplace"}));
 
 });
 
