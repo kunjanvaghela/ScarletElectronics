@@ -24,7 +24,6 @@
         <a href="/item-listing/create">Sell</a>
         <a href="/users/get-purchase-history">Purchase History</a>
         <a href="/users/support">Support</a>
-        <a href="/staff-login/login">Staff Login</a>
         <a href="#">Deals</a>
         <a href="#">Services</a>
       </div>
@@ -94,12 +93,22 @@
           function updateLoggedOutUI() {
               // Update the UI for a logged-out user
               $('#user-login-container').html(`
-                  <form action="/users/login" method="get">
-                    <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
+                  <form action="/staff-login/login" method="get">
+                    <button type="submit" class="button header__cta hide-for-mobile">Staff Login</button>
                   </form>
               `);
           }
-      
+          // function updateLoggedOutUI() {
+          //     // Update the UI for a logged-out user
+          //     $('#user-login-container').html(`
+          //         <form action="/users/login" method="get">
+          //           <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
+          //         </form>
+          //         <form action="/staff-login/login" method="get">
+          //           <button type="submit" class="button header__cta hide-for-mobile">Staff Login</button>
+          //         </form>
+          //     `);
+          // }
       });
       
     </script>

@@ -157,7 +157,7 @@ async function checkPromoCode(promoCode,total_price)
             promocode_discount = promocode_discount;
         }
     }
-    promocode_discount_string = "Promocode Discount Applied is : "+promocode_discount;
+    promocode_discount_string = "Promocode Discount Applied : "+promocode_discount;
     return [promocode_discount, promocode_discount_string,statusCode];
 
 }
@@ -851,7 +851,7 @@ router.post('/checkout', async (req, res)=>
     res.clearCookie("address5");
     //res.render('orderplace');
 
-    res.status(200).send(JSON.stringify({message: "Payment Successful and order placed", redirectUrl: "/cart/orderplace"}));
+    res.status(200).send(JSON.stringify({message: "Order Placed Successfully", redirectUrl: "/cart/orderplace"}));
 
 });
 

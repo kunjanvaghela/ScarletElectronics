@@ -94,7 +94,7 @@
                             <tr>
                                 <td class="w-15 text-center align-middle"><a href="http://localhost:3000/item-listing/catalog?item-id=<%= orderDetail.listingId %>" ><%= orderDetail.name %></a></td>
                                 <td class="w-15 text-center align-middle"><%= orderDetail.shipmentId %></td>
-                                <td class="w-15 text-center align-middle"><a href="<%= orderDetail.trackingUrl %>" ><%= orderDetail.trackingId %></a></td>
+                                <td class="w-15 text-center align-middle"><a href="<%= orderDetail.trackingUrl %>" >Track Here!</a></td>
                                 <td class="w-15 text-center align-middle"><%= orderDetail.quantity %></td>
                                 <td class="w-15 text-center align-middle"><%= orderDetail.total_cost_of_item %></td>
                                 <td class="w-15 text-center align-middle"><%= orderDetail.return_shipment %></td>
@@ -105,6 +105,9 @@
                                             <button type="button" class="btn btn-primary" onclick="returnOrder('<%= orderDetail.orderId %>')">
                                                 Return Order
                                             </button>
+                                        <% } %>
+                                        <% if (orderDetail.order_status === 'return requested') { %>
+                                               <b>Return Requested</b>
                                         <% } %>
                                     </form>
                                 </td>
