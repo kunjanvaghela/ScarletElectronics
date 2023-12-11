@@ -444,7 +444,10 @@ button, .button {
   background-color: #CD4631;
   border-color: darkred;
 }
-
+.btn-primary:focus {
+  background-color: #CD4631;
+  border-color: darkred;
+}
 .btn-primary:hover {
   background-color: #a8301d;
   border-color: darkred;
