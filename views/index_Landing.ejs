@@ -24,114 +24,107 @@
   </style>
 </head>
 
-<body>
-
+<body class="body_flex">
   <header class = "header">
     <div class="overlay has-fade"></div>
 
     <!-- Nav Bar -->
-    <nav class="container flex flex-ai-c flex-jc-sb">
-      <a href="/landing_page" class="header__logo">  <!-- Logo Image -->
+    <nav class="flex flex-jc-sb flex-ai-s flex-ai-c">
+      <div class="header__logo">      
+        <a href="/">  <!-- Logo Image -->
         <img src="../public/landing_page/images/logo_med.svg" alt="scarletElectronics" 
-        >
-      </a>
+        ></a>
+      </div>
 
       <!-- Mobile end Hamburger Menu -->
-      <a id="btnHamburger" class="header__toggle hide-for-desktop " >
-        <span></span>
-        <span></span>
-        <span></span>
-      </a>
-
+      <div class = "container">
+        <a class="header__toggle container hide-for-desktop" id="btnHamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </a>
+      </div>
+      
       <!-- PC end nav bar subject to change -->
-      <div class="header__links hide-for-mobile">
-        <a href="#">Home</a>
-        <a href="#">Catalogue</a>
-        <a href="#">Deals</a>
-        <a href="#">Services</a>
+      <div class="flex flex-ai-s flex-jc-sb flex-ai-c hide-for-mobile header__list_bin">
+        <div class="header__links"><a href="/users/home">Home</a></div>
+        <div class="header__links"><a href="/item-listing/listings">Catalogue</a></div>
+        <div class="header__links"><a href="#">Services</a></div>
+        <div class="header__links"><a href="#">Contact</a></div>
       </div>
 
-      <div class="header__cart hide-for-mobile hearder__cart__btn flex flex-jc-c flex-ai-c"> 
-        <button href="#" class="hearder__cart__btn flex flex-jc-c flex-ai-c"><img class="header__cart__icon" src="../public/landing_page/images/cart.png" alt="shopping cart"></button>
+      <div class="flex flex-ai-s flex-jc-sb flex-ai-c hide-for-mobile">
+          <div class="header__user-action"> <button class="header__cart__bin" href="#"><img class="header__cart__icon" src="../public/landing_page/images/cart.png" alt="shopping cart"></button> </div>
+          <div class="header__user-action"><form action="/users/login" method="get">
+            <button type="submit" class="button header__cta">Register/ Login</button>
+          </form><div>
       </div>
-
-      <!-- <a href="#" class="button header__cta hide-for-mobile">Register/ Login</a> -->
-      <form action="/users/login" method="get">
-        <button type="submit" class="button header__cta hide-for-mobile">Register/ Login</button>
-      </form>
 
     </nav>
     <!-- End of Nav Bar -->
 
     <div class="header__menu has-fade hide-for-desktop">
       <!-- Hamburger menu for small viewport -->
-      <a href="#">Home</a>
-      <a href="#">Catalogue</a>
-      <a href="#">Deals</a>
+      <a href="/users/home">Home</a>
+      <a href="/item-listing/listings">Catalogue</a>
       <a href="#">Services</a>
-      <a href="#">Register</a>
+      <a href="#">Contact</a>
+      <a href="#">Cart</a>
+      <a href="/users/login" method="get">Register/ Login</a>
     </div>
 
-  </header>
-
-
-  <section class="search">
-    <!--search bar -->
-    <div class="search__bin flex flex-jc-c flex-ai-c">
-      <form action="" class="search__bar flex flex-jc-c flex-ai-c">
-        <input class="search__input" type="text" placeholder="Search our catalogue!" name="q">
-        <button class="search__button flex flex-jc-c flex-ai-c" type="submit"><img class="search__icon" src="../public/landing_page/images/search.png" alt="search"></button> 
-      </form>
-    </div>
-  </section>
-
-  <section class="hero"> 
-    <!-- Image Slider -->
-    <div class="hero__slider">
-      <div class="hero__slider__slides flex flex-jc-c flex-ai-c">
-        <div class="hero__slider__slideBin"><img id="slide1" src="../public/landing_page/images/electronics5.webp" alt="general electronics stock photo" style="width: 30rem; height: 20rem;"></div>
-        <div class="hero__slider__slideBin"><img id="slide2" src="../public/landing_page/images/electronics2.jpg" alt="device stock photo" style="width: 30rem; height: 20rem;">  <!--Image by <a href="https://www.freepik.com/free-photo/modern-stationary-collection-arrangement_23441437.htm#query=electronic%20product&position=1&from_view=keyword&track=ais">Freepik</a>--></div>
-        <div class="hero__slider__slideBin"><img id="slide3" src="../public/landing_page/images/electronics3.jpg" alt="balk Friday sale info" style="width: 30rem; height: 20rem;">  <!----></div>
-        <div class="hero__slider__slideBin"><img id="slide4" src="../public/landing_page/images/electronics4.jpg" alt="we sell house appliances too!" style="width: 30rem; height: 20rem;">  <!--<a href="https://www.freepik.com/free-vector/household-appliances-realistic-composition_21253197.htm#query=house%20appliances&position=0&from_view=search&track=ais">Image by macrovector</a> on Freepik--></div>
+  <div class="content">
+    <section class="search">
+      <!--search bar -->
+      <div class="search__bin flex flex-jc-c flex-ai-c">
+        <form action="" class="search__bar flex flex-jc-c flex-ai-c">
+          <input class="search__input" type="text" placeholder="Search our catalogue!" name="q">
+          <button class="search__button flex flex-jc-c flex-ai-c" type="submit"><img class="search__icon" src="../public/landing_page/images/search.png" alt="search"></button> 
+        </form>
       </div>
-        
-      <div class="hero__slider__nav flex">
-        <a href="#slide1"></a>
-        <a href="#slide2"></a>
-        <a href="#slide3"></a>
-        <a href="#slide4"></a>
-      </div>
-    </div>
-    <!--End of Image Slider -->
+    </section>
 
-    <div class="hero__text">
-      <h2>Welcome to Scarlet Electronics</h2>
-      <p style="color: red;">Red Hot, Quality Electronics Guaranteed!</p>
-    </div>
-  </section>
+    <section class="hero"> 
+      <!-- Image Slider -->
+      <div class="slider">
+        <div class="slider__bin">
+          <div class="slider__images flex">
+            <input type="radio" name="slider" id="img1" checked>
+            <input type="radio" name="slider" id="img2">
+            <input type="radio" name="slider" id="img3">
+            <input type="radio" name="slider" id="img4">
+
+            <img src="../public/landing_page/images/electronics2.jpg" class="slider__image slider__image1" alt="img1">
+            <img src="../public/landing_page/images/electronics3.jpg" class="slider__image slider__image2" alt="img2">
+            <img src="../public/landing_page/images/electronics4.jpg" class="slider__image slider__image3" alt="img3">
+            <img src="../public/landing_page/images/electronics5.webp" class="slider__image slider__image4" alt="img4">
+          </div>
+
+          <div class="slider__buttons">
+            <label for="img1"></label>
+            <label for="img2"></label>
+            <label for="img3"></label>
+            <label for="img4"></label>
+          </div>
+        </div>
+      </div>
+      <!--End of Image Slider -->
+
+      <!-- text -->
+
+        <div class="hero__text">
+          <h2>Welcome to Scarlet Electronics!</h2>
+          <p style="color: red;">Red Hot, Quality Electronics Guaranteed!</p>
+        </div>
+    
+    </section>
+
+  </div>
+
 
   <!--JS link -->
   <script src="../public/landing_page/app/js/script.js"></script>
+
+  <%- include('Common/footer.ejs') %>
 </body>
-
-<footer class="footer">
-  <div class="footer__text">
-    <p> Get the latest Updates from Us!</p>
-  </div>
-  <div class="footer__social">
-      <a href="#"><img class="icon" id="icon1" src="../public/landing_page/images/icon-twitter.svg" alt="twitter"></button> 
-      <a href="#"><img class="icon" id="icon2" src="../public/landing_page/images/icon-youtube.svg" alt="youtube"></button> 
-      <a href="#"><img class="icon" id="icon3" src="../public/landing_page/images/icon-instagram.svg" alt="instagram"></button> 
-      <a href="#"><img class="icon" id="icon4" src="../public/landing_page/images/icon-facebook.svg" alt="facebook"></button> 
-      <a href="#"><img class="icon" id="icon5" src="../public/landing_page/images/icon-pinterest.svg" alt="pinterest"></button> 
-  </div>
-
-  <hr>
-  
-  <div class="footer__disclaimer">
-    <p> A course project by Group 12 for [332:567] Software Engineering</p>
-    <p id="rights">Rutgers University, All rights preserved. 2023 Fall</p>
-  </div>
-
-</footer>
 </html>

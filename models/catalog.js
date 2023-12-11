@@ -22,18 +22,22 @@ module.exports = (sequelize, DataTypes) => {
           },
           cpu: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           gpu: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           ram: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           storage: {
             type: DataTypes.STRING(350),
           },
           operating_system: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           screen_size: {
             type: DataTypes.STRING(350),
@@ -46,9 +50,11 @@ module.exports = (sequelize, DataTypes) => {
           },
           front_camera: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           rear_camera: {
             type: DataTypes.STRING(350),
+            allowNull: true,
           },
           itemImage: {
             type: DataTypes.BLOB('long'),
@@ -87,6 +93,9 @@ module.exports = (sequelize, DataTypes) => {
       Catalog.hasMany(models.ItemListing, {
           foreignKey: 'itemId',
       });
+      Catalog.hasMany(models.Review, {
+        foreignKey: 'itemId',
+    });
   };
 
     Catalog.sync({ force: false })
