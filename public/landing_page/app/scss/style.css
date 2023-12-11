@@ -284,34 +284,55 @@ button, .button {
 .hero {
   margin: 0;
   padding: 2rem;
-  background: #fffaf1;
+  background: #f5f5f5;
 }
-.hero__slider {
-  min-width: 30rem;
-  background: #CD4631;
-  padding-top: 0.5rem;
-  padding-bottom: 0.3rem;
-  margin: 0 0;
-  overflow-x: hidden;
+
+.hero__text {
+  font-weight: 700;
+  text-align: center;
 }
-.hero__slider__slides {
-  box-shadow: 0 1.5rem 3rem -0.75rem hsla(0, 0%, 0%, 0.25);
+
+.hero__text p {
+  margin-top: -1rem;
 }
-.hero__slider__slides img {
-  flex: 1 0 100%;
-  scroll-snap-align: start;
-  -o-object-fit: cover;
-     object-fit: cover;
+
+.slider {
+  padding-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #242526;
 }
-.hero__slider__nav {
-  -moz-column-gap: 1rem;
-       column-gap: 1rem;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
+
+.slider__bin {
+  position: relative;
+  width: 42%;
+  overflow: hidden;
 }
-.hero__slider__nav a {
+
+.slider__images {
+  width: 100%;
+}
+
+.slider__images input {
+  display: none;
+}
+
+.slider__image {
+  height: 27.4rem;
+  /* width: 50rem; */
+  width: 100%;
+  transition: all 0.15s ease;
+}
+
+.slider__buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+}
+
+.slider__buttons label {
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
@@ -320,13 +341,24 @@ button, .button {
   cursor: pointer;
   opacity: 0.8;
   transition: 250ms ease-in-out;
+  margin: 5px;
 }
-.hero__slider__nav a:hover {
+
+.slider__buttons label:hover {
   background: #cc1d00;
 }
-.hero__text {
-  font-weight: 700;
-  text-align: center;
+
+#img1:checked ~ .slider__image1{
+  margin-left: 0;
+}
+#img2:checked ~ .slider__image2{
+  margin-left: -100%;
+}
+#img3:checked ~ .slider__image3{
+  margin-left: -200%;
+}
+#img4:checked ~ .slider__image4{
+  margin-left: -300%;
 }
 
 .footer {
