@@ -616,4 +616,31 @@ router.post("/apply-filter", async (req, res) => {
 
 });
 
+
+//search functionality.
+router.get("/searchItem", async (req, res) => {
+  console.log(req.query);
+  
+  let listings = await ItemListing.findAll({
+    where: {
+        price: db.sequelize.literal('ItemListing.price = (SELECT MIN(price) FROM item_listing AS il WHERE il.itemId = ItemListing.itemId)'),
+    },
+    include: [{
+      model: Catalog,
+      where: {
+          description: {
+              [db.Sequelize.Op.like]: '%' + req.query.description + '%'
+          }
+      }
+    }]
+  });
+
+  res.status(200).json({
+    success: true,
+    body: listings
+  })
+
+});
+
+
 module.exports = router;

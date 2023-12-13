@@ -799,6 +799,7 @@ router.get("/get-purchase-history", async (req, res) => {
 
 
 		res.render("purchase_history", { user: userDetails, order: orderDetails, purchaseMap: purchaseHashMap });
+
 	} else {
 		res.redirect("login");
 	}
