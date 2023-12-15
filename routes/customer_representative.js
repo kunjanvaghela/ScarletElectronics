@@ -376,6 +376,7 @@ const getAllMesseges = async (req, res) => {
         requestId: getMessage.requestId,
         userId: getMessage.userId,
         customerRep: getMessage.customer_rep,
+        customerRepName: username,
         listingId: getMessage.listingId,
         updateDescription: getMessage.update_description,
         createdOn: getMessage.created_on,
