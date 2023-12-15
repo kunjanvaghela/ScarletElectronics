@@ -66,7 +66,7 @@
 	
 				<div class="col-md-7" id="product-div-2">
 					<div class="row mb-3" id="product-div-rating">
-						<div class="star-rating">
+						<div class="star-rating" id="star-rating-id">
 							<span class="star">&#9733;</span>
 							<span class="star">&#9733;</span>
 							<span class="star">&#9733;</span>
@@ -194,6 +194,10 @@
 			</div>
 		</div>
 
+		<br><br>
+
+		<%- include('Common/footer.ejs') %>
+
 		<script>
 			// Function to retrieve URL parameters by name
 			function getParameterByName(name, url) {
@@ -232,6 +236,23 @@
 				});
 			}
 		
+			function generateStars(rating) {
+				let blackStar = "<span class='star'>&#x2605;</span>".repeat(Math.floor(rating));
+				let halfStar = (rating % 1 !== 0) ? "<span class='star'>&#x00bd;</span>" : "";
+				let whiteStar = "<span class='star'>&#x2606;</span>".repeat(5 - Math.ceil(rating));
+
+				return blackStar + halfStar + whiteStar;
+			}
+
+			function createStarRating(rating) {
+				console.log('rating fn : '+rating);
+				const container = document.getElementById("star-rating-id");
+				if (rating === 0) {
+					container.innerHTML = 'Be The First One To Rate This Product';
+				} else {
+					container.innerHTML = generateStars(rating);
+				}
+			}
 
 			// Function to update HTML content with received data
 			function updateProductDetails(product, imageFiles, averageRating) {
@@ -246,10 +267,13 @@
 				// Update other product details
 				var productDiv2 = document.querySelector('#product-div-2');
 				// productDiv2.querySelector('#product-div-rating .star-rating').innerHTML = '&#9733;&#9733;&#9733;&#9733;&#9733;';
-				const productRatingElement = document.querySelector('.star-rating');
-				productRatingElement.dataset.rating = roundToNearestHalf(averageRating);
-				console.log('productRatingElement : '+productRatingElement.dataset.rating);
-				console.log('productRatingElement : '+averageRating);
+				// const productRatingElement = document.querySelector('.star-rating');
+				// productRatingElement.dataset.rating = roundToNearestHalf(averageRating);
+				// console.log('productRatingElement : '+productRatingElement.dataset.rating);
+				// console.log('productRatingElement : '+averageRating);
+				// Example usage
+				const rating = roundToNearestHalf(averageRating);
+				createStarRating(rating);
 
 				productDiv2.querySelector('#product-div-description p').innerHTML = product.description;
 		

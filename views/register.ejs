@@ -12,11 +12,13 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
 
+    <div class="content">
 
     <div align="center">
         <br> <br>
-        <h1 class="text-primary text-center mx-auto">Welcome to the ScarletElectronics</h1>
+        <h1 class="text-center mx-auto">Welcome to the ScarletElectronics</h1>
         <br> <br> <br>
         <h2 class="text-center">User Register Form</h2>
         <form id="reg" name="registration" method="POST" action="/users/registerUser"
@@ -160,6 +162,8 @@
     </div>
     </form>
     </div>
+    </div>
+    <%- include('Common/footer.ejs') %>
 
 
     <!-- <script src="formValidation.js"></script> -->

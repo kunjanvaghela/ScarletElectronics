@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<h1 class="text-primary text-center mx-auto">Order Details</h1>
+<h1 class="text-center mx-auto">Order Details</h1>
 <div>
     <ul class="nav">
         <li class="nav-item">
@@ -61,7 +61,7 @@
             <td class="w-15 text-center"><%= order.total_price %></td>
             <td class="w-15 text-center"><%= order.paymentId %></td>
             <td class="w-15 text-center"><%= order.shipmentId %></td>
-            <td class="w-15 text-center"><a href="<%= order.trackerUrl %>" ><%= order.trackingId %></a></td>
+            <td class="w-15 text-center"><a href="<%= order.trackerUrl %>" >Track Here!</a></td>
             <td class="w-15 text-center"><%= order.quantity %></td>
             <td class="w-15 text-center"><%= order.total_cost_of_item %></td>
             <td class="w-15 text-center"><%= order.order_status %></td>

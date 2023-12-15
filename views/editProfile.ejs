@@ -46,11 +46,12 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
 
 
     <div align="center">
         <br> <br>
-        <h1 class="text-primary text-center mx-auto">Welcome to the ScarletElectronics</h1>
+        <h1 class="text-center mx-auto">Welcome to the ScarletElectronics</h1>
         <br> <br> <br>
         <h2 class="text-center">Edit Profile Form</h2>
         <form id="reg" name="registration" method="POST" action="/users/modify-user" onSubmit="return formValidation();">
@@ -157,6 +158,7 @@
     </form>
     </div>
 
+    <%- include('Common/footer.ejs') %>
 
     <script>
         function phoneNumberCheck()

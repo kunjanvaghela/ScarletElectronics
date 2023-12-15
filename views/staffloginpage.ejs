@@ -18,15 +18,16 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
 
     <!-- NOTE: The server-side conditionals were removed. You might want to include the relevant headers based on which one would typically be displayed. -->
     <!-- Example: Including the header for 'EndUser' -->
     <!-- (You can replace this with other header content as needed) -->
     <!-- Include Content of "Common/header.jsp" here -->
 
-    <div align="center">
+    <div align="center content">
         <br> <br>
-        <h1 class="text-center mx-auto " style="color: red;">Customer Representative Login Page</h1>
+        <h1 class="text-center mx-auto">Customer Representative Login Page</h1>
         <br> <br><br>
         <% if (locals.message) { %>
             <h2 style="font-size: larger; color: red;" class="error">
@@ -87,6 +88,7 @@
     </div>
 
     <!-- Include Content of "Common/footer.jsp" here -->
+    <%- include('Common/footer.ejs') %>
 
     <!-- <script src="loginFormValidation.js"></script> -->
     <script>
