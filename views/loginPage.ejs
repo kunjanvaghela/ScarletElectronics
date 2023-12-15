@@ -9,6 +9,7 @@
 
 <head>
     <meta charset="ISO-8859-1">
+    <link rel="icon" type="image/png" sizes="32x32" href="../public/landing_page/images/favicon-32x32.png">
     <title>ScarletElectronics Sign Up</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
@@ -18,15 +19,16 @@
 </head>
 
 <body>
+    <%- include('Common/header2.ejs') %>
 
     <!-- NOTE: The server-side conditionals were removed. You might want to include the relevant headers based on which one would typically be displayed. -->
     <!-- Example: Including the header for 'EndUser' -->
     <!-- (You can replace this with other header content as needed) -->
     <!-- Include Content of "Common/header.jsp" here -->
 
-    <div align="center">
+    <div align="center" class="content">
         <br> <br>
-        <h1 class="text-primary text-center mx-auto">Welcome to ScarletElectronics</h1>
+        <h1 class="text-center mx-auto">Welcome to ScarletElectronics</h1>
         <br> <br><br>
         <% if (locals.message) { %>
             <h2 style="font-size: larger; color: red;" class="error">
@@ -131,8 +133,8 @@
                     return response.json().then(data => {
                         if (response.ok) {
                             // If the response is successful, alert the message and then redirect
-                            alert(data.message);
-                            window.location.href = data.redirectUrl || '/item-listing';
+                            //alert(data.message);
+                            window.location.href = data.redirectUrl || '/item-listing/listings';
                         } else {
                             // If the response is not successful, throw an error with the message from the server
                             throw new Error(data.message);
@@ -211,6 +213,8 @@
 
 
     </script>
+
+<%- include('Common/footer.ejs') %>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     const EndUser = sequelize.define('EndUsers', {
         userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         },
         address_line1: DataTypes.STRING(50),
@@ -29,8 +29,11 @@ module.exports = (sequelize, DataTypes) => {
         EndUser.belongsTo(models.User, {
             foreignKey: 'userId'
         });
-        
-    };
+        EndUser.hasMany(models.EndUserRequest, {
+            foreignKey: 'userId'
+        });
+        
+    };
 
     return EndUser;
 }
