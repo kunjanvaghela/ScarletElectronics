@@ -43,42 +43,140 @@ Scarlet Electronics provides a comprehensive solution for online electronics tra
    - Secure payment processing through Stripe.
    - Billing includes taxes and applied discounts.
 
+## Tech Stack
+
+The Scarlet Electronics E-commerce platform is built on a robust tech stack that combines various technologies for seamless functionality. Here are the key technologies and libraries used in the project:
+
+- **Node.js (Express):** Utilized as the server-side runtime environment, Express provided a minimal and flexible framework for building web applications.
+
+- **MySQL:** Leveraged for database management, MySQL ensured efficient storage and retrieval of data, maintaining the integrity of the platform's information.
+
+- **Sequelize:** Used as an ORM (Object-Relational Mapping) for Node.js, Sequelize facilitated interaction with the MySQL database, simplifying data manipulation and storage.
+
+- **EJS (Embedded JavaScript):** Employed as the templating engine, EJS allowed for dynamic content generation on the server side, enhancing the user interface.
+
+- **JWT (JSON Web Tokens):** Implemented for secure transmission of user credentials and streamlined authentication across the entire platform.
+
+- **Axios:** Used for making HTTP requests, Axios facilitated communication with external APIs and services, enhancing functionality such as Google reCaptcha and Easypost integration.
+
+- **Dotenv:** Employed for managing environment variables, Dotenv ensured a secure and configurable setup for the application.
+
+- **Nodemon:** Used in development for automatic server restarts upon file changes, enhancing the development workflow.
+
+- **Stripe:** Integrated for secure payment processing, Stripe ensured a reliable and smooth transaction experience for users.
+
+- **Easypost API:** Utilized for easy integration with a third-party courier service, providing users with accurate delivery tracking links.
+
+- **Nodemailer:** Implemented for sending transactional emails, Nodemailer facilitated communication with users, including password reset OTPs and notifications.
+
+- **@google-cloud/recaptcha-enterprise:** Integrated for Google reCaptcha v2 to enhance security and protect against various attacks.
+
+- **GoogleApis:** Utilized for Google Drive integration, allowing the platform to store and access images seamlessly.
+
+- **Multer:** Implemented for accepting multiple images, enhancing the platform's capabilities for product listings and catalog management.
+
+- **CleverCloud:** Utilized for maintaining a single database hosted on the internet among multiple contributors, ensuring a centralized and collaborative database management approach.
+
+
+
+
 ## Getting Started
 
 Follow these steps to set up and run Scarlet Electronics:
 
 1. **Clone Repository:**
-   git clone https://github.com/MITUL-SHAH/ECommerce.git
+
+   ```git clone https://github.com/kunjanvaghela/ScarletElectronics```
+
 2. **Checkout Main Branch:**
-```bash
-git checkout main 
-```
+
+    ```git checkout main ```
+
 3. **Configure Database:**
-Edit config/config.json with the provided development parameters.
+
+    Create database from the schema present in resources/databasedump.sql file. Edit the 'development' confguration to your database's hosting in config/config.json file.
+
 4. **Install Dependencies:**
-```npm install```
+
+    ```npm install```
+
 5. **GoogleAPI Setup:**
-Place the service account key file ('scarletelectronics-key.json') in the 'util' folder.
-6. **Access Platform:**
 
-Navigate to [http://localhost:3000/users/home](http://localhost:3000/users/home) to get started.
+    Place the service account key file ('scarletelectronics-key.json') in the 'util' folder. Create your own access using 'Authentication Method = Service account' as provided in Google Developers documentation (Refer: https://developers.google.com/workspace/guides/create-credentials#service-account).
 
-**7. Demo Credentials:**
+6. **Run Server:**
 
-- **Username:** kunjan.vaghela@rutgers.edu
-- **Password:** Kunj123!
-or,
-- **Username:** jimrichards1920@gmail.com
-- **Password:** TEST@1234
+    Use one of the following commands to start the server from project's main directory:
 
-For any issues connecting to GoogleAPI, contact kunjan.vaghela@rutgers.edu.
+    ```npm start```
 
-We hope you enjoy the Scarlet Electronics E-commerce experience! Happy buying and selling!
+    or,
 
-Demo Credentials:
+    ```npm run devStart```
 
-Username: jimrichards1920@gmail.com
-Password: TEST@1234
-For any issues connecting to GoogleAPI, contact kunjan.vaghela@rutgers.edu.
+7. **Access Platform:**
+
+    Navigate to [http://localhost:3000/users/home](http://localhost:3000/users/home) to get started.
+
+    - **Username:** kunjan.vaghela@rutgers.edu
+    - **Password:** Kunj123!
+
+    or,
+
+    - **Username:** jimrichards1920@gmail.com
+    - **Password:** TEST@1234
+
+
+## Contribution
+
+This project was a collaborative effort, and the following outlines my (Kunjan) specific contributions:
+
+### Developer Contributions:
+
+1. **Create Listing Page:**
+   - Implemented the feature allowing sellers to create listings only for items present in Scarlet Electronic's product catalog.
+   - Developed the GUI for creating listings and fetching available products from the Product Catalog.
+
+2. **Listings Page:**
+   - Implemented the feature to fetch all available listings in Scarlet Electronics, enhancing the user browsing experience.
+   - Developed a user-friendly interface for end-users and visitors to view an overview of available listings, along with database fetch operations.
+
+3. **Product Page:**
+   - Created functionality to retrieve detailed information about a specific product, enhancing the overall user experience.
+   - Implemented features for ratings while collaborating with other contributors for the review functionality.
+
+4. **GoogleDrive API Integration:**
+   - Integrated operations to add product images to Google Drive, storing only the product's folder ID in the ScarletElectronic's database.
+
+5. **Visitor and End User Headers:**
+   - Enhanced the design and functionality of headers for both visitors and end-users.
+
+6. **Log Out Functionality:**
+   - Created the initial version of the Log Out functionality, involving cookie deletion for improved security.
+
+### Major Bug Fixes:
+
+1. **Add Product in Product Catalog:**
+   - Utilized the Multer library to accept and store images from the frontend to the backend.
+
+2. **User Registration Bug Fix:**
+   - Implemented IsA relationship to include details in the 'users' parent table and the 'end_user' child table during end user registration.
+
+### Major Design Contributions (Apart from Features Developed Individually):
+
+1. **Database Tables Designing and Hosting:**
+   - Contributed to the design of database structure and hosting of the database on cloud platform for efficient data management across all contributors.
+
+2. **Image Storage and Retrieval Structure:**
+   - Designed the structure for storing and retrieving product images.
+
+3. **Designing Structure for Customer Support Representative:**
+   - Contributed to the design of the structure for Customer Support Representative functionalities.
+
+4. **Structure of Use of StripeAPI and EasyPostAPI:**
+   - Contributed to the design structure for integrating StripeAPI and EasyPostAPI for payment processing and delivery tracking.
+
+
+For any inquiries regarding the project, feel free to contact me at [kunjanvaghela@gmail.com](mailto:kunjanvaghela@gmail.com).
 
 We hope you enjoy the Scarlet Electronics E-commerce experience! Happy buying and selling!
