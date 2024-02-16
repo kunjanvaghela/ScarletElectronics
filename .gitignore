@@ -13,3 +13,4 @@ views/tryy.ejs
 node_modules/googleapis-common/node_modules/.bin/uuid
 views/Common/mainheader.ejs
 views/Common/common_header.ejs
+views/.DS_Store
