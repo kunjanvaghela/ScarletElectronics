@@ -47,36 +47,39 @@ Scarlet Electronics provides a comprehensive solution for online electronics tra
 
 The Scarlet Electronics E-commerce platform is built on a robust tech stack that combines various technologies for seamless functionality. Here are the key technologies and libraries used in the project:
 
+### Backend
+
 - **Node.js (Express):** Utilized as the server-side runtime environment, Express provided a minimal and flexible framework for building web applications.
 
 - **MySQL:** Leveraged for database management, MySQL ensured efficient storage and retrieval of data, maintaining the integrity of the platform's information.
 
 - **Sequelize:** Used as an ORM (Object-Relational Mapping) for Node.js, Sequelize facilitated interaction with the MySQL database, simplifying data manipulation and storage.
 
+### Frontend
+
 - **EJS (Embedded JavaScript):** Employed as the templating engine, EJS allowed for dynamic content generation on the server side, enhancing the user interface.
+
+- **HTML/CSS/SCSS/Bootstrap**
+
+- **AJAX**
+
+### Libraries used:
 
 - **JWT (JSON Web Tokens):** Implemented for secure transmission of user credentials and streamlined authentication across the entire platform.
 
-- **Axios:** Used for making HTTP requests, Axios facilitated communication with external APIs and services, enhancing functionality such as Google reCaptcha and Easypost integration.
+- **Nodemailer:** Implemented for sending transactional emails, Nodemailer facilitated communication with users, including password reset OTPs and notifications.
 
-- **Dotenv:** Employed for managing environment variables, Dotenv ensured a secure and configurable setup for the application.
+- **Multer:** Implemented for accepting multiple images, enhancing the platform's capabilities for product listings and catalog management.
 
-- **Nodemon:** Used in development for automatic server restarts upon file changes, enhancing the development workflow.
+## Third Party APIs used:
 
 - **Stripe:** Integrated for secure payment processing, Stripe ensured a reliable and smooth transaction experience for users.
 
 - **Easypost API:** Utilized for easy integration with a third-party courier service, providing users with accurate delivery tracking links.
 
-- **Nodemailer:** Implemented for sending transactional emails, Nodemailer facilitated communication with users, including password reset OTPs and notifications.
-
 - **@google-cloud/recaptcha-enterprise:** Integrated for Google reCaptcha v2 to enhance security and protect against various attacks.
 
 - **GoogleApis:** Utilized for Google Drive integration, allowing the platform to store and access images seamlessly.
-
-- **Multer:** Implemented for accepting multiple images, enhancing the platform's capabilities for product listings and catalog management.
-
-- **CleverCloud:** Utilized for maintaining a single database hosted on the internet among multiple contributors, ensuring a centralized and collaborative database management approach.
-
 
 
 
