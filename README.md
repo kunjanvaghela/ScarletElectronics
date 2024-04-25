@@ -71,7 +71,7 @@ The Scarlet Electronics E-commerce platform is built on a robust tech stack that
 
 - **Multer:** Implemented for accepting multiple images, enhancing the platform's capabilities for product listings and catalog management.
 
-## Third Party APIs used:
+### Third Party APIs used:
 
 - **Stripe:** Integrated for secure payment processing, Stripe ensured a reliable and smooth transaction experience for users.
 
